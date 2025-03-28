@@ -30,6 +30,7 @@
             --lesson-perfect-bg: #e0fadf;  --lesson-perfect-border: #54c780;
             --lesson-perfect-text: #065f46;--lesson-imperfect-bg: #ffe9e9;
             --lesson-imperfect-border: #f79494; --lesson-imperfect-text: #b91c1c;
+            --table-border: #e2e8f0;       --table-header-bg: #f1f5f9;
         }
 
         body.dark-theme {
@@ -56,6 +57,7 @@
             --lesson-perfect-bg: #064e3b; --lesson-perfect-border: #10b981;
             --lesson-perfect-text: #a7f3d0;--lesson-imperfect-bg: #7f1d1d;
             --lesson-imperfect-border: #f87171; --lesson-imperfect-text: #fecaca;
+            --table-border: #334155;       --table-header-bg: #0f172a;
         }
 
 
@@ -71,6 +73,8 @@
         .rtl-layout [dir="ltr"] * { direction: ltr; } /* Allow overriding for specific LTR content */
 
         .rtl-layout .header { text-align: right; }
+        /* Added rule for header buttons */
+        .rtl-layout .header .header-buttons { flex-direction: row-reverse; }
         .rtl-layout .nav-btn { flex-direction: row-reverse; }
         .rtl-layout .nav-btn span:first-child { margin-left: 0; margin-right: 6px; }
         .rtl-layout .section-content {
@@ -113,7 +117,7 @@
         .rtl-layout .review-matching-column div { text-align: right; }
         .rtl-layout .review-ordering-list-item { flex-direction: row-reverse; }
         .rtl-layout .review-order-number { margin-right: 0; margin-left: 8px; }
-        .rtl-layout #settings-modal * { direction: rtl; }
+        .rtl-layout #settings-modal *, .rtl-layout #stats-modal * { direction: rtl; } /* Apply to stats modal too */
         .rtl-layout .modal-header { flex-direction: row-reverse; }
         .rtl-layout .theme-options label { flex-direction: row-reverse; }
         .rtl-layout .theme-options input[type="radio"] { margin-right: 0; margin-left: 10px;}
@@ -124,6 +128,10 @@
         .rtl-layout .question-review.partial { border-right-color: var(--partial-border); }
         /* Ensure icons in buttons display correctly */
         .rtl-layout .btn > span:first-child { margin-left: 0; margin-right: 6px; }
+        /* RTL Table Styles */
+        .rtl-layout #stats-table th, .rtl-layout #stats-table td { text-align: right; }
+        .rtl-layout #stats-table td:first-child, .rtl-layout #stats-table th:first-child { padding-left: 10px; padding-right: 0; }
+
 
         /* Welcome View */
         #welcome-view { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; background-color: var(--body-bg); color: var(--text-color); padding: 40px 20px; }
@@ -138,9 +146,10 @@
         .container.initially-hidden { opacity: 0; pointer-events: none; }
 
         .header { display: flex; justify-content: space-between; align-items: center; text-align: left; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .header h1 { font-size: 24px; margin: 0; color: var(--text-heading); }
-        #settings-btn { background: none; border: 1px solid var(--button-border); color: var(--text-muted); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 20px; line-height: 1; transition: all 0.2s ease; }
-        #settings-btn:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); color: var(--text-color); }
+        .header h1 { font-size: 24px; margin: 0; color: var(--text-heading); flex-grow: 1; } /* Allow title to grow */
+        .header .header-buttons { display: flex; gap: 10px; } /* Container for buttons */
+        #settings-btn, #stats-btn { background: none; border: 1px solid var(--button-border); color: var(--text-muted); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 20px; line-height: 1; transition: all 0.2s ease; }
+        #settings-btn:hover, #stats-btn:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); color: var(--text-color); }
 
         /* Nav Section */
         .nav-section { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; transition: opacity 0.3s ease, max-height 0.3s ease, visibility 0.3s ease, margin 0.3s ease, padding 0.3s ease; overflow: hidden; max-height: 500px; opacity: 1; visibility: visible; }
@@ -213,6 +222,7 @@
         .matching-item:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); }
         .matching-item.selected { background-color: var(--accent-color-light); border-color: var(--accent-color); font-weight: 500; }
         .matching-item.matched { background-color: var(--matched-item-bg); border-color: var(--matched-item-border); cursor: pointer; opacity: 1.0; }
+        .matching-item:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; } /* Basic focus style if needed */
         #matching-arrow-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
         #matching-arrow-svg line { stroke: var(--accent-color); stroke-width: 2; transition: stroke 0.3s ease, opacity 0.3s ease; marker-end: url(#arrowhead); } /* Added stroke transition */
         #matching-arrow-svg #arrowhead polygon { fill: var(--accent-color); transition: fill 0.3s ease; }
@@ -310,19 +320,33 @@
         .review-order-correct { color: var(--correct-text); }
         .review-order-incorrect { color: var(--incorrect-text); text-decoration: line-through; opacity: 0.8; }
 
-        /* Settings Modal */
-        #settings-modal { position: fixed; inset: 0; background-color: var(--modal-overlay-bg); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        #settings-modal.visible { opacity: 1; pointer-events: auto; }
-        .modal-content { background-color: var(--modal-bg); padding: 25px 30px; border-radius: 12px; box-shadow: 0 5px 20px var(--shadow-color); width: 90%; max-width: 400px; border: 1px solid var(--border-color); position: relative; transform: scale(0.95); transition: transform 0.3s ease; }
-        #settings-modal.visible .modal-content { transform: scale(1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        /* --- Modal Base Styles (Shared by Settings and Stats) --- */
+        #settings-modal, #stats-modal { position: fixed; inset: 0; background-color: var(--modal-overlay-bg); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        #settings-modal.visible, #stats-modal.visible { opacity: 1; pointer-events: auto; }
+        .modal-content { background-color: var(--modal-bg); padding: 25px 30px; border-radius: 12px; box-shadow: 0 5px 20px var(--shadow-color); width: 90%; max-width: 450px; border: 1px solid var(--border-color); position: relative; transform: scale(0.95); transition: transform 0.3s ease; max-height: 90vh; display: flex; flex-direction: column; }
+        #stats-modal .modal-content { max-width: 700px; } /* Wider modal for stats table */
+        #settings-modal.visible .modal-content, #stats-modal.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .modal-title { font-size: 20px; font-weight: 600; color: var(--text-heading); }
         .modal-close-btn { font-size: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; line-height: 1; padding: 0 5px; }
+        .modal-body { margin-bottom: 20px; overflow-y: auto; flex-grow: 1;} /* Allow body to scroll */
         .modal-section { margin-bottom: 20px; }
         .modal-section h4 { font-size: 16px; font-weight: 500; color: var(--text-heading); margin: 0 0 12px 0; }
+        .modal-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); text-align: right; flex-shrink: 0; }
+
+        /* Settings Modal Specific */
         .theme-options label { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; font-size: 15px; color: var(--text-color); }
         .theme-options input[type="radio"] { accent-color: var(--accent-color); }
-        .modal-footer { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); text-align: right; }
+
+        /* Stats Modal Table */
+        #stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: fixed; }
+        #stats-table th, #stats-table td { border: 1px solid var(--table-border); padding: 8px 10px; text-align: center; font-size: 14px; white-space: nowrap; }
+        #stats-table th { background-color: var(--table-header-bg); font-weight: 600; color: var(--text-heading); }
+        #stats-table td:first-child, #stats-table th:first-child { text-align: left; font-weight: 500; padding-right: 10px; } /* Align first column text */
+        #stats-table td { color: var(--text-muted); }
+        #stats-table tr:last-child td { border-bottom: none; }
+        #stats-table th:last-child, #stats-table td:last-child { font-weight: bold; color: var(--text-color); } /* Highlight Total column */
+
 
         /* --- END OF styles.css --- */
     </style>
@@ -342,7 +366,11 @@
     <!-- Main Container -->
     <div class="container initially-hidden">
         <div class="header">
-            <h1>Question Bank</h1> <button id="settings-btn" title="Settings">⚙️</button>
+            <h1>Question Bank</h1>
+            <div class="header-buttons"> <!-- Added wrapper for buttons -->
+                <button id="stats-btn" title="View Statistics">📊</button> <!-- Changed icon -->
+                <button id="settings-btn" title="Settings">⚙️</button>
+            </div>
         </div>
         <div class="nav-section">
              <div class="subjects">
@@ -373,14 +401,46 @@
     <!-- Settings Modal -->
     <div id="settings-modal" class="hidden">
         <div class="modal-content">
-            <div class="modal-header"> <h3 class="modal-title">Settings</h3> <button class="modal-close-btn" onclick="toggleSettingsModal(false)">×</button> </div>
+            <div class="modal-header"> <h3 class="modal-title">Settings</h3> <button class="modal-close-btn" id="settings-modal-close-header" onclick="toggleSettingsModal(false)">×</button> </div>
             <div class="modal-body">
                 <div class="modal-section"> <h4>Theme</h4> <div class="theme-options"> <label><input type="radio" name="theme" value="light"> Light ☀️</label> <label><input type="radio" name="theme" value="dark"> Dark 🌙</label> </div> </div>
                 <div class="modal-section"> <h4>Data</h4> <button class="btn reset-data-btn" id="reset-data-button">Reset Data</button> <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Clears theme, welcome status, and stats.</p> </div>
             </div>
-            <div class="modal-footer"> <button class="btn close-btn" id="settings-close-btn" onclick="toggleSettingsModal(false)">Close</button> </div>
+            <div class="modal-footer"> <button class="btn close-btn" id="settings-modal-close-footer" onclick="toggleSettingsModal(false)">Close</button> </div>
         </div>
     </div>
+
+    <!-- Statistics Modal -->
+    <div id="stats-modal" class="hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="stats-modal-title">Overall Statistics</h3>
+                <button class="modal-close-btn" id="stats-modal-close-header" onclick="toggleStatsModal(false)">×</button>
+            </div>
+            <div class="modal-body">
+                <table id="stats-table">
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>التاريخ</th>
+                            <th>دين</th>
+                            <th>اللغة العربية</th>
+                            <th>English</th>
+                            <th>المجموع</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-table-body">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+                 <p style="font-size:12px;color:var(--text-muted);margin-top:15px;">Stats based on best performance per lesson.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-btn" id="stats-modal-close-footer" onclick="toggleStatsModal(false)">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- START OF topics.js ---
@@ -407,11 +467,13 @@
 
     <script>
         // --- START OF questions.js ---
-        let quizState = { currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: 0, startTime: null, endTime: null, selectedAnswers: [], questions: [], originalQuestions: [], subject: '', unit: '', lesson: '', semester: '', matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {} } }; // Added selectedMatchElement for RTL clarity
+        let quizState = { currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: 0, startTime: null, endTime: null, selectedAnswers: [], questions: [], originalQuestions: [], subject: '', unit: '', lesson: '', semester: '', matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {} } };
         let allLessonStats = {};
 
         const LS_THEME_KEY = 'quizAppTheme'; const LS_VISITED_KEY = 'quizAppVisited'; const LS_STATS_KEY = 'quizAppLessonStats';
         const RTL_SUBJECTS = ["اللغة العربية", "دين", "التاريخ"]; // <-- Define RTL subjects
+        // Define the exact order of subjects for the stats table
+        const STATS_SUBJECT_ORDER = ["التاريخ", "دين", "اللغة العربية", "english"];
 
         // --- UI String Translations (Expanded) ---
         const uiStrings = {
@@ -421,15 +483,16 @@
                 viewResults: "View Results",
                 resultsSubjectLabel: "Subject:", resultsSemesterLabel: "Semester:",
                 resultsUnitLabel: "Unit:", resultsLessonLabel: "Lesson:", resultsCorrectLabel: "Correct:",
-                resultsTimeLabel: "Time:",
+                resultsTimeLabel: "Time:", resultsYourAnswerLabel: "Your Answer:", resultsCorrectAnswerLabel: "Correct Answer:",
                 redoQuiz: "Redo Quiz", reviewAnswers: "Review Answers",
                 backToResults: "Back to Results",
                 settingsTitle: "Settings", settingsThemeHeading: "Theme",
                 settingsLightMode: "Light Mode", settingsDarkMode: "Dark Mode", settingsDataHeading: "Data Management",
                 settingsResetBtn: "Reset Saved Data", settingsResetInfo: "Clears theme, welcome status, and all saved lesson statistics.",
                 settingsCloseBtn: "Close",
+                statsTitle: "Overall Statistics", statsAnswersLabel: "Answers", statsTimeLabel: "Time", statsTotalLabel: "Total",
                 matchingInstruction: "Click an item on the left, then its corresponding item on the right. Click a matched item again to deselect the pair.",
-                orderingInstruction: "Select the correct order number ({num}) for each item.", // {num} will be replaced
+                orderingInstruction: "Select the correct order number ({num}) for each item.",
                 matchingItemsHeader: "Items", matchingMatchesHeader: "Matches",
                 defaultErrorMessage: "Could not load questions for this lesson.",
                 leaveQuizConfirm: "Leave the current quiz? Progress will be lost.",
@@ -448,13 +511,14 @@
                  viewResults: "عرض النتائج",
                  resultsSubjectLabel: "المادة:", resultsSemesterLabel: "الفصل:",
                  resultsUnitLabel: "الوحدة:", resultsLessonLabel: "الدرس:", resultsCorrectLabel: "الصحيحة:",
-                 resultsTimeLabel: "الوقت:",
+                 resultsTimeLabel: "الوقت:", resultsYourAnswerLabel: "إجابتك:", resultsCorrectAnswerLabel: "الإجابة الصحيحة:",
                  redoQuiz: "إعادة الاختبار", reviewAnswers: "مراجعة الإجابات",
                  backToResults: "العودة للنتائج",
                  settingsTitle: "الإعدادات", settingsThemeHeading: "السمة",
                  settingsLightMode: "وضع فاتح", settingsDarkMode: "وضع داكن", settingsDataHeading: "إدارة البيانات",
                  settingsResetBtn: "إعادة تعيين البيانات", settingsResetInfo: "يمسح تفضيلات السمة وحالة شاشة الترحيب وجميع إحصائيات الدروس المحفوظة.",
                  settingsCloseBtn: "إغلاق",
+                 statsTitle: "الإحصائيات العامة", statsAnswersLabel: "الاجابات", statsTimeLabel: "الوقت", statsTotalLabel: "المجموع",
                  matchingInstruction: "انقر على عنصر في القائمة الأولى، ثم على العنصر المقابل له في القائمة الثانية. انقر على زوج متطابق مرة أخرى لإلغاء التحديد.",
                  orderingInstruction: "حدد رقم الترتيب الصحيح ({num}) لكل عنصر.",
                  matchingItemsHeader: "العناصر", matchingMatchesHeader: "المطابقات",
@@ -471,21 +535,22 @@
             }
         };
 
-        let contentElement, quizViewElement, quizTitleElement, quizContainerElement, feedbackContainerElement, quizButtonsContainerElement, matchingSvgElement, navSectionElement, welcomeViewElement, mainContainerElement, settingsModalElement, settingsButtonElement;
+        let contentElement, quizViewElement, quizTitleElement, quizContainerElement, feedbackContainerElement, quizButtonsContainerElement, matchingSvgElement, navSectionElement, welcomeViewElement, mainContainerElement;
+        let settingsModalElement, settingsButtonElement, statsModalElement, statsButtonElement; // Added Stats elements
         let matchingArrowObserver = null; let resizeTimeout = null;
 
         // --- Utility Functions ---
         function shuffleArray(array) { const newArray=[...array]; for(let i=newArray.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[newArray[i],newArray[j]]=[newArray[j],newArray[i]];} return newArray; }
         function debounce(func,wait){ let timeout; return function(...args){const later=()=>{clearTimeout(timeout);func(...args);};clearTimeout(timeout);timeout=setTimeout(later,wait);}; }
-        function formatTime(s){if(s===null||s<0)return'N/A';const m=Math.floor(s/60),c=Math.floor(s%60);return m>0?`${m}m ${c}s`:`${c}s`;}
-        function getLessonStorageKey(s,sem,u,l){const c=str=>str.replace(/\s+/g,'_').replace(/-/g,'__');return`${c(s)}-${c(sem)}-${c(u)}-${c(l)}`;}
+        function formatTime(s){if(s===null||s<=0||isNaN(s))return'0s';const m=Math.floor(s/60),c=Math.floor(s%60);return m>0?`${m}m ${c}s`:`${c}s`;} // Ensure NaN/0 returns 0s
+        function getLessonStorageKey(s,sem,u,l){const c=str=>(str || '').replace(/\s+/g,'_').replace(/-/g,'__');return`${c(s)}-${c(sem)}-${c(u)}-${c(l)}`;} // Add safety for undefined strings
         function getCurrentLang() { return document.documentElement.lang || 'en'; }
         function getStrings() { return uiStrings[getCurrentLang()] || uiStrings.en; }
 
         // --- Lesson Stats Management ---
-        function loadLessonStats(){try{const s=localStorage.getItem(LS_STATS_KEY);allLessonStats=s?JSON.parse(s):{};}catch(e){console.error("Fail stats load:",e);allLessonStats={};}}
-        function saveLessonStats(subj,sem,unit,lesson,score,total,time){const k=getLessonStorageKey(subj,sem,unit,lesson);const e=allLessonStats[k];let u=!1;if(!e){allLessonStats[k]={bestScore:score,totalQuestions:total,bestTime:time};u=!0;}else{if(score>e.bestScore){e.bestScore=score;e.bestTime=time;e.totalQuestions=total;u=!0;}else if(score===e.bestScore&&time<e.bestTime){e.bestTime=time;u=!0;}if(total!==e.totalQuestions){e.totalQuestions=total;u=!0;}}if(u)try{localStorage.setItem(LS_STATS_KEY,JSON.stringify(allLessonStats));}catch(e){console.error("Fail stats save:",e);}}
-        function updateLessonBoxDisplays(){const a=document.querySelector('.semester-content.active');if(!a)return;const l=a.querySelectorAll('.section-content');l.forEach(b=>{const s=b.dataset.subject,sem=b.dataset.semester,u=b.dataset.unit,les=b.dataset.lesson,dS=b.querySelector('.lesson-stats-display'),qC=b.querySelector('.lesson-q-count');if(!s||!sem||!u||!les||!dS)return;const k=getLessonStorageKey(s,sem,u,les),st=allLessonStats[k];b.classList.remove('lesson-complete-perfect','lesson-complete-imperfect');dS.textContent='';if(qC)qC.style.display='';if(st){const sT=`🏆 ${st.bestScore}/${st.totalQuestions}`,tT=`⏱️ ${formatTime(st.bestTime)}`;dS.textContent=`${sT} | ${tT}`;if(st.bestScore===st.totalQuestions&&st.totalQuestions>0)b.classList.add('lesson-complete-perfect');else b.classList.add('lesson-complete-imperfect');}else{if(qC)qC.style.display='';}});}
+        function loadLessonStats(){try{const s=localStorage.getItem(LS_STATS_KEY);allLessonStats=s?JSON.parse(s):{};}catch(e){console.error("Failed to load lesson stats:",e);allLessonStats={};}}
+        function saveLessonStats(subj,sem,unit,lesson,score,total,time){const k=getLessonStorageKey(subj,sem,unit,lesson);const e=allLessonStats[k];let u=!1;if(!e||!e.totalQuestions){allLessonStats[k]={bestScore:score,totalQuestions:total,bestTime:time};u=!0;}else{if(score>e.bestScore){e.bestScore=score;e.bestTime=time;e.totalQuestions=total;u=!0;}else if(score===e.bestScore&&time<e.bestTime){e.bestTime=time;u=!0;}if(total!==e.totalQuestions){e.totalQuestions=total;u=!0;}}if(u)try{localStorage.setItem(LS_STATS_KEY,JSON.stringify(allLessonStats));}catch(e){console.error("Failed to save lesson stats:",e);}}
+        function updateLessonBoxDisplays(){const a=document.querySelector('.semester-content.active');if(!a)return;const l=a.querySelectorAll('.section-content');l.forEach(b=>{const s=b.dataset.subject,sem=b.dataset.semester,u=b.dataset.unit,les=b.dataset.lesson,dS=b.querySelector('.lesson-stats-display'),qC=b.querySelector('.lesson-q-count');if(!s||!sem||!u||!les||!dS)return;const k=getLessonStorageKey(s,sem,u,les),st=allLessonStats[k];b.classList.remove('lesson-complete-perfect','lesson-complete-imperfect');dS.textContent='';if(qC)qC.style.display='';if(st&&st.totalQuestions>0){const sT=`🏆 ${st.bestScore}/${st.totalQuestions}`,tT=`⏱️ ${formatTime(st.bestTime)}`;dS.textContent=`${sT} | ${tT}`;if(st.bestScore===st.totalQuestions)b.classList.add('lesson-complete-perfect');else b.classList.add('lesson-complete-imperfect');}else{if(qC)qC.style.display='';}});}
 
         // --- UI Language Update ---
         function updateUiLanguage(lang = 'en') {
@@ -503,7 +568,6 @@
                     const textSpan = element.querySelector('.btn-text');
                     if (textSpan) {
                         textSpan.textContent = text;
-                        // Icon direction handled by CSS flex-direction generally
                     } else {
                         element.textContent = text; // Set text directly if no span
                     }
@@ -522,8 +586,12 @@
             // --- Update Static & Dynamic Elements ---
             setText('semester-btn-first', 'firstSemester');
             setText('semester-btn-second', 'secondSemester');
-            setText('settings-close-btn', 'settingsCloseBtn');
+            setText('settings-close-btn', 'settingsCloseBtn'); // Use ID if unique
+            setText('settings-modal-close-footer', 'settingsCloseBtn'); // Assuming footer button also means close
             setText('reset-data-button', 'settingsResetBtn');
+            setText('stats-modal-close-footer', 'settingsCloseBtn'); // Use ID for stats modal close
+             setText('stats-modal-title', 'statsTitle'); // Update Stats Modal Title
+
 
             // Buttons that might exist depending on view
             setText('back-to-topics-btn', 'backToTopics');
@@ -547,23 +615,27 @@
                 } else if (quizContainerElement && quizContainerElement.querySelector('.review-container')) {
                     quizTitleElement.textContent = `${strings.reviewTitlePrefix || 'Review'}: ${quizState.lesson || ''}`;
                 } else if (quizContainerElement && quizContainerElement.querySelector('.error-display')) {
-                     quizTitleElement.textContent = strings.defaultErrorMessage || 'Error'; // Or a specific error title key
+                     quizTitleElement.textContent = strings.defaultErrorMessage.includes('load') ? strings.defaultErrorMessage : 'Error';
                 } else if (quizState.lesson) {
                     quizTitleElement.textContent = `${strings.quizTitlePrefix || 'Quiz'}: ${quizState.lesson}`;
+                } else {
+                    // Default or placeholder if no state matches
+                     quizTitleElement.textContent = strings.quizTitlePrefix || 'Quiz';
                 }
             }
 
 
             // Modal text
-            const modal = document.getElementById('settings-modal');
-            if(modal) {
+            const settingsM = document.getElementById('settings-modal');
+            if(settingsM) {
                 setText('settings-modal .modal-title', 'settingsTitle', { selector: '#settings-modal .modal-title' });
                 setText('settings-modal .modal-section:nth-of-type(1) h4', 'settingsThemeHeading', { selector: '#settings-modal .modal-section:nth-of-type(1) h4' });
-                const lightLabel = modal.querySelector('input[value="light"]')?.parentElement; if(lightLabel) lightLabel.childNodes[lightLabel.childNodes.length-1].nodeValue = ` ${strings.settingsLightMode || 'Light Mode'} ☀️`;
-                const darkLabel = modal.querySelector('input[value="dark"]')?.parentElement; if(darkLabel) darkLabel.childNodes[darkLabel.childNodes.length-1].nodeValue = ` ${strings.settingsDarkMode || 'Dark Mode'} 🌙`;
+                const lightLabel = settingsM.querySelector('input[value="light"]')?.parentElement; if(lightLabel) lightLabel.childNodes[lightLabel.childNodes.length-1].nodeValue = ` ${strings.settingsLightMode || 'Light Mode'} ☀️`;
+                const darkLabel = settingsM.querySelector('input[value="dark"]')?.parentElement; if(darkLabel) darkLabel.childNodes[darkLabel.childNodes.length-1].nodeValue = ` ${strings.settingsDarkMode || 'Dark Mode'} 🌙`;
                 setText('settings-modal .modal-section:nth-of-type(2) h4', 'settingsDataHeading', { selector: '#settings-modal .modal-section:nth-of-type(2) h4' });
                 setText('settings-modal .modal-section:nth-of-type(2) p', 'settingsResetInfo', { selector: '#settings-modal .modal-section:nth-of-type(2) p' });
             }
+            // Stats modal title already updated above
 
              // Results Details Labels
              setDetailLabel('subject', 'resultsSubjectLabel');
@@ -592,15 +664,18 @@
 
              // Result Header Message
              const resultHeader = document.querySelector('.results-header');
-             if (resultHeader) { // Only update if the results view is actually displayed
+             if (resultHeader) {
                  const score = quizState.totalQuestions > 0 ? (quizState.correctAnswers / quizState.totalQuestions) * 100 : 0;
-                 let msgKey = 'quizResultPractice'; // Default
+                 let msgKey = 'quizResultPractice';
                  if (quizState.totalQuestions === 0) msgKey = 'quizResultNoQuestions';
                  else if (score >= 90) msgKey = 'quizResultExcellent';
                  else if (score >= 70) msgKey = 'quizResultGreat';
                  else if (score >= 50) msgKey = 'quizResultGood';
                  resultHeader.textContent = strings[msgKey] || '';
              }
+
+             // Update Stats Table Header if needed (though it's hardcoded Arabic)
+             // Consider making table headers dynamic if full translation is required
         }
 
 
@@ -609,7 +684,6 @@
             if (mainContainerElement) {
                 const lang = enable ? 'ar' : 'en';
                 mainContainerElement.classList.toggle('rtl-layout', enable);
-                // Only call updateUiLanguage IF the language actually changed
                 if (document.documentElement.lang !== lang) {
                     updateUiLanguage(lang);
                 }
@@ -619,8 +693,88 @@
         function handleThemeChange(e){const n=e.target.value;applyTheme(n);localStorage.setItem(LS_THEME_KEY,n);}
         function loadAndApplyTheme(){const s=localStorage.getItem(LS_THEME_KEY);const c=s||'dark';applyTheme(c);if(!s)localStorage.setItem(LS_THEME_KEY,'dark');}
         function toggleSettingsModal(s){if(!settingsModalElement)return;if(s){const c=localStorage.getItem(LS_THEME_KEY)||'dark';const r=settingsModalElement.querySelectorAll('input[name="theme"]');r.forEach(rd=>rd.checked=rd.value===c);settingsModalElement.classList.remove('hidden');setTimeout(()=>settingsModalElement.classList.add('visible'),10);}else{settingsModalElement.classList.remove('visible');setTimeout(()=>settingsModalElement.classList.add('hidden'),300);}}
+
+        // --- Stats Modal ---
+        function toggleStatsModal(show) {
+            if (!statsModalElement) return;
+            if (show) {
+                populateStatsModal(); // Calculate and fill data
+                statsModalElement.classList.remove('hidden');
+                setTimeout(() => statsModalElement.classList.add('visible'), 10);
+            } else {
+                statsModalElement.classList.remove('visible');
+                setTimeout(() => statsModalElement.classList.add('hidden'), 300);
+            }
+        }
+
+        function calculateOverallStats() {
+            const subjectStats = {};
+            STATS_SUBJECT_ORDER.forEach(subj => { // Initialize based on defined order
+                 subjectStats[subj] = { answered: 0, total: 0, time: 0 };
+            });
+            let overallAnswered = 0;
+            let overallTotal = 0;
+            let overallTime = 0;
+
+            for (const key in allLessonStats) {
+                if (allLessonStats.hasOwnProperty(key)) {
+                    const parts = key.split('-');
+                    const subject = parts[0].replace(/__/g, '-').replace(/_/g, ' '); // Decode subject name from key
+
+                    const stat = allLessonStats[key];
+
+                    if (subjectStats[subject] && stat.totalQuestions > 0) { // Check if subject is tracked and has questions
+                        subjectStats[subject].answered += stat.bestScore;
+                        subjectStats[subject].total += stat.totalQuestions;
+                        subjectStats[subject].time += stat.bestTime; // Sum best times
+
+                        overallAnswered += stat.bestScore;
+                        overallTotal += stat.totalQuestions;
+                        overallTime += stat.bestTime;
+                    }
+                }
+            }
+            return { subjectStats, overallAnswered, overallTotal, overallTime };
+        }
+
+        function populateStatsModal() {
+            const { subjectStats, overallAnswered, overallTotal, overallTime } = calculateOverallStats();
+            const tbody = document.getElementById('stats-table-body');
+            const strings = getStrings();
+            if (!tbody) return;
+
+            tbody.innerHTML = ''; // Clear previous rows
+
+            // Answers Row
+            const answersRow = tbody.insertRow();
+            const answersLabelCell = answersRow.insertCell();
+            answersLabelCell.textContent = strings.statsAnswersLabel || 'Answers';
+
+            STATS_SUBJECT_ORDER.forEach(subj => {
+                const cell = answersRow.insertCell();
+                const stats = subjectStats[subj];
+                cell.textContent = stats ? `${stats.answered}/${stats.total}` : '0/0';
+            });
+            const totalAnswersCell = answersRow.insertCell();
+            totalAnswersCell.textContent = `${overallAnswered}/${overallTotal}`;
+
+            // Time Row
+            const timeRow = tbody.insertRow();
+            const timeLabelCell = timeRow.insertCell();
+            timeLabelCell.textContent = strings.statsTimeLabel || 'Time';
+
+            STATS_SUBJECT_ORDER.forEach(subj => {
+                const cell = timeRow.insertCell();
+                const stats = subjectStats[subj];
+                cell.textContent = stats ? formatTime(stats.time) : '0s';
+            });
+            const totalTimeCell = timeRow.insertCell();
+            totalTimeCell.textContent = formatTime(overallTime);
+        }
+
+
         function resetSavedData(){
-            const strings = getStrings(); // Get current language strings
+            const strings = getStrings();
             const confirmMsg = strings.resetDataConfirm || 'Confirm Reset?';
             if (confirm(confirmMsg)) {
                 localStorage.removeItem(LS_THEME_KEY);
@@ -638,17 +792,22 @@
         // --- DOM Ready Listener ---
         document.addEventListener('DOMContentLoaded',()=>{
             // Get DOM elements
-            welcomeViewElement=document.getElementById('welcome-view');mainContainerElement=document.querySelector('.container');contentElement=document.getElementById('content');quizViewElement=document.getElementById('quiz-view');quizTitleElement=document.getElementById('quiz-title');quizContainerElement=document.getElementById('quiz-container');feedbackContainerElement=document.getElementById('feedback-container');quizButtonsContainerElement=document.getElementById('quiz-buttons-container');navSectionElement=document.querySelector('.nav-section');settingsButtonElement=document.getElementById('settings-btn');settingsModalElement=document.getElementById('settings-modal');
+            welcomeViewElement=document.getElementById('welcome-view');mainContainerElement=document.querySelector('.container');contentElement=document.getElementById('content');quizViewElement=document.getElementById('quiz-view');quizTitleElement=document.getElementById('quiz-title');quizContainerElement=document.getElementById('quiz-container');feedbackContainerElement=document.getElementById('feedback-container');quizButtonsContainerElement=document.getElementById('quiz-buttons-container');navSectionElement=document.querySelector('.nav-section');
+            settingsButtonElement=document.getElementById('settings-btn');settingsModalElement=document.getElementById('settings-modal');
+            statsButtonElement = document.getElementById('stats-btn'); statsModalElement = document.getElementById('stats-modal'); // Get stats elements
+
             // Initial Setup
             loadAndApplyTheme();loadLessonStats();handleWelcome();
-            // Set initial UI language and RTL based on default subject or saved preference (if any)
              const initialSubjectBtn = document.querySelector('.nav-btn.active');
-             const initialSubject = initialSubjectBtn?.dataset.subject || 'english'; // Default to english if somehow none active
-             setRtlLayout(RTL_SUBJECTS.includes(initialSubject)); // Sets layout AND calls updateUiLanguage
+             const initialSubject = initialSubjectBtn?.dataset.subject || 'english';
+             setRtlLayout(RTL_SUBJECTS.includes(initialSubject));
 
             // Event Listeners
             if(settingsButtonElement)settingsButtonElement.addEventListener('click',()=>toggleSettingsModal(true));
+            if(statsButtonElement) statsButtonElement.addEventListener('click', () => toggleStatsModal(true)); // Listener for stats button
             if(settingsModalElement){const r=settingsModalElement.querySelectorAll('input[name="theme"]');r.forEach(rd=>rd.addEventListener('change',handleThemeChange));const b=document.getElementById('reset-data-button');if(b)b.addEventListener('click',resetSavedData);settingsModalElement.addEventListener('click',(e)=>{if(e.target===settingsModalElement)toggleSettingsModal(false);});}
+            if (statsModalElement) {statsModalElement.addEventListener('click', (e) => { if (e.target === statsModalElement) toggleStatsModal(false); });} // Close stats modal on overlay click
+
 
             // Subject/Semester Buttons
             document.querySelectorAll('.nav-btn[data-subject]').forEach(b=>{b.addEventListener('click',function(){
@@ -658,7 +817,7 @@
                 showTopicList();
                 document.querySelectorAll('.nav-btn[data-subject]').forEach(btn=>btn.classList.remove('active'));
                 this.classList.add('active');
-                updateContent(); // This will handle setRtlLayout and updateUiLanguage
+                updateContent();
             });});
             document.querySelectorAll('.semester-btn').forEach(b=>{b.addEventListener('click',function(){
                 const strings = getStrings();
@@ -675,16 +834,12 @@
                 const strings = getStrings();
                 const confirmMsg = strings.leaveQuizConfirm || "Leave quiz?";
                 if (!quizViewElement.classList.contains('hidden') && !confirm(confirmMsg)) return;
-                // If they confirm or no quiz active, proceed
-                if (!quizViewElement.classList.contains('hidden')) showTopicList(); // Clean up if leaving
+                if (!quizViewElement.classList.contains('hidden')) showTopicList();
                 const s=l.dataset.subject,sem=l.dataset.semester,u=l.dataset.unit,les=l.dataset.lesson;
                 handleSectionClick(s,sem,u,les);
             }});
 
-            // Resize Listener
             window.addEventListener('resize',debounce(updateAllArrowPositions,250));
-
-            // Initial content load if already visited
             if(localStorage.getItem(LS_VISITED_KEY))updateContent();
         });
 
@@ -699,10 +854,9 @@
             quizViewElement.classList.add('hidden');
             navSectionElement.classList.remove('hidden');
 
-            setRtlLayout(isRTL); // Ensure layout is correct for the topics list
-            updateContent(); // Show correct list AND update stats display (calls updateUiLanguage if needed)
+            setRtlLayout(isRTL);
+            updateContent();
 
-            // Clean up quiz-specific things
             if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
             if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
             quizState = {currentQuestionIndex:0,correctAnswers:0,totalQuestions:0,startTime:null,endTime:null,selectedAnswers:[],questions:[],originalQuestions:[],subject:'',unit:'',lesson:'',semester:'',matchingState:{selectedPromptElement:null, selectedMatchElement: null, userPairs:{}}};
@@ -711,30 +865,28 @@
         function showQuizView(){if(mainContainerElement&&contentElement&&quizViewElement&&navSectionElement){mainContainerElement.classList.remove('hidden');contentElement.classList.add('hidden');quizViewElement.classList.remove('hidden');navSectionElement.classList.add('hidden');quizViewElement.scrollIntoView({behavior:'smooth',block:'start'});}}
 
         // --- Core Functions ---
-        function updateContent() { // Updates topic list view AND triggers stat/RTL display update
+        function updateContent() {
             const aSBtn = document.querySelector('.nav-btn[data-subject].active'); const aSemBtn = document.querySelector('.semester-btn.active');
             if (!aSBtn || !aSemBtn || !contentElement) return;
             const actSub = aSBtn.dataset.subject; const actSem = aSemBtn.dataset.semester;
             const sanSub = actSub.replace(/\s+/g, '-');
             const isRTL = RTL_SUBJECTS.includes(actSub);
 
-            setRtlLayout(isRTL); // Set RTL based on ACTIVE subject, this calls updateUiLanguage
+            setRtlLayout(isRTL);
 
             contentElement.querySelectorAll('.semester-content').forEach(c=>c.classList.remove('active'));
             const cId = `${sanSub}-${actSem}`; const sCE = contentElement.querySelector(`#${cId}`);
             if (sCE) {
                 sCE.classList.add('active');
-                updateLessonBoxDisplays(); // Update stats display AFTER showing the correct semester
+                updateLessonBoxDisplays();
             } else {
                 console.warn(`Semester content ID "#${cId}" not found.`);
-                // Optionally display a message in the content area if needed
-                // contentElement.innerHTML = `<p>Error: Content for ${actSub} - ${actSem} not found.</p>`;
             }
         }
         function handleSectionClick(subj,sem,unit,lesson){
             if(!subj||!sem||!unit||!lesson) {
                 const strings = getStrings();
-                alert(strings.defaultErrorMessage || "Error identifying topic."); // Use translated error
+                alert(strings.defaultErrorMessage || "Error identifying topic.");
                 return;
             }
             try{
@@ -743,18 +895,18 @@
                 if(oQ?.length) {
                     startQuiz(subj,sem,unit,lesson,oQ);
                 } else {
-                    showError(subj,unit,lesson); // No questions found
+                    showError(subj,unit,lesson);
                 }
             } catch(e){
                 console.error("Error handling section click:",e);
-                showError(subj,unit,lesson, (getStrings().defaultErrorMessage || "Error loading quiz.")); // General error
+                showError(subj,unit,lesson, (getStrings().defaultErrorMessage || "Error loading quiz."));
             }
         }
         function startQuiz(subj,sem,unit,lesson,oQ){
             const sQ = shuffleArray(oQ);
             quizState = {currentQuestionIndex:0,correctAnswers:0,totalQuestions:sQ.length,startTime:new Date(),endTime:null,selectedAnswers:new Array(sQ.length).fill(null),questions:sQ,originalQuestions:oQ,subject:subj,unit:unit,lesson:lesson,semester:sem,matchingState:{selectedPromptElement:null, selectedMatchElement: null, userPairs:{}}};
             const isRTL = RTL_SUBJECTS.includes(subj);
-            setRtlLayout(isRTL); // Set RTL for quiz, this calls updateUiLanguage if language changes
+            setRtlLayout(isRTL);
             if(quizTitleElement) {
                 const strings = getStrings();
                 quizTitleElement.textContent = `${strings.quizTitlePrefix || 'Quiz'}: ${lesson}`;
@@ -762,10 +914,10 @@
             displayQuestion();
         }
         function displayQuestion(){
+             // ... (rest of displayQuestion remains largely the same) ...
             if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement)return;
             const cQ=quizState.questions[quizState.currentQuestionIndex]; if(!cQ){displayResults();return;}
 
-            // Clear previous state
             quizContainerElement.innerHTML='';feedbackContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';
             if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;} if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
 
@@ -774,36 +926,34 @@
             const qT=document.createElement('p');qT.className='question-text';qT.innerHTML=`<strong>Q:</strong> ${cQ.question||'?'}`;qW.appendChild(qT);
             const tW=document.createElement('div');tW.className='question-type-wrapper';
 
-            // Render based on type
-            try{switch(cQ.type){case"matching":renderMatching(cQ,tW);requestAnimationFrame(setupArrowObserver);break;case"ordering":renderOrdering(cQ,tW);break;case"multiple_choice":default:renderMultipleChoice(cQ,tW);break;}}catch(e){console.error("Render error:",e);tW.innerHTML=`<p style="color:red;">Error displaying question.</p>`;} // Consider using translated error
+            try{switch(cQ.type){case"matching":renderMatching(cQ,tW);requestAnimationFrame(setupArrowObserver);break;case"ordering":renderOrdering(cQ,tW);break;case"multiple_choice":default:renderMultipleChoice(cQ,tW);break;}}catch(e){console.error("Render error:",e);tW.innerHTML=`<p style="color:red;">Error displaying question.</p>`;}
 
             qW.appendChild(tW);quizContainerElement.appendChild(qW);
 
-            // Add buttons
             const sB=document.createElement('button');sB.className='btn submit-btn';sB.id='submit-btn';sB.innerHTML=`<span class="btn-text"></span>`; sB.onclick=checkAnswer;
             const nB=document.createElement('button');nB.className='btn next-btn hidden';nB.id='next-btn';nB.innerHTML=`<span class="btn-text"></span>`; nB.onclick=nextQuestion;
             quizButtonsContainerElement.append(sB,nB);
-            sB.disabled=true; // Disable initially
-            // Enable submit only if it's not MC/Ordering/Matching (or specific logic handles enabling)
+            sB.disabled=true;
             if(cQ.type!=='multiple_choice'&&cQ.type!=='ordering'&&cQ.type!=='matching')sB.disabled=false;
 
-            updateUiLanguage(getCurrentLang()); // Set button text and other UI elements for the current language
+            updateUiLanguage(getCurrentLang()); // Set button text etc.
         }
 
         // --- Rendering Functions ---
         function renderMultipleChoice(q,c){if(!q.options?.length)return c.textContent='Err Opts';const oD=document.createElement('div');oD.className='options-container';q.options.forEach((o,i)=>{const id=`option-${i}`,l=document.createElement('label');l.className='option-label';l.htmlFor=id;const inp=document.createElement('input');inp.type='radio';inp.name='question-option';inp.value=i;inp.id=id;inp.className='option-input';inp.addEventListener('change',()=>{const s=document.getElementById('submit-btn');if(s)s.disabled=false;});const t=document.createElement('span');t.className='option-text';t.textContent=o;l.append(inp,t);oD.appendChild(l);});c.appendChild(oD);}
 
         function renderMatching(question, container) {
-             if (!question.prompts?.length || !question.matches?.length || question.prompts.length !== question.matches.length) { container.textContent = 'Error: Matching data is invalid.'; return; } // Consider i18n
+             // Removed tabindex=0 and onkeydown from item creation
+             if (!question.prompts?.length || !question.matches?.length || question.prompts.length !== question.matches.length) { container.textContent = 'Error: Matching data is invalid.'; return; }
 
              const strings = getStrings();
-             quizState.matchingState.userPairs = {}; // Reset pairs for this question
-             quizState.matchingState.selectedPromptElement = null; // Reset selection
-             quizState.matchingState.selectedMatchElement = null; // Reset selection
+             quizState.matchingState.userPairs = {};
+             quizState.matchingState.selectedPromptElement = null;
+             quizState.matchingState.selectedMatchElement = null;
 
              const instr = document.createElement('p');
              instr.className = 'matching-instructions';
-             instr.textContent = strings.matchingInstruction || ''; // Set instruction text
+             instr.textContent = strings.matchingInstruction || '';
              container.appendChild(instr);
 
              const outer = document.createElement('div');
@@ -811,7 +961,6 @@
              outer.id = `matching-outer-${quizState.currentQuestionIndex}`;
              container.appendChild(outer);
 
-             // Create SVG container *once* per matching question render
              matchingSvgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
              matchingSvgElement.id = 'matching-arrow-svg';
              matchingSvgElement.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-color)"/></marker></defs>';
@@ -823,772 +972,76 @@
              const promCol = document.createElement('div');
              promCol.className = 'matching-column';
              promCol.id = 'prompts-column';
-             // Use translated header
              promCol.innerHTML = `<h4>${strings.matchingItemsHeader || 'Items'}</h4>`;
              const matCol = document.createElement('div');
              matCol.className = 'matching-column';
              matCol.id = 'matches-column';
-             // Use translated header
              matCol.innerHTML = `<h4>${strings.matchingMatchesHeader || 'Matches'}</h4>`;
 
-             // Shuffle matches for display
              const shuffledMatches = question.matches.map((text, originalIndex) => ({ text, originalIndex })).sort(() => 0.5 - Math.random());
 
-             // Create Prompt items (Accessibility Enhanced)
              question.prompts.forEach((promptText, promptIndex) => {
                  const item = document.createElement('div');
                  item.className = 'matching-item prompt-item';
                  item.textContent = promptText;
                  item.dataset.index = promptIndex;
                  item.id = `prompt-${promptIndex}`;
-                 item.tabIndex = 0; // Make focusable
+                 // item.tabIndex = 0; // REMOVED
                  item.onclick = handleMatchingClick;
-                 item.onkeydown = (e) => { // Handle keyboard activation
-                     if (e.key === 'Enter' || e.key === ' ') {
-                         e.preventDefault(); // Prevent scrolling on space
-                         handleMatchingClick(e);
-                     }
-                 };
+                 // item.onkeydown = ...; // REMOVED
                  promCol.appendChild(item);
              });
 
-             // Create Match items (Accessibility Enhanced)
              shuffledMatches.forEach(matchObject => {
                  const item = document.createElement('div');
                  item.className = 'matching-item match-item';
                  item.textContent = matchObject.text;
-                 item.dataset.index = matchObject.originalIndex; // Store original index
+                 item.dataset.index = matchObject.originalIndex;
                  item.id = `match-${matchObject.originalIndex}`;
-                 item.tabIndex = 0; // Make focusable
+                 // item.tabIndex = 0; // REMOVED
                  item.onclick = handleMatchingClick;
-                 item.onkeydown = (e) => { // Handle keyboard activation
-                     if (e.key === 'Enter' || e.key === ' ') {
-                         e.preventDefault(); // Prevent scrolling on space
-                         handleMatchingClick(e);
-                     }
-                 };
+                 // item.onkeydown = ...; // REMOVED
                  matCol.appendChild(item);
              });
 
              matchCont.append(promCol, matCol);
              outer.appendChild(matchCont);
-
-             // updateUiLanguage(getCurrentLang()); // Already called by displayQuestion or setRtlLayout
         }
-
-        function renderOrdering(q,c){
-            if(!q.items?.length) { c.textContent='Error: Ordering data invalid.'; return; } // i18n
-
-            const strings = getStrings();
-            const numItems = q.items.length;
-
-            const instr = document.createElement('p');
-            instr.className='ordering-instructions';
-            const instructionText = strings.orderingInstruction || ''; // Get base text
-            instr.textContent = numItems > 0 ? instructionText.replace('{num}', `1-${numItems}`) : instructionText.replace('{num}', 'N/A'); // Add numbers
-            c.appendChild(instr);
-
-            const oC=document.createElement('div');
-            oC.className='ordering-container';
-            oC.id='ordering-list';
-
-            // Enable/disable submit based on all selects having a value
-            const checkCompletion=()=>{
-                const allSelects=oC.querySelectorAll('.ordering-select');
-                const allSelected = Array.from(allSelects).every(select => select.value !== "");
-                const submitBtn=document.getElementById('submit-btn');
-                if(submitBtn) submitBtn.disabled=!allSelected;
-            };
-
-            // Shuffle items for display
-            const shuffledItems=q.items.map((text,originalIndex)=>({text,originalIndex})).sort(()=>.5-Math.random());
-
-            shuffledItems.forEach(({text: itemText, originalIndex}) => {
-                const d=document.createElement('div');
-                d.className='ordering-item';
-                d.dataset.originalIndex=originalIndex; // Store original index if needed
-
-                const s=document.createElement('select');
-                s.className='ordering-select';
-                s.dataset.itemIndex=originalIndex; // Link select to original item index
-
-                const defaultOpt=document.createElement('option');
-                defaultOpt.value="";
-                defaultOpt.textContent="-";
-                defaultOpt.selected=true;
-                defaultOpt.disabled=true;
-                s.appendChild(defaultOpt);
-
-                for(let j=1;j<=numItems;j++){
-                    const opt=document.createElement('option');
-                    opt.value=j;
-                    opt.textContent=j;
-                    s.appendChild(opt);
-                }
-                s.addEventListener('change', checkCompletion); // Check on change
-
-                const sp=document.createElement('span');
-                sp.className='ordering-text';
-                sp.textContent=itemText;
-
-                d.append(s,sp); // Append select and text
-                oC.appendChild(d);
-            });
-            c.appendChild(oC);
-            // updateUiLanguage(getCurrentLang()); // Called by displayQuestion
-        }
-
-        // --- Interaction Handlers ---
-        function handleMatchingClick(event) {
-            // Get the actual item clicked, whether via mouse or keyboard event target
-            const clickedItem = event.target.closest('.matching-item');
-            if (!clickedItem || clickedItem.disabled) return; // Ignore if not an item or disabled
-
-            const isRTL = mainContainerElement.classList.contains('rtl-layout');
-            const isPrompt = clickedItem.classList.contains('prompt-item');
-            const isMatch = clickedItem.classList.contains('match-item');
-            const isAlreadyMatched = clickedItem.classList.contains('matched');
-            const clickedIndex = clickedItem.dataset.index; // Always the original index
-
-            // --- Case 1: Clicking an already matched item (prompt or match) to DESELECT ---
-            if (isAlreadyMatched) {
-                let promptIndexToClear = -1;
-                let matchIndexToClear = -1;
-
-                // Find the pair to clear based on which item was clicked
-                if (isPrompt) { // Clicked a matched prompt item (visually right in RTL)
-                    promptIndexToClear = clickedIndex;
-                    matchIndexToClear = quizState.matchingState.userPairs[promptIndexToClear];
-                } else { // Clicked a matched match item (visually left in RTL)
-                    matchIndexToClear = clickedIndex;
-                    // Find the prompt index associated with this match index
-                    promptIndexToClear = Object.keys(quizState.matchingState.userPairs).find(
-                        pIdx => quizState.matchingState.userPairs[pIdx] == matchIndexToClear
-                    );
-                }
-
-                // If a valid pair was identified
-                if (promptIndexToClear != -1 && matchIndexToClear !== undefined && promptIndexToClear !== undefined) {
-                    const promptElement = document.getElementById(`prompt-${promptIndexToClear}`);
-                    const matchElement = document.getElementById(`match-${matchIndexToClear}`);
-
-                    // Remove visual cues
-                    if (promptElement) promptElement.classList.remove('matched', 'selected');
-                    if (matchElement) matchElement.classList.remove('matched', 'selected');
-
-                    // Remove the pairing data and the arrow
-                    delete quizState.matchingState.userPairs[promptIndexToClear];
-                    removeArrow(promptIndexToClear);
-
-                    // Clear any residual selection state
-                    quizState.matchingState.selectedPromptElement = null;
-                    quizState.matchingState.selectedMatchElement = null;
-
-                    // Disable submit button as the set is no longer complete
-                    const submitBtn = document.getElementById('submit-btn');
-                    if (submitBtn) submitBtn.disabled = true;
-                }
-                return; // Done handling deselect
-            }
-
-
-            // --- Case 2: Selecting items to form a pair ---
-            if (isRTL) {
-                 // --- RTL FLOW --- User interacts with Match (visually left) then Prompt (visually right)
-                if (isMatch) { // Clicked a MATCH item (visually left)
-                    if (clickedItem === quizState.matchingState.selectedMatchElement) {
-                        // Clicking the selected match again: Deselect it
-                        clickedItem.classList.remove('selected');
-                        quizState.matchingState.selectedMatchElement = null;
-                    } else {
-                        // Clicking a new match: Deselect old (if any), select new
-                        if (quizState.matchingState.selectedMatchElement) {
-                            quizState.matchingState.selectedMatchElement.classList.remove('selected');
-                        }
-                        clickedItem.classList.add('selected');
-                        quizState.matchingState.selectedMatchElement = clickedItem;
-                        // In RTL, clear prompt selection when a match is selected
-                        if(quizState.matchingState.selectedPromptElement) {
-                             quizState.matchingState.selectedPromptElement.classList.remove('selected');
-                             quizState.matchingState.selectedPromptElement = null;
-                        }
-                    }
-                } else if (isPrompt && quizState.matchingState.selectedMatchElement) {
-                    // Clicked a PROMPT item (visually right) WHILE a MATCH item (visually left) is selected: Create pair
-                    const matchIndex = quizState.matchingState.selectedMatchElement.dataset.index;
-                    const promptIndex = clickedIndex;
-
-                    // Store the user's pair (Prompt Index -> Match Index)
-                    quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10);
-
-                    // Update visuals for the paired items
-                    quizState.matchingState.selectedMatchElement.classList.remove('selected');
-                    quizState.matchingState.selectedMatchElement.classList.add('matched');
-                    clickedItem.classList.add('matched'); // Mark prompt as matched too
-
-                    // Draw arrow: Always pass (Prompt Element, Match Element, Prompt Index)
-                    drawArrow(clickedItem, quizState.matchingState.selectedMatchElement, promptIndex);
-
-                    // Clear selection state
-                    quizState.matchingState.selectedMatchElement = null;
-                    // quizState.matchingState.selectedPromptElement remains null (was cleared before or wasn't set)
-
-                    // Check if all items are matched to enable submit
-                    const totalPrompts = document.querySelectorAll('.prompt-item').length;
-                    const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
-                    const submitBtn = document.getElementById('submit-btn');
-                    if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
-                        submitBtn.disabled = false;
-                    }
-                }
-                // Else: Clicking prompt with no match selected, or clicking already matched -> Handled by Case 1 or does nothing
-
-            } else {
-                // --- LTR FLOW --- User interacts with Prompt (left) then Match (right)
-                 if (isPrompt) { // Clicked a PROMPT item (left)
-                    if (clickedItem === quizState.matchingState.selectedPromptElement) {
-                        // Clicking the selected prompt again: Deselect it
-                        clickedItem.classList.remove('selected');
-                        quizState.matchingState.selectedPromptElement = null;
-                    } else {
-                        // Clicking a new prompt: Deselect old (if any), select new
-                        if (quizState.matchingState.selectedPromptElement) {
-                            quizState.matchingState.selectedPromptElement.classList.remove('selected');
-                        }
-                        clickedItem.classList.add('selected');
-                        quizState.matchingState.selectedPromptElement = clickedItem;
-                        // In LTR, clear match selection when a prompt is selected
-                        if(quizState.matchingState.selectedMatchElement) {
-                             quizState.matchingState.selectedMatchElement.classList.remove('selected');
-                             quizState.matchingState.selectedMatchElement = null;
-                        }
-                    }
-                } else if (isMatch && quizState.matchingState.selectedPromptElement) {
-                    // Clicked a MATCH item (right) WHILE a PROMPT item (left) is selected: Create pair
-                    const promptIndex = quizState.matchingState.selectedPromptElement.dataset.index;
-                    const matchIndex = clickedIndex;
-
-                    // Store the user's pair
-                    quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10);
-
-                    // Update visuals
-                    quizState.matchingState.selectedPromptElement.classList.remove('selected');
-                    quizState.matchingState.selectedPromptElement.classList.add('matched');
-                    clickedItem.classList.add('matched'); // Mark match as matched
-
-                    // Draw arrow: Always pass (Prompt Element, Match Element, Prompt Index)
-                    drawArrow(quizState.matchingState.selectedPromptElement, clickedItem, promptIndex);
-
-                    // Clear selection state
-                    quizState.matchingState.selectedPromptElement = null;
-                    // quizState.matchingState.selectedMatchElement remains null
-
-                    // Check completion
-                    const totalPrompts = document.querySelectorAll('.prompt-item').length;
-                    const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
-                    const submitBtn = document.getElementById('submit-btn');
-                    if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
-                        submitBtn.disabled = false;
-                    }
-                }
-                 // Else: Clicking match with no prompt selected, or clicking already matched -> Handled by Case 1 or does nothing
-            }
-        }
-
-
-        // --- Arrow Drawing (Corrected for RTL X and Y Coordinates) ---
-        function drawArrow(pE, mE, pI) {
-            // pE = Prompt Element (Items column in LTR, Right column in RTL)
-            // mE = Match Element (Matches column in LTR, Left column in RTL)
-            // pI = Prompt Index (used for arrow ID)
-
-            const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
-
-            // Ensure SVG exists; Locate it reliably if needed.
-             if (!matchingSvgElement) {
-                 const svgContainer = outerDiv?.querySelector('svg#matching-arrow-svg');
-                 if (svgContainer) {
-                     matchingSvgElement = svgContainer;
-                 } else {
-                    console.error("drawArrow: SVG element '#matching-arrow-svg' not found within outerDiv:", outerDiv?.id);
-                    return; // Cannot draw without SVG
-                 }
-             }
-
-            // Ensure all required elements are valid before proceeding
-            if (!pE || !mE || !outerDiv) {
-                 console.warn("drawArrow: Missing required elements (prompt, match, or outer div). Prompt:", pE?.id, "Match:", mE?.id, "Index:", pI);
-                 return;
-            }
-
-            // Get bounding rectangles *inside* the function for fresh values
-            const svgRect = matchingSvgElement.getBoundingClientRect();
-            const pR = pE.getBoundingClientRect(); // Prompt Element Rect
-            const mR = mE.getBoundingClientRect(); // Match Element Rect
-            const isRTL = mainContainerElement.classList.contains('rtl-layout');
-
-            let startX, startY, endX, endY;
-
-            // Calculate Midpoints relative to SVG Top (Common calculation)
-            const promptMidY = pR.top + pR.height / 2 - svgRect.top;
-            const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
-
-            // --- Calculate X and Y based on Layout Direction ---
-            if (isRTL) {
-                // RTL VISUAL: Match(Left) --> Prompt(Right)
-                // Start Point: LEFT edge of Match element (mE)
-                // End Point:   RIGHT edge of Prompt element (pE)
-
-                startX = mR.left - svgRect.left;   // X: Left edge of the Match element relative to SVG left
-                startY = matchMidY;                // Y: Vertical center of the Match element (VISUAL START)
-
-                endX   = pR.right - svgRect.left;  // X: Right edge of the Prompt element relative to SVG left
-                endY   = promptMidY;               // Y: Vertical center of the Prompt element (VISUAL END)
-
-            } else {
-                // LTR VISUAL: Prompt(Left) --> Match(Right)
-                // Start Point: RIGHT edge of Prompt element (pE)
-                // End Point:   LEFT edge of Match element (mE)
-
-                startX = pR.right - svgRect.left; // X: Right edge of the Prompt element relative to SVG left
-                startY = promptMidY;              // Y: Vertical center of the Prompt element (VISUAL START)
-
-                endX   = mR.left - svgRect.left;  // X: Left edge of the Match element relative to SVG left
-                endY   = matchMidY;               // Y: Vertical center of the Match element (VISUAL END)
-            }
-
-            // Find or create the line element
-            let line = matchingSvgElement.querySelector(`#arrow-${pI}`);
-            if (!line) {
-                line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.id = `arrow-${pI}`;
-                line.style.opacity = '0'; // Start invisible for transition
-                line.style.transition = 'stroke 0.3s ease, opacity 0.3s ease';
-                matchingSvgElement.appendChild(line);
-            }
-
-            // Validate coordinates before applying
-             if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) ||
-                 !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
-                 console.error("drawArrow: Invalid coordinates calculated.", { startX, startY, endX, endY, pI, isRTL });
-                 line.style.opacity = '0'; // Hide potentially broken line
-                 return; // Stop execution for this arrow if coords are bad
-             }
-
-            // Apply calculated coordinates and styles
-            line.setAttribute('x1', startX);
-            line.setAttribute('y1', startY);
-            line.setAttribute('x2', endX);
-            line.setAttribute('y2', endY);
-            line.setAttribute('stroke', 'var(--accent-color)');
-            line.setAttribute('stroke-width', '2');
-            line.setAttribute('marker-end', 'url(#arrowhead)');
-
-            // Use rAF for smoother visual update
-            requestAnimationFrame(() => {
-                 line.style.opacity = '1'; // Make the line visible
-            });
-        }
-
-        function removeArrow(pI){if(!matchingSvgElement)return;const l=matchingSvgElement.querySelector(`#arrow-${pI}`);if(l){l.style.opacity='0';setTimeout(()=>l.remove(),300);}} // Transition fade out
-        function updateAllArrowPositions(){
-             // Ensure we are in a matching question state
-             if(!matchingSvgElement || !quizState || !quizState.questions[quizState.currentQuestionIndex] || quizState.questions[quizState.currentQuestionIndex].type !== 'matching') {
-                 return;
-             }
-             const userPairs = quizState.matchingState.userPairs;
-             // Redraw arrows for all existing pairs
-             for (const promptIndex in userPairs) {
-                 if (userPairs.hasOwnProperty(promptIndex)) {
-                     const matchIndex = userPairs[promptIndex];
-                     const promptElement = document.getElementById(`prompt-${promptIndex}`);
-                     const matchElement = document.getElementById(`match-${matchIndex}`);
-                     if (promptElement && matchElement) {
-                         drawArrow(promptElement, matchElement, promptIndex);
-                     } else {
-                         // If an element is missing (shouldn't normally happen), remove the arrow
-                         removeArrow(promptIndex);
-                     }
-                 }
-             }
-        }
-        function setupArrowObserver(){
-            const targetNode = document.getElementById('matching-cols');
-            if (!targetNode || !matchingSvgElement) {
-                console.warn("Observer setup failed: Target or SVG missing.");
-                return;
-            }
-            if (matchingArrowObserver) { matchingArrowObserver.disconnect(); } // Disconnect previous if exists
-
-            const config = { attributes: true, childList: true, subtree: true, characterData: true };
-            // Debounced callback to prevent excessive redraws during rapid changes
-            const callback = debounce(updateAllArrowPositions, 50);
-
-            matchingArrowObserver = new MutationObserver(callback);
-            matchingArrowObserver.observe(targetNode, config);
-
-            // Also observe quiz container for broader layout shifts (like resizing)
-            const quizContainerTarget = document.getElementById('quiz-container');
-            if(quizContainerTarget) {
-                // Observe attributes change which might indicate style changes affecting layout
-                matchingArrowObserver.observe(quizContainerTarget, { attributes: true, subtree: false });
-            }
-
-            // Initial draw/update after a short delay to allow rendering
-            setTimeout(updateAllArrowPositions, 100);
-        }
-
-
-        // --- Answer Checking ---
-        function checkAnswer(){
-            if(!feedbackContainerElement||!quizButtonsContainerElement)return;
-            // Disconnect observer during feedback display to prevent updates based on feedback styling
-            if(matchingArrowObserver){matchingArrowObserver.disconnect(); matchingArrowObserver = null;}
-
-            const cQ=quizState.questions[quizState.currentQuestionIndex];
-            let result = {isCorrect:false, feedback:'', userResponse:null, scoreIncrement:0};
-
-            try{
-                switch(cQ.type){
-                    case "matching": result = checkMatching(cQ); break;
-                    case "ordering": result = checkOrdering(cQ); break;
-                    case "multiple_choice": default: result = checkMultipleChoice(cQ); break;
-                }
-            } catch(e){
-                console.error("Error checking answer:", e);
-                const strings = getStrings();
-                result = {isCorrect:false, feedback:`<div class="incorrect-feedback">${strings.defaultErrorMessage || 'Error checking answer.'}</div>`, userResponse:null, scoreIncrement:0}; // i18n
-            }
-
-            quizState.selectedAnswers[quizState.currentQuestionIndex]=result.userResponse;
-            if(result.scoreIncrement>0) quizState.correctAnswers+=result.scoreIncrement;
-
-            feedbackContainerElement.innerHTML=result.feedback;
-            feedbackContainerElement.classList.remove('hidden');
-            disableInputs();
-
-            // Toggle buttons
-            const submitBtn=quizButtonsContainerElement.querySelector('#submit-btn');
-            const nextBtn=quizButtonsContainerElement.querySelector('#next-btn');
-            if(submitBtn) submitBtn.classList.add('hidden');
-            if(nextBtn) {
-                // Update Next button text if it's the last question
-                const strings = getStrings();
-                const nextBtnTextKey = (quizState.currentQuestionIndex === quizState.totalQuestions - 1 && quizState.totalQuestions > 0) ? 'viewResults' : 'next';
-                const textSpan = nextBtn.querySelector('.btn-text');
-                if (textSpan) textSpan.textContent = strings[nextBtnTextKey] || nextBtnTextKey;
-
-                nextBtn.classList.remove('hidden');
-            }
-        }
-        function checkMultipleChoice(q){const sR=document.querySelector('input[name="question-option"]:checked');if(!sR)return{isCorrect:false,feedback:'<div class="incorrect-feedback">Select answer.</div>',userResponse:null,scoreIncrement:0};const sI=parseInt(sR.value,10),cAT=q.answer,sAT=q.options?.[sI],iC=sAT===cAT;document.querySelectorAll('.option-label').forEach((l,i)=>{const ip=l.querySelector('input');if(q.options?.[i]===cAT)l.classList.add('correct-option');if(ip&&ip.checked&&!iC)l.classList.add('incorrect-option');});const fH=iC?'<div class="correct-feedback">Correct! ✓</div>':`<div class="incorrect-feedback">Incorrect. <span>Correct: ${cAT||'N/A'}</span></div>`;return{isCorrect:iC,feedback:fH,userResponse:sI,scoreIncrement:iC?1:0};} // TODO: i18n Feedback
-        function checkMatching(q){const uP=quizState.matchingState.userPairs,cP=q.answer||{},tCP=Object.keys(cP).length;let cMC=0;if(tCP===0)return{isCorrect:true,feedback:'<div class="correct-feedback">No match needed.</div>',userResponse:uP,scoreIncrement:0};for(const pI in cP)if(uP.hasOwnProperty(pI)&&uP[pI]===cP[pI])cMC++;const iFC=cMC===tCP&&Object.keys(uP).length===tCP,iPC=cMC>0&&!iFC;let fH="";if(iFC)fH=`<div class="correct-feedback">Correct! ✓ All matched.</div>`;else if(iPC)fH=`<div class="partial-feedback">Partial. ${cMC}/${tCP}.</div>`;else fH=`<div class="incorrect-feedback">Incorrect. 0/${tCP}.</div>`;for(const pI in uP){const uMI=uP[pI],cMI=cP[pI],l=matchingSvgElement?.querySelector(`#arrow-${pI}`),pE=document.getElementById(`prompt-${pI}`),uME=document.getElementById(`match-${uMI}`);if(!l || !pE || !uME) continue; /* Safety check */ if(uMI===cMI){l.style.stroke='var(--correct-border)';l.querySelector('polygon')?.setAttribute('fill', 'var(--correct-border)');pE.style.borderColor='var(--correct-border)';uME.style.borderColor='var(--correct-border)';}else{l.style.stroke='var(--incorrect-border)';l.querySelector('polygon')?.setAttribute('fill', 'var(--incorrect-border)');pE.style.borderColor='var(--incorrect-border)';uME.style.borderColor='var(--incorrect-border)';}}return{isCorrect:iFC,feedback:fH,userResponse:uP,scoreIncrement:iFC?1:0};} // TODO: i18n Feedback
-        function checkOrdering(q){const oI=q.items||[],cAO=q.answer||[],nI=oI.length;if(nI===0||!Array.isArray(cAO)||nI!==cAO.length)return console.error("Invalid ord data:",q),{isCorrect:false,feedback:'<div class="incorrect-feedback">Err: Invalid setup.</div>',userResponse:null,scoreIncrement:0};const uOM={},sP=new Set();let aS=true,hD=false;const sE=document.querySelectorAll("#ordering-list .ordering-select");if(sE.length!==nI)return console.error("Ord Err: Select mismatch."),{isCorrect:false,feedback:'<div class="incorrect-feedback">Err processing sel.</div>',userResponse:null,scoreIncrement:0};sE.forEach(s=>{const iI=parseInt(s.dataset.itemIndex,10),sV=s.value;if(sV===""){aS=false;}else{const p=parseInt(sV,10);if(isNaN(p)||p<1||p>nI){aS=false;return;}uOM[iI]=p;if(sP.has(p))hD=true;sP.add(p);}});if(!aS)return{isCorrect:false,feedback:'<div class="incorrect-feedback">Select order all.</div>',userResponse:uOM,scoreIncrement:0};if(hD||sP.size!==nI){const nT=nI>1?`nums 1-${nI}`:'num 1';return{isCorrect:false,feedback:`<div class="incorrect-feedback">Use each order ${nT} once.</div>`,userResponse:uOM,scoreIncrement:0};}const uOI=new Array(nI).fill(null);let cOk=true;for(const iIS in uOM){if(uOM.hasOwnProperty(iIS)){const iI=parseInt(iIS,10),iT=oI[iI],uP=uOM[iI]-1;if(iT===undefined||uP<0||uP>=nI||uOI[uP]!==null){cOk=false;break;}uOI[uP]=iT;}}if(!cOk||uOI.some(i=>i===null))return console.error("Ord Err: Construct fail.",uOM,uOI),{isCorrect:false,feedback:'<div class="incorrect-feedback">Err processing seq.</div>',userResponse:uOI,scoreIncrement:0};const iC=JSON.stringify(uOI)===JSON.stringify(cAO);const fH=iC?'<div class="correct-feedback">Correct! ✓</div>':`<div class="incorrect-feedback">Incorrect. <span>Correct: ${cAO.join(" → ")}</span></div>`;sE.forEach(s=>{const iI=parseInt(s.dataset.itemIndex,10),iT=oI[iI],uSP=uOM[iI],cP=cAO.indexOf(iT)+1;if(uSP===cP){s.style.borderColor="var(--correct-border)";s.style.backgroundColor="var(--correct-bg)";}else{s.style.borderColor="var(--incorrect-border)";s.style.backgroundColor="var(--incorrect-bg)";}s.style.borderWidth="2px";});return{isCorrect:iC,feedback:fH,userResponse:uOI,scoreIncrement:iC?1:0};} // TODO: i18n Feedback
-        function disableInputs(){document.querySelectorAll('input[name="question-option"],.ordering-select').forEach(i=>i.disabled=true);document.querySelectorAll('.option-label').forEach(l=>l.style.cursor='default');document.querySelectorAll('.matching-item').forEach(i=>{i.style.pointerEvents='none';i.style.cursor='default';i.tabIndex = -1; /* Disable focus */ });}
-
-        // --- Navigation and Results ---
+        // --- renderOrdering remains the same ---
+        function renderOrdering(q,c){if(!q.items?.length) { c.textContent='Error: Ordering data invalid.'; return; }const strings = getStrings();const numItems = q.items.length;const instr = document.createElement('p');instr.className='ordering-instructions';const instructionText = strings.orderingInstruction || '';instr.textContent = numItems > 0 ? instructionText.replace('{num}', `1-${numItems}`) : instructionText.replace('{num}', 'N/A');c.appendChild(instr);const oC=document.createElement('div');oC.className='ordering-container';oC.id='ordering-list';const checkCompletion=()=>{const allSelects=oC.querySelectorAll('.ordering-select');const allSelected = Array.from(allSelects).every(select => select.value !== "");const submitBtn=document.getElementById('submit-btn');if(submitBtn) submitBtn.disabled=!allSelected;};const shuffledItems=q.items.map((text,originalIndex)=>({text,originalIndex})).sort(()=>.5-Math.random());shuffledItems.forEach(({text: itemText, originalIndex}) => {const d=document.createElement('div');d.className='ordering-item';d.dataset.originalIndex=originalIndex;const s=document.createElement('select');s.className='ordering-select';s.dataset.itemIndex=originalIndex;const defaultOpt=document.createElement('option');defaultOpt.value="";defaultOpt.textContent="-";defaultOpt.selected=true;defaultOpt.disabled=true;s.appendChild(defaultOpt);for(let j=1;j<=numItems;j++){const opt=document.createElement('option');opt.value=j;opt.textContent=j;s.appendChild(opt);}s.addEventListener('change', checkCompletion);const sp=document.createElement('span');sp.className='ordering-text';sp.textContent=itemText;d.append(s,sp);oC.appendChild(d);});c.appendChild(oC);}
+
+        // --- Interaction Handlers (handleMatchingClick remains the same) ---
+        function handleMatchingClick(event) {const clickedItem = event.target.closest('.matching-item');if (!clickedItem || clickedItem.disabled) return; const isRTL = mainContainerElement.classList.contains('rtl-layout');const isPrompt = clickedItem.classList.contains('prompt-item');const isMatch = clickedItem.classList.contains('match-item');const isAlreadyMatched = clickedItem.classList.contains('matched');const clickedIndex = clickedItem.dataset.index; if (isAlreadyMatched) {let promptIndexToClear = -1;let matchIndexToClear = -1;if (isPrompt) { promptIndexToClear = clickedIndex; matchIndexToClear = quizState.matchingState.userPairs[promptIndexToClear];} else { matchIndexToClear = clickedIndex; promptIndexToClear = Object.keys(quizState.matchingState.userPairs).find( pIdx => quizState.matchingState.userPairs[pIdx] == matchIndexToClear );}if (promptIndexToClear != -1 && matchIndexToClear !== undefined && promptIndexToClear !== undefined) {const promptElement = document.getElementById(`prompt-${promptIndexToClear}`);const matchElement = document.getElementById(`match-${matchIndexToClear}`);if (promptElement) promptElement.classList.remove('matched', 'selected');if (matchElement) matchElement.classList.remove('matched', 'selected');delete quizState.matchingState.userPairs[promptIndexToClear];removeArrow(promptIndexToClear);quizState.matchingState.selectedPromptElement = null;quizState.matchingState.selectedMatchElement = null;const submitBtn = document.getElementById('submit-btn');if (submitBtn) submitBtn.disabled = true;}return;} if (isRTL) { if (isMatch) { if (clickedItem === quizState.matchingState.selectedMatchElement) { clickedItem.classList.remove('selected'); quizState.matchingState.selectedMatchElement = null;} else { if (quizState.matchingState.selectedMatchElement) { quizState.matchingState.selectedMatchElement.classList.remove('selected');}clickedItem.classList.add('selected'); quizState.matchingState.selectedMatchElement = clickedItem; if(quizState.matchingState.selectedPromptElement) { quizState.matchingState.selectedPromptElement.classList.remove('selected'); quizState.matchingState.selectedPromptElement = null;}}} else if (isPrompt && quizState.matchingState.selectedMatchElement) { const matchIndex = quizState.matchingState.selectedMatchElement.dataset.index; const promptIndex = clickedIndex; quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); quizState.matchingState.selectedMatchElement.classList.remove('selected'); quizState.matchingState.selectedMatchElement.classList.add('matched'); clickedItem.classList.add('matched'); drawArrow(clickedItem, quizState.matchingState.selectedMatchElement, promptIndex); quizState.matchingState.selectedMatchElement = null; const totalPrompts = document.querySelectorAll('.prompt-item').length; const matchedCount = Object.keys(quizState.matchingState.userPairs).length; const submitBtn = document.getElementById('submit-btn'); if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) { submitBtn.disabled = false;}}} else { if (isPrompt) { if (clickedItem === quizState.matchingState.selectedPromptElement) { clickedItem.classList.remove('selected'); quizState.matchingState.selectedPromptElement = null;} else { if (quizState.matchingState.selectedPromptElement) { quizState.matchingState.selectedPromptElement.classList.remove('selected');}clickedItem.classList.add('selected'); quizState.matchingState.selectedPromptElement = clickedItem; if(quizState.matchingState.selectedMatchElement) { quizState.matchingState.selectedMatchElement.classList.remove('selected'); quizState.matchingState.selectedMatchElement = null;}}} else if (isMatch && quizState.matchingState.selectedPromptElement) { const promptIndex = quizState.matchingState.selectedPromptElement.dataset.index; const matchIndex = clickedIndex; quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); quizState.matchingState.selectedPromptElement.classList.remove('selected'); quizState.matchingState.selectedPromptElement.classList.add('matched'); clickedItem.classList.add('matched'); drawArrow(quizState.matchingState.selectedPromptElement, clickedItem, promptIndex); quizState.matchingState.selectedPromptElement = null; const totalPrompts = document.querySelectorAll('.prompt-item').length; const matchedCount = Object.keys(quizState.matchingState.userPairs).length; const submitBtn = document.getElementById('submit-btn'); if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) { submitBtn.disabled = false;}}}}
+
+
+        // --- Arrow Drawing (drawArrow, removeArrow, updateAll, setupObserver remain the same) ---
+        function drawArrow(pE, mE, pI) {const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);if (!matchingSvgElement) { const svgContainer = outerDiv?.querySelector('svg#matching-arrow-svg'); if (svgContainer) { matchingSvgElement = svgContainer;} else { console.error("drawArrow: SVG element '#matching-arrow-svg' not found within outerDiv:", outerDiv?.id); return;}}if (!pE || !mE || !outerDiv) { console.warn("drawArrow: Missing required elements (prompt, match, or outer div). Prompt:", pE?.id, "Match:", mE?.id, "Index:", pI); return;}const svgRect = matchingSvgElement.getBoundingClientRect();const pR = pE.getBoundingClientRect(); const mR = mE.getBoundingClientRect(); const isRTL = mainContainerElement.classList.contains('rtl-layout');let startX, startY, endX, endY;const promptMidY = pR.top + pR.height / 2 - svgRect.top;const matchMidY  = mR.top + mR.height / 2 - svgRect.top;if (isRTL) {startX = mR.left - svgRect.left;   startY = matchMidY;                endX   = pR.right - svgRect.left;  endY   = promptMidY;               } else {startX = pR.right - svgRect.left; startY = promptMidY;              endX   = mR.left - svgRect.left;  endY   = matchMidY;              }let line = matchingSvgElement.querySelector(`#arrow-${pI}`);if (!line) {line = document.createElementNS('http://www.w3.org/2000/svg', 'line');line.id = `arrow-${pI}`;line.style.opacity = '0'; line.style.transition = 'stroke 0.3s ease, opacity 0.3s ease';matchingSvgElement.appendChild(line);}if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) || !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) { console.error("drawArrow: Invalid coordinates calculated.", { startX, startY, endX, endY, pI, isRTL }); line.style.opacity = '0'; return;}line.setAttribute('x1', startX);line.setAttribute('y1', startY);line.setAttribute('x2', endX);line.setAttribute('y2', endY);line.setAttribute('stroke', 'var(--accent-color)');line.setAttribute('stroke-width', '2');line.setAttribute('marker-end', 'url(#arrowhead)');requestAnimationFrame(() => { line.style.opacity = '1'; });}
+        function removeArrow(pI){if(!matchingSvgElement)return;const l=matchingSvgElement.querySelector(`#arrow-${pI}`);if(l){l.style.opacity='0';setTimeout(()=>l.remove(),300);}}
+        function updateAllArrowPositions(){if(!matchingSvgElement || !quizState || !quizState.questions[quizState.currentQuestionIndex] || quizState.questions[quizState.currentQuestionIndex].type !== 'matching') { return; } const userPairs = quizState.matchingState.userPairs; for (const promptIndex in userPairs) { if (userPairs.hasOwnProperty(promptIndex)) { const matchIndex = userPairs[promptIndex]; const promptElement = document.getElementById(`prompt-${promptIndex}`); const matchElement = document.getElementById(`match-${matchIndex}`); if (promptElement && matchElement) { drawArrow(promptElement, matchElement, promptIndex); } else { removeArrow(promptIndex); }}}}
+        function setupArrowObserver(){const targetNode = document.getElementById('matching-cols');if (!targetNode || !matchingSvgElement) {console.warn("Observer setup failed: Target or SVG missing.");return;}if (matchingArrowObserver) { matchingArrowObserver.disconnect(); }const config = { attributes: true, childList: true, subtree: true, characterData: true };const callback = debounce(updateAllArrowPositions, 50);matchingArrowObserver = new MutationObserver(callback);matchingArrowObserver.observe(targetNode, config);const quizContainerTarget = document.getElementById('quiz-container');if(quizContainerTarget) { matchingArrowObserver.observe(quizContainerTarget, { attributes: true, subtree: false }); } setTimeout(updateAllArrowPositions, 100);}
+
+        // --- Answer Checking (checkAnswer, checkMultipleChoice, checkMatching, checkOrdering remain the same)---
+        function checkAnswer(){if(!feedbackContainerElement||!quizButtonsContainerElement)return;if(matchingArrowObserver){matchingArrowObserver.disconnect(); matchingArrowObserver = null;}const cQ=quizState.questions[quizState.currentQuestionIndex];let result = {isCorrect:false, feedback:'', userResponse:null, scoreIncrement:0};try{switch(cQ.type){case "matching": result = checkMatching(cQ); break;case "ordering": result = checkOrdering(cQ); break;case "multiple_choice": default: result = checkMultipleChoice(cQ); break;}} catch(e){console.error("Error checking answer:", e);const strings = getStrings();result = {isCorrect:false, feedback:`<div class="incorrect-feedback">${strings.defaultErrorMessage || 'Error checking answer.'}</div>`, userResponse:null, scoreIncrement:0};}quizState.selectedAnswers[quizState.currentQuestionIndex]=result.userResponse;if(result.scoreIncrement>0) quizState.correctAnswers+=result.scoreIncrement;feedbackContainerElement.innerHTML=result.feedback;feedbackContainerElement.classList.remove('hidden');disableInputs();const submitBtn=quizButtonsContainerElement.querySelector('#submit-btn');const nextBtn=quizButtonsContainerElement.querySelector('#next-btn');if(submitBtn) submitBtn.classList.add('hidden');if(nextBtn) {const strings = getStrings();const nextBtnTextKey = (quizState.currentQuestionIndex === quizState.totalQuestions - 1 && quizState.totalQuestions > 0) ? 'viewResults' : 'next';const textSpan = nextBtn.querySelector('.btn-text');if (textSpan) textSpan.textContent = strings[nextBtnTextKey] || nextBtnTextKey;nextBtn.classList.remove('hidden');}}
+        function checkMultipleChoice(q){const sR=document.querySelector('input[name="question-option"]:checked'); const strings=getStrings(); if(!sR)return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.selectAnswerPrompt || 'Please select an answer.'}</div>`,userResponse:null,scoreIncrement:0};const sI=parseInt(sR.value,10),cAT=q.answer,sAT=q.options?.[sI],iC=sAT===cAT;document.querySelectorAll('.option-label').forEach((l,i)=>{const ip=l.querySelector('input');if(q.options?.[i]===cAT)l.classList.add('correct-option');if(ip&&ip.checked&&!iC)l.classList.add('incorrect-option');});const fH=iC?`<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`:`<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct answer:'} ${cAT||'N/A'}</span></div>`;return{isCorrect:iC,feedback:fH,userResponse:sI,scoreIncrement:iC?1:0};}
+        function checkMatching(q){const uP=quizState.matchingState.userPairs,cP=q.answer||{},tCP=Object.keys(cP).length;let cMC=0;const strings=getStrings();if(tCP===0)return{isCorrect:true,feedback:`<div class="correct-feedback">${strings.matchingNoMatchNeeded || 'No matching needed.'}</div>`,userResponse:uP,scoreIncrement:0};for(const pI in cP)if(uP.hasOwnProperty(pI)&&uP[pI]===cP[pI])cMC++;const iFC=cMC===tCP&&Object.keys(uP).length===tCP,iPC=cMC>0&&!iFC;let fH="";if(iFC)fH=`<div class="correct-feedback">${strings.matchingAllCorrect || 'Correct! ✓ All matched.'}</div>`;else if(iPC)fH=`<div class="partial-feedback">${(strings.matchingPartialCorrect || 'Partial correct: {correct}/{total}.').replace('{correct}',cMC).replace('{total}',tCP)}</div>`;else fH=`<div class="incorrect-feedback">${(strings.matchingNoneCorrect || 'Incorrect: 0/{total} matched.').replace('{total}',tCP)}</div>`;for(const pI in uP){const uMI=uP[pI],cMI=cP[pI],l=matchingSvgElement?.querySelector(`#arrow-${pI}`),pE=document.getElementById(`prompt-${pI}`),uME=document.getElementById(`match-${uMI}`);if(!l || !pE || !uME) continue; if(uMI===cMI){l.style.stroke='var(--correct-border)';l.querySelector('polygon')?.setAttribute('fill', 'var(--correct-border)');pE.style.borderColor='var(--correct-border)';uME.style.borderColor='var(--correct-border)';}else{l.style.stroke='var(--incorrect-border)';l.querySelector('polygon')?.setAttribute('fill', 'var(--incorrect-border)');pE.style.borderColor='var(--incorrect-border)';uME.style.borderColor='var(--incorrect-border)';}}return{isCorrect:iFC,feedback:fH,userResponse:uP,scoreIncrement:iFC?1:0};}
+        function checkOrdering(q){const oI=q.items||[],cAO=q.answer||[],nI=oI.length;const strings=getStrings();if(nI===0||!Array.isArray(cAO)||nI!==cAO.length)return console.error("Invalid ord data:",q),{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingInvalidData || 'Error: Invalid ordering setup.'}</div>`,userResponse:null,scoreIncrement:0};const uOM={},sP=new Set();let aS=true,hD=false;const sE=document.querySelectorAll("#ordering-list .ordering-select");if(sE.length!==nI)return console.error("Ord Err: Select mismatch."),{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSelectionError || 'Error processing selections.'}</div>`,userResponse:null,scoreIncrement:0};sE.forEach(s=>{const iI=parseInt(s.dataset.itemIndex,10),sV=s.value;if(sV===""){aS=false;}else{const p=parseInt(sV,10);if(isNaN(p)||p<1||p>nI){aS=false;return;}uOM[iI]=p;if(sP.has(p))hD=true;sP.add(p);}});if(!aS)return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSelectAll || 'Please select an order for all items.'}</div>`,userResponse:uOM,scoreIncrement:0};if(hD||sP.size!==nI){const nT=nI>1?(strings.orderingUseEachNumOncePlural || 'numbers 1-{n}').replace('{n}',nI):(strings.orderingUseEachNumOnceSingular || 'number 1');return{isCorrect:false,feedback:`<div class="incorrect-feedback">${(strings.orderingDuplicateUse || 'Please use each order {nums} exactly once.').replace('{nums}',nT)}</div>`,userResponse:uOM,scoreIncrement:0};}const uOI=new Array(nI).fill(null);let cOk=true;for(const iIS in uOM){if(uOM.hasOwnProperty(iIS)){const iI=parseInt(iIS,10),iT=oI[iI],uP=uOM[iI]-1;if(iT===undefined||uP<0||uP>=nI||uOI[uP]!==null){cOk=false;break;}uOI[uP]=iT;}}if(!cOk||uOI.some(i=>i===null))return console.error("Ord Err: Construct fail.",uOM,uOI),{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSequenceError || 'Error processing sequence.'}</div>`,userResponse:uOI,scoreIncrement:0};const iC=JSON.stringify(uOI)===JSON.stringify(cAO);const fH=iC?`<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`:`<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct order:'} ${cAO.join(" → ")}</span></div>`;sE.forEach(s=>{const iI=parseInt(s.dataset.itemIndex,10),iT=oI[iI],uSP=uOM[iI],cP=cAO.indexOf(iT)+1;if(uSP===cP){s.style.borderColor="var(--correct-border)";s.style.backgroundColor="var(--correct-bg)";}else{s.style.borderColor="var(--incorrect-border)";s.style.backgroundColor="var(--incorrect-bg)";}s.style.borderWidth="2px";});return{isCorrect:iC,feedback:fH,userResponse:uOI,scoreIncrement:iC?1:0};}
+        function disableInputs(){document.querySelectorAll('input[name="question-option"],.ordering-select').forEach(i=>i.disabled=true);document.querySelectorAll('.option-label').forEach(l=>l.style.cursor='default');document.querySelectorAll('.matching-item').forEach(i=>{i.style.pointerEvents='none';i.style.cursor='default'; /* Removed tabindex = -1 */});}
+
+        // --- Navigation and Results (nextQuestion, displayResults remain the same) ---
         function nextQuestion(){quizState.currentQuestionIndex++;if(quizState.currentQuestionIndex<quizState.totalQuestions)displayQuestion();else{quizState.endTime=new Date();displayResults();}}
+        function displayResults(){if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;quizContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';const strings = getStrings();quizTitleElement.textContent = strings.viewResults || 'Quiz Results'; const tT=quizState.endTime&&quizState.startTime?Math.round((quizState.endTime-quizState.startTime)/1000):0;const tS=formatTime(tT);const score = quizState.totalQuestions>0?(quizState.correctAnswers/quizState.totalQuestions)*100:0;const scoreRounded=score.toFixed(0);if(quizState.totalQuestions>0)saveLessonStats(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.correctAnswers,quizState.totalQuestions,tT);let resultMessageKey = 'quizResultPractice'; if (quizState.totalQuestions === 0) resultMessageKey = 'quizResultNoQuestions'; else if (score >= 90) resultMessageKey = 'quizResultExcellent'; else if (score >= 70) resultMessageKey = 'quizResultGreat'; else if (score >= 50) resultMessageKey = 'quizResultGood'; const resultMessage = strings[resultMessageKey] || '';const rD=document.createElement('div');rD.className='results-container';rD.innerHTML=` <h2 class="results-header">${resultMessage}</h2> <div class="results-score"><div class="score-circle"><span class="score-number">${scoreRounded}</span><span class="score-percent-sign">%</span></div></div> <div class="results-details"> <p data-detail-key="subject"><span class="detail-icon">📚</span><strong>${strings.resultsSubjectLabel || 'Subject:'}</strong> <span class="detail-value">${quizState.subject||'N/A'}</span></p> <p data-detail-key="semester"><span class="detail-icon">🗓️</span><strong>${strings.resultsSemesterLabel || 'Semester:'}</strong> <span class="detail-value">${quizState.semester||'N/A'}</span></p> <p data-detail-key="unit"><span class="detail-icon">🔖</span><strong>${strings.resultsUnitLabel || 'Unit:'}</strong> <span class="detail-value">${quizState.unit||'N/A'}</span></p> <p data-detail-key="lesson"><span class="detail-icon">📖</span><strong>${strings.resultsLessonLabel || 'Lesson:'}</strong> <span class="detail-value">${quizState.lesson||'N/A'}</span></p> <p data-detail-key="correct"><span class="detail-icon">✅</span><strong>${strings.resultsCorrectLabel || 'Correct:'}</strong> <span class="detail-value">${quizState.correctAnswers}/${quizState.totalQuestions}</span></p> <p data-detail-key="time"><span class="detail-icon">⏱️</span><strong>${strings.resultsTimeLabel || 'Time:'}</strong> <span class="detail-value">${tS}</span></p> </div>`;quizContainerElement.appendChild(rD);const aD=document.createElement('div');aD.className='results-actions quiz-buttons'; const rB=document.createElement('button');rB.className='btn redo-btn'; rB.id='redo-btn'; rB.innerHTML=`🔄 <span class="btn-text">${strings.redoQuiz || 'Redo Quiz'}</span>`; rB.onclick=()=>{startQuiz(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.originalQuestions);};aD.appendChild(rB);if(quizState.totalQuestions>0){const revB=document.createElement('button');revB.id='review-btn';revB.className='btn review-btn';revB.innerHTML=`🧐 <span class="btn-text">${strings.reviewAnswers || 'Review Answers'}</span>`;revB.onclick=reviewAnswers;aD.appendChild(revB);}const bTB=document.createElement('button');bTB.className='btn back-to-topics-btn'; bTB.id='back-to-topics-btn-results'; bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;bTB.onclick=showTopicList;aD.appendChild(bTB); quizButtonsContainerElement.appendChild(aD); }
 
-        function displayResults(){
-            if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;
-            quizContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';
+        // --- Answer Review (reviewAnswers, calculateReviewStatus, reviewMultipleChoiceReview, reviewMatchingReview, reviewOrderingReview remain the same) ---
+        function reviewAnswers(){if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;quizContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';const strings = getStrings();quizTitleElement.textContent = `${strings.reviewTitlePrefix || 'Review'}: ${quizState.lesson || ''}`;const rD=document.createElement('div');rD.className='review-container';quizState.questions.forEach((q,i)=>{const questionDiv=document.createElement('div');const userAnswer=quizState.selectedAnswers[i];let {correctnessClass: statusClass, statusText} = calculateReviewStatus(q, userAnswer); questionDiv.className=`question-review ${statusClass}`; const questionTypeDisplay=(q.type||'multiple_choice').replace('_',' ');questionDiv.innerHTML=`<div class="review-question-header"><span class="review-question-number">Q ${i+1} (${questionTypeDisplay})</span><span class="review-status">${statusText}</span></div><p class="review-question-text">${q.question||'?'}</p><div class="review-answer-content" id="review-answer-content-${i}"></div>`;rD.appendChild(questionDiv);const contentArea=questionDiv.querySelector(`#review-answer-content-${i}`);if(contentArea){try{switch(q.type){case"matching": reviewMatchingReview(q,userAnswer,contentArea);break;case"ordering": reviewOrderingReview(q,userAnswer,contentArea);break;case"multiple_choice": default: reviewMultipleChoiceReview(q,userAnswer,contentArea);break;}} catch(e) {console.error("Error rendering review answer:", e);contentArea.innerHTML=`<p style="color:red">Error displaying review.</p>`;}} else {console.warn(`Could not find content area for review question ${i}`);}});quizContainerElement.appendChild(rD);const aD=document.createElement('div');aD.className='review-actions quiz-buttons';const bRB=document.createElement('button');bRB.className='btn back-btn'; bRB.id = 'back-btn'; bRB.innerHTML=`<span>←</span> <span class="btn-text">${strings.backToResults || 'Back to Results'}</span>`; bRB.onclick=displayResults;aD.appendChild(bRB);const bTB=document.createElement('button');bTB.className='btn back-to-topics-btn'; bTB.id = 'back-to-topics-btn-review'; bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`; bTB.onclick=showTopicList;aD.appendChild(bTB);quizButtonsContainerElement.appendChild(aD);quizContainerElement.scrollIntoView({behavior:'smooth',block:'start'});}
+        function calculateReviewStatus(q,uA){let correctnessClass='incorrect';let statusText = getStrings().reviewStatusIncorrect || '✗ Incorrect'; let isCorrect = false;let isPartial = false;const strings = getStrings(); try{switch(q.type){case"matching":const correctPairs = q.answer || {};const totalCorrectPairs = Object.keys(correctPairs).length;let correctlyMatchedCount = 0;if(totalCorrectPairs > 0 && uA && typeof uA === 'object') {for(const pI in correctPairs) {if(uA.hasOwnProperty(pI) && uA[pI] === correctPairs[pI]) {correctlyMatchedCount++;}}}isCorrect = totalCorrectPairs > 0 && correctlyMatchedCount === totalCorrectPairs && Object.keys(uA || {}).length === totalCorrectPairs;isPartial = totalCorrectPairs > 0 && correctlyMatchedCount > 0 && !isCorrect;if (isCorrect) {correctnessClass = "correct";statusText = strings.reviewStatusCorrect || "✓ Correct";} else if (isPartial) {correctnessClass = "partial";statusText = (strings.reviewStatusPartial || "~ Partial ({correct}/{total})").replace('{correct}', correctlyMatchedCount).replace('{total}', totalCorrectPairs);} else if (uA === null || Object.keys(uA || {}).length === 0) { statusText = strings.reviewStatusUnanswered || 'Unanswered';}break;case"ordering":isCorrect = uA && Array.isArray(uA) && q.answer && Array.isArray(q.answer) && JSON.stringify(uA) === JSON.stringify(q.answer);if (uA === null || !Array.isArray(uA)) { statusText = strings.reviewStatusUnanswered || 'Unanswered';correctnessClass = 'incorrect';} else if (isCorrect) {correctnessClass = "correct";statusText = strings.reviewStatusCorrect || "✓ Correct";}break;case"multiple_choice": default:isCorrect = uA !== null && q.options && q.answer && q.options[uA] === q.answer;if (uA === null) { statusText = strings.reviewStatusUnanswered || 'Unanswered';correctnessClass = 'incorrect';} else if (isCorrect) {correctnessClass = "correct";statusText = strings.reviewStatusCorrect || "✓ Correct";}break;}} catch(e) {console.error("Error calculating review status:", e);correctnessClass = 'incorrect';statusText = 'Error';}return { correctnessClass, statusText };}
+        function reviewMultipleChoiceReview(q,uAI,c){const strings = getStrings();const d=document.createElement("div");d.className="review-mc-answer";const userSelectedText=(uAI!==null&&q.options?.[uAI]!==undefined)?q.options[uAI]:(strings.reviewStatusUnanswered || "No answer"); const isCorrect=(uAI!==null&&userSelectedText===q.answer);let userAnswerHTML=`<span class="user-answer-text`;if(uAI===null)userAnswerHTML+=`">`; else if(isCorrect)userAnswerHTML+=` correct">`; else userAnswerHTML+=` incorrect">`;userAnswerHTML+=`${userSelectedText}</span>`;d.innerHTML=`<p><strong>${strings.resultsYourAnswerLabel || 'Your Answer:'}</strong> ${userAnswerHTML}</p>`;if(!isCorrect && uAI !== null) { d.innerHTML+=`<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer||"N/A"}</span></p>`;} else if (!isCorrect && uAI === null) { d.innerHTML+=`<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer||"N/A"}</span></p>`;}c.appendChild(d);}
+        function reviewMatchingReview(q,uP,c){const strings = getStrings();const d=document.createElement("div");d.className="review-matching-answer";d.innerHTML=`<p><strong>${strings.matchingMatchesHeader || 'Matches'}:</strong></p>`;const grid=document.createElement("div");grid.className="review-matching-grid";const promptsCol=document.createElement("div"), matchesCol=document.createElement("div");promptsCol.className="review-matching-column";matchesCol.className="review-matching-column";const correctPairs=q.answer||{},promptsList=q.prompts||[],matchesList=q.matches||[];promptsList.forEach((promptText,promptIndex)=>{const userMatchIndex=uP?uP[promptIndex]:null; const correctMatchIndex=correctPairs[promptIndex]; const isPairCorrect=(userMatchIndex!==null&&userMatchIndex===correctMatchIndex);const promptDiv=document.createElement("div");promptDiv.textContent=`${promptIndex+1}. ${promptText}`;const matchDiv=document.createElement("div");const userMatchText = (userMatchIndex!==null&&matchesList[userMatchIndex]!==undefined)?matchesList[userMatchIndex]:`(${strings.reviewStatusUnanswered || 'Unanswered'})`; const correctMatchText = (correctMatchIndex!==undefined&&matchesList[correctMatchIndex]!==undefined)?matchesList[correctMatchIndex]:"(N/A)"; if (isPairCorrect) {promptDiv.className="review-matched-pair-correct";matchDiv.textContent=correctMatchText; matchDiv.className="review-matched-pair-correct";} else {promptDiv.className="review-matched-pair-incorrect";matchDiv.innerHTML=`<span style="text-decoration:line-through;">${userMatchText}</span> <span style="font-weight:500;">(${correctMatchText})</span>`;matchDiv.className="review-matched-pair-incorrect";}promptsCol.appendChild(promptDiv);matchesCol.appendChild(matchDiv);});grid.append(promptsCol,matchesCol);d.appendChild(grid);c.appendChild(d);}
+        function reviewOrderingReview(q,uOI,c){const strings = getStrings();const d=document.createElement("div");d.className="review-ordering-answer";const correctOrder=q.answer||[];const isFullyCorrect=uOI&&JSON.stringify(uOI)===JSON.stringify(correctOrder);d.innerHTML=`<p><strong>${strings.orderingInstruction ? strings.orderingInstruction.split(':')[0] : 'Ordering'}:</strong></p>`;const list=document.createElement("div");list.className="review-ordering-list";correctOrder.forEach((correctItemText,correctIndex)=>{const itemDiv=document.createElement("div");itemDiv.className="review-ordering-list-item";const userIndex = uOI ? uOI.indexOf(correctItemText) : -1;const userPosition = (userIndex !== -1) ? userIndex + 1 : null; const correctPosition = correctIndex + 1; let numberSpanHTML='';if (userPosition === correctPosition) { numberSpanHTML=`<span class="review-order-number review-order-correct">${correctPosition}.</span>`;itemDiv.style.backgroundColor='var(--correct-bg)';} else if (userPosition !== null) { numberSpanHTML=`<span class="review-order-number review-order-incorrect">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;itemDiv.style.backgroundColor='var(--incorrect-bg)';} else { numberSpanHTML=`<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;itemDiv.style.backgroundColor='var(--partial-bg)';}itemDiv.innerHTML=`${numberSpanHTML} ${correctItemText}`;list.appendChild(itemDiv);});d.appendChild(list);c.appendChild(d);}
 
-            const strings = getStrings();
-            quizTitleElement.textContent = strings.viewResults || 'Quiz Results'; // Set title
+        // --- Error Display (showError remains the same) ---
+        function showError(subj, unit, lesson, customMessage = '') {if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;showQuizView(); const strings = getStrings();quizTitleElement.textContent = strings.defaultErrorMessage.includes('load') ? strings.defaultErrorMessage : 'Error'; quizContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';const defaultMsg = (strings.defaultErrorMessage || "No questions found for \"{lesson}\" in \"{unit}\".").replace('{lesson}', lesson || 'N/A').replace('{unit}', unit || 'N/A');const displayMsg = customMessage || defaultMsg;const errorDiv=document.createElement('div');errorDiv.className='error-display';errorDiv.innerHTML=`<div class="error-message">${displayMsg}</div>`;const backBtn=document.createElement('button');backBtn.className='btn back-to-topics-btn'; backBtn.id='back-to-topics-btn-error'; backBtn.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;backBtn.onclick=showTopicList;errorDiv.appendChild(backBtn);quizContainerElement.appendChild(errorDiv);}
 
-            const tT=quizState.endTime&&quizState.startTime?Math.round((quizState.endTime-quizState.startTime)/1000):0;
-            const tS=formatTime(tT);
-            const score = quizState.totalQuestions>0?(quizState.correctAnswers/quizState.totalQuestions)*100:0;
-            const scoreRounded=score.toFixed(0);
-
-            // Save stats if questions existed
-            if(quizState.totalQuestions>0)saveLessonStats(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.correctAnswers,quizState.totalQuestions,tT);
-
-            // Determine result message using i18n strings
-            let resultMessageKey = 'quizResultPractice'; // Default
-            if (quizState.totalQuestions === 0) resultMessageKey = 'quizResultNoQuestions';
-            else if (score >= 90) resultMessageKey = 'quizResultExcellent';
-            else if (score >= 70) resultMessageKey = 'quizResultGreat';
-            else if (score >= 50) resultMessageKey = 'quizResultGood';
-            const resultMessage = strings[resultMessageKey] || '';
-
-            const rD=document.createElement('div');rD.className='results-container';
-            // Use resultMessage for the header
-            rD.innerHTML=` <h2 class="results-header">${resultMessage}</h2> <div class="results-score"><div class="score-circle"><span class="score-number">${scoreRounded}</span><span class="score-percent-sign">%</span></div></div> <div class="results-details"> <p data-detail-key="subject"><span class="detail-icon">📚</span><strong>${strings.resultsSubjectLabel || 'Subject:'}</strong> <span class="detail-value">${quizState.subject||'N/A'}</span></p> <p data-detail-key="semester"><span class="detail-icon">🗓️</span><strong>${strings.resultsSemesterLabel || 'Semester:'}</strong> <span class="detail-value">${quizState.semester||'N/A'}</span></p> <p data-detail-key="unit"><span class="detail-icon">🔖</span><strong>${strings.resultsUnitLabel || 'Unit:'}</strong> <span class="detail-value">${quizState.unit||'N/A'}</span></p> <p data-detail-key="lesson"><span class="detail-icon">📖</span><strong>${strings.resultsLessonLabel || 'Lesson:'}</strong> <span class="detail-value">${quizState.lesson||'N/A'}</span></p> <p data-detail-key="correct"><span class="detail-icon">✅</span><strong>${strings.resultsCorrectLabel || 'Correct:'}</strong> <span class="detail-value">${quizState.correctAnswers}/${quizState.totalQuestions}</span></p> <p data-detail-key="time"><span class="detail-icon">⏱️</span><strong>${strings.resultsTimeLabel || 'Time:'}</strong> <span class="detail-value">${tS}</span></p> </div>`;
-            quizContainerElement.appendChild(rD);
-
-            // Actions Container
-            const aD=document.createElement('div');aD.className='results-actions quiz-buttons'; // Re-use class for consistent styling
-
-            // Redo Button
-            const rB=document.createElement('button');rB.className='btn redo-btn'; rB.id='redo-btn'; rB.innerHTML=`🔄 <span class="btn-text">${strings.redoQuiz || 'Redo Quiz'}</span>`; rB.onclick=()=>{startQuiz(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.originalQuestions);};
-            aD.appendChild(rB);
-
-            // Review Button (only if there were questions)
-            if(quizState.totalQuestions>0){const revB=document.createElement('button');revB.id='review-btn';revB.className='btn review-btn';revB.innerHTML=`🧐 <span class="btn-text">${strings.reviewAnswers || 'Review Answers'}</span>`;revB.onclick=reviewAnswers;aD.appendChild(revB);}
-
-            // Back to Topics Button
-            const bTB=document.createElement('button');bTB.className='btn back-to-topics-btn'; bTB.id='back-to-topics-btn-results'; bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;bTB.onclick=showTopicList;
-            aD.appendChild(bTB); // Add to actions container
-
-            quizButtonsContainerElement.appendChild(aD); // Add actions container to main button area
-            // updateUiLanguage(getCurrentLang()); // No need, labels set directly
-        }
-
-
-        // --- Answer Review ---
-        function reviewAnswers(){
-            if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;
-            quizContainerElement.innerHTML='';feedbackContainerElement.classList.add('hidden');quizButtonsContainerElement.innerHTML='';
-
-            const strings = getStrings();
-            quizTitleElement.textContent = `${strings.reviewTitlePrefix || 'Review'}: ${quizState.lesson || ''}`;
-
-            const rD=document.createElement('div');rD.className='review-container';
-            quizState.questions.forEach((q,i)=>{
-                const questionDiv=document.createElement('div');
-                const userAnswer=quizState.selectedAnswers[i];
-                let {correctnessClass: statusClass, statusText} = calculateReviewStatus(q, userAnswer); // Get status class and text
-
-                questionDiv.className=`question-review ${statusClass}`; // Use class from calculation
-                const questionTypeDisplay=(q.type||'multiple_choice').replace('_',' ');
-
-                // Build header with status
-                questionDiv.innerHTML=`<div class="review-question-header"><span class="review-question-number">Q ${i+1} (${questionTypeDisplay})</span><span class="review-status">${statusText}</span></div><p class="review-question-text">${q.question||'?'}</p><div class="review-answer-content" id="review-answer-content-${i}"></div>`;
-                rD.appendChild(questionDiv);
-
-                // Populate answer details
-                const contentArea=questionDiv.querySelector(`#review-answer-content-${i}`);
-                if(contentArea){
-                    try{
-                        switch(q.type){
-                            case"matching": reviewMatchingReview(q,userAnswer,contentArea);break;
-                            case"ordering": reviewOrderingReview(q,userAnswer,contentArea);break;
-                            case"multiple_choice": default: reviewMultipleChoiceReview(q,userAnswer,contentArea);break;
-                        }
-                    } catch(e) {
-                        console.error("Error rendering review answer:", e);
-                        contentArea.innerHTML=`<p style="color:red">Error displaying review.</p>`; // i18n needed
-                    }
-                } else {
-                    console.warn(`Could not find content area for review question ${i}`);
-                }
-            });
-            quizContainerElement.appendChild(rD);
-
-            // Actions Container
-            const aD=document.createElement('div');aD.className='review-actions quiz-buttons';
-
-            // Back to Results Button
-            const bRB=document.createElement('button');bRB.className='btn back-btn'; bRB.id = 'back-btn'; bRB.innerHTML=`<span>←</span> <span class="btn-text">${strings.backToResults || 'Back to Results'}</span>`; bRB.onclick=displayResults;
-            aD.appendChild(bRB);
-
-            // Back to Topics Button
-            const bTB=document.createElement('button');bTB.className='btn back-to-topics-btn'; bTB.id = 'back-to-topics-btn-review'; bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`; bTB.onclick=showTopicList;
-            aD.appendChild(bTB);
-
-            quizButtonsContainerElement.appendChild(aD);
-            quizContainerElement.scrollIntoView({behavior:'smooth',block:'start'});
-            // updateUiLanguage(getCurrentLang()); // No need, set directly
-        }
-
-        function calculateReviewStatus(q,uA){
-            let correctnessClass='incorrect';
-            let statusText = getStrings().reviewStatusIncorrect || '✗ Incorrect'; // Default to incorrect
-            let isCorrect = false;
-            let isPartial = false;
-            const strings = getStrings(); // Get strings once
-
-            try{
-                switch(q.type){
-                    case"matching":
-                        const correctPairs = q.answer || {};
-                        const totalCorrectPairs = Object.keys(correctPairs).length;
-                        let correctlyMatchedCount = 0;
-                        if(totalCorrectPairs > 0 && uA && typeof uA === 'object') {
-                            for(const pI in correctPairs) {
-                                if(uA.hasOwnProperty(pI) && uA[pI] === correctPairs[pI]) {
-                                    correctlyMatchedCount++;
-                                }
-                            }
-                        }
-                        isCorrect = totalCorrectPairs > 0 && correctlyMatchedCount === totalCorrectPairs && Object.keys(uA || {}).length === totalCorrectPairs;
-                        isPartial = totalCorrectPairs > 0 && correctlyMatchedCount > 0 && !isCorrect;
-
-                        if (isCorrect) {
-                            correctnessClass = "correct";
-                            statusText = strings.reviewStatusCorrect || "✓ Correct";
-                        } else if (isPartial) {
-                            correctnessClass = "partial";
-                            statusText = (strings.reviewStatusPartial || "~ Partial ({correct}/{total})")
-                                         .replace('{correct}', correctlyMatchedCount)
-                                         .replace('{total}', totalCorrectPairs);
-                        } else if (uA === null || Object.keys(uA || {}).length === 0) {
-                             statusText = strings.reviewStatusUnanswered || 'Unanswered';
-                        }
-                        break;
-
-                    case"ordering":
-                        isCorrect = uA && Array.isArray(uA) && q.answer && Array.isArray(q.answer) && JSON.stringify(uA) === JSON.stringify(q.answer);
-                        if (uA === null || !Array.isArray(uA)) { // Check if unanswered
-                            statusText = strings.reviewStatusUnanswered || 'Unanswered';
-                            correctnessClass = 'incorrect'; // Keep class as incorrect
-                        } else if (isCorrect) {
-                            correctnessClass = "correct";
-                            statusText = strings.reviewStatusCorrect || "✓ Correct";
-                        }
-                        // No partial state for ordering in this logic
-                        break;
-
-                    case"multiple_choice": default:
-                        isCorrect = uA !== null && q.options && q.answer && q.options[uA] === q.answer;
-                        if (uA === null) { // Check if unanswered
-                            statusText = strings.reviewStatusUnanswered || 'Unanswered';
-                            correctnessClass = 'incorrect';
-                        } else if (isCorrect) {
-                            correctnessClass = "correct";
-                            statusText = strings.reviewStatusCorrect || "✓ Correct";
-                        }
-                        break;
-                }
-            } catch(e) {
-                console.error("Error calculating review status:", e);
-                correctnessClass = 'incorrect';
-                statusText = 'Error'; // Keep simple error text
-            }
-            return { correctnessClass, statusText };
-        }
-
-        function reviewMultipleChoiceReview(q,uAI,c){
-            const strings = getStrings();
-            const d=document.createElement("div");d.className="review-mc-answer";
-            const userSelectedText=(uAI!==null&&q.options?.[uAI]!==undefined)?q.options[uAI]:(strings.reviewStatusUnanswered || "No answer"); // Use unanswered string
-            const isCorrect=(uAI!==null&&userSelectedText===q.answer);
-            let userAnswerHTML=`<span class="user-answer-text`;
-            if(uAI===null)userAnswerHTML+=`">`; // Neutral style for unanswered
-            else if(isCorrect)userAnswerHTML+=` correct">`;
-            else userAnswerHTML+=` incorrect">`;
-            userAnswerHTML+=`${userSelectedText}</span>`;
-            // Use translated labels
-            d.innerHTML=`<p><strong>${strings.resultsYourAnswerLabel || 'Your Answer:'}</strong> ${userAnswerHTML}</p>`;
-            if(!isCorrect && uAI !== null) { // Only show correct if user answered incorrectly
-                d.innerHTML+=`<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer||"N/A"}</span></p>`;
-            } else if (!isCorrect && uAI === null) { // Show correct if unanswered
-                 d.innerHTML+=`<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer||"N/A"}</span></p>`;
-            }
-            c.appendChild(d);
-        }
-        function reviewMatchingReview(q,uP,c){
-            const strings = getStrings();
-            const d=document.createElement("div");d.className="review-matching-answer";
-            d.innerHTML=`<p><strong>${strings.matchingMatchesHeader || 'Matches'}:</strong></p>`; // Use translated header
-            const grid=document.createElement("div");grid.className="review-matching-grid";
-            const promptsCol=document.createElement("div"), matchesCol=document.createElement("div");
-            promptsCol.className="review-matching-column";matchesCol.className="review-matching-column";
-            const correctPairs=q.answer||{},promptsList=q.prompts||[],matchesList=q.matches||[];
-
-            promptsList.forEach((promptText,promptIndex)=>{
-                const userMatchIndex=uP?uP[promptIndex]:null; // User's matched index for this prompt
-                const correctMatchIndex=correctPairs[promptIndex]; // Correct matched index for this prompt
-                const isPairCorrect=(userMatchIndex!==null&&userMatchIndex===correctMatchIndex);
-
-                const promptDiv=document.createElement("div");promptDiv.textContent=`${promptIndex+1}. ${promptText}`;
-                const matchDiv=document.createElement("div");
-
-                // Get text for user's match and correct match
-                const userMatchText = (userMatchIndex!==null&&matchesList[userMatchIndex]!==undefined)?matchesList[userMatchIndex]:`(${strings.reviewStatusUnanswered || 'Unanswered'})`; // Use unanswered string
-                const correctMatchText = (correctMatchIndex!==undefined&&matchesList[correctMatchIndex]!==undefined)?matchesList[correctMatchIndex]:"(N/A)"; // N/A if correct answer is missing
-
-                if (isPairCorrect) {
-                    promptDiv.className="review-matched-pair-correct";
-                    matchDiv.textContent=correctMatchText; // Show only the correct match
-                    matchDiv.className="review-matched-pair-correct";
-                } else {
-                    promptDiv.className="review-matched-pair-incorrect";
-                    // Show user's incorrect match (struck through) and the correct one
-                    matchDiv.innerHTML=`<span style="text-decoration:line-through;">${userMatchText}</span> <span style="font-weight:500;">(${correctMatchText})</span>`;
-                    matchDiv.className="review-matched-pair-incorrect";
-                }
-                promptsCol.appendChild(promptDiv);
-                matchesCol.appendChild(matchDiv);
-            });
-            grid.append(promptsCol,matchesCol);
-            d.appendChild(grid);
-            c.appendChild(d);
-        }
-        function reviewOrderingReview(q,uOI,c){
-            const strings = getStrings();
-            const d=document.createElement("div");d.className="review-ordering-answer";
-            const correctOrder=q.answer||[];
-            const isFullyCorrect=uOI&&JSON.stringify(uOI)===JSON.stringify(correctOrder);
-            d.innerHTML=`<p><strong>${strings.orderingInstruction ? strings.orderingInstruction.split(':')[0] : 'Ordering'}:</strong></p>`; // Basic label
-
-            const list=document.createElement("div");list.className="review-ordering-list";
-
-            correctOrder.forEach((correctItemText,correctIndex)=>{
-                const itemDiv=document.createElement("div");
-                itemDiv.className="review-ordering-list-item";
-
-                // Find where the user placed this item
-                const userIndex = uOI ? uOI.indexOf(correctItemText) : -1;
-                const userPosition = (userIndex !== -1) ? userIndex + 1 : null; // User's selected position (1-based)
-                const correctPosition = correctIndex + 1; // Correct position (1-based)
-
-                let numberSpanHTML='';
-                if (userPosition === correctPosition) { // Correctly placed
-                    numberSpanHTML=`<span class="review-order-number review-order-correct">${correctPosition}.</span>`;
-                    itemDiv.style.backgroundColor='var(--correct-bg)';
-                } else if (userPosition !== null) { // Placed, but incorrectly
-                    numberSpanHTML=`<span class="review-order-number review-order-incorrect">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
-                    itemDiv.style.backgroundColor='var(--incorrect-bg)';
-                } else { // Not placed by user (likely unanswered or error)
-                    numberSpanHTML=`<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
-                    itemDiv.style.backgroundColor='var(--partial-bg)'; // Use partial as 'missed'
-                }
-
-                itemDiv.innerHTML=`${numberSpanHTML} ${correctItemText}`;
-                list.appendChild(itemDiv);
-            });
-            d.appendChild(list);
-            c.appendChild(d);
-        }
-
-
-        // --- Error Display ---
-        function showError(subj, unit, lesson, customMessage = '') {
-            if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement||!quizTitleElement)return;
-            showQuizView(); // Ensure quiz view is visible
-
-            const strings = getStrings();
-            quizTitleElement.textContent = strings.defaultErrorMessage.includes('load') ? strings.defaultErrorMessage : 'Error'; // Generic title
-
-            quizContainerElement.innerHTML=''; // Clear previous content
-            feedbackContainerElement.classList.add('hidden');
-            quizButtonsContainerElement.innerHTML='';
-
-            // Construct error message
-            const defaultMsg = (strings.defaultErrorMessage || "No questions found for \"{lesson}\" in \"{unit}\".")
-                                .replace('{lesson}', lesson || 'N/A')
-                                .replace('{unit}', unit || 'N/A');
-            const displayMsg = customMessage || defaultMsg;
-
-            const errorDiv=document.createElement('div');
-            errorDiv.className='error-display';
-            errorDiv.innerHTML=`<div class="error-message">${displayMsg}</div>`;
-
-            // Back button
-            const backBtn=document.createElement('button');
-            backBtn.className='btn back-to-topics-btn'; // Use consistent class
-            backBtn.id='back-to-topics-btn-error'; // Specific ID if needed
-            backBtn.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;
-            backBtn.onclick=showTopicList;
-            errorDiv.appendChild(backBtn);
-
-            quizContainerElement.appendChild(errorDiv);
-            // updateUiLanguage(getCurrentLang()); // Buttons set directly
-        }
-
-        // --- Get Questions Data ---
+        // --- Get Questions Data (getQuestions remains the same) ---
         function getQuestions(subj,sem,unitT,lessonT){if(!subj||!sem||!unitT||!lessonT)return console.error("Missing getQ params:",{subj,sem,unitT,lessonT}),[];try{const sD=topicsData[subj]?.[sem];if(!sD?.units)return console.warn(`Units miss: ${subj}->${sem}`),[];const u=sD.units.find(un=>un?.title===unitT);if(!u?.lessons)return console.warn(`Unit/Les miss: "${unitT}" ${subj}->${sem}.`),[];const l=u.lessons.find(ls=>ls?.title===lessonT);if(!l)return console.warn(`Les miss: "${lessonT}".`),[];if(Array.isArray(l.questions)&&l.questions.length>0)return l.questions.map(q=>({...(q.type?{}:{type:'multiple_choice'}),...q}));else return console.log(`No Qs for "${lessonT}".`),[];}catch(e){console.error("Err getQ:",e);return[];}}
 
         // --- END OF questions.js ---
