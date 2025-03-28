@@ -103,6 +103,9 @@
         .rtl-layout .ordering-select { margin-right: 0; margin-left: 15px; }
         .rtl-layout #feedback-container { text-align: right; }
         .rtl-layout .incorrect-feedback span { text-align: right; }
+        /* RTL: Adjust Explanation Alignment */
+        .rtl-layout .feedback-explanation { text-align: right; }
+        .rtl-layout .feedback-explanation[dir="ltr"] { text-align: left; } /* Keep LTR explanations left-aligned */
         .rtl-layout #quiz-buttons-container { justify-content: flex-start; }
         .rtl-layout .results-actions .back-to-topics-btn { margin-left: 0; margin-right: auto; }
         .rtl-layout .review-actions .back-to-topics-btn { margin-left: 0; margin-right: auto; }
@@ -245,6 +248,33 @@
         .correct-option .option-text { color: var(--correct-text) !important; }
         .incorrect-option { background-color: var(--incorrect-bg) !important; border-color: var(--incorrect-border) !important; }
         .incorrect-option .option-text { color: var(--incorrect-text) !important; }
+        /* --- START: Added Explanation CSS --- */
+        .feedback-explanation {
+            margin-top: 12px; /* Space between feedback/answer and explanation */
+            padding-top: 12px;
+            border-top: 1px solid var(--feedback-border); /* Separator line */
+            font-size: 0.9em; /* Slightly smaller font */
+            color: var(--text-muted); /* Muted text color */
+            line-height: 1.6; /* Improve readability */
+            text-align: left; /* Ensure LTR text aligns left even in RTL layout */
+        }
+        /* Ensure explanation text direction is LTR if content is always LTR */
+        .feedback-explanation[dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+        .rtl-layout .feedback-explanation {
+            text-align: right; /* Align right in RTL layout */
+        }
+        .rtl-layout .feedback-explanation[dir="ltr"] {
+            text-align: left; /* Override if explanation content is LTR */
+        }
+        /* Review screen specific margin */
+        .review-answer-content .feedback-explanation {
+            margin-top: 15px;
+        }
+        /* --- END: Added Explanation CSS --- */
+
 
         /* Button container */
         #quiz-buttons-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
@@ -393,7 +423,7 @@
                 <button class="btn back-to-topics-btn" id="back-to-topics-btn" onclick="showTopicList()"><span>⬅️</span> <span class="btn-text">Back to Topics</span></button>
             </div>
             <div id="quiz-container"></div>
-            <div id="feedback-container" class="feedback-container hidden"></div>
+            <div id="feedback-container" class="feedback-container hidden"></div> <!-- Updated class name -->
             <div id="quiz-buttons-container" class="quiz-buttons"></div>
         </div>
     </div>
@@ -444,7 +474,7 @@
 
     <script>
         // --- START OF topics.js ---
-        // Data remains the same as provided...
+        // Data includes explanation fields now
         const topicsData = {
     "english": {
         "first": {
@@ -460,19 +490,22 @@
                                     "type": "multiple_choice",
                                     "question": "Device in 'curtain of night fell'?",
                                     "options": ["Simile", "Metaphor", "Alliteration", "Hyperbole","test"],
-                                    "answer": "Metaphor"
+                                    "answer": "Metaphor",
+                                    "explanation": "A metaphor directly compares two unlike things without using 'like' or 'as'. 'Curtain of night' compares the falling night to a curtain closing."
                                 },
                                 {
                                     "type": "multiple_choice",
                                     "question": "'Ambiguous' means:",
                                     "options": ["Clear", "Uncertain", "Definite", "Determined"],
                                     "answer": "Uncertain"
+                                    // No explanation provided for this one - it's optional
                                 },
                                 {
                                     "type": "ordering",
                                     "question": "Order alphabetically:",
                                     "items": ["Banana", "Apple", "Cherry", "Date", "Fig"],
-                                    "answer": ["Apple", "Banana", "Cherry", "Date", "Fig"]
+                                    "answer": ["Apple", "Banana", "Cherry", "Date", "Fig"],
+                                    "explanation": "Items are sorted based on the standard English alphabet order (A, B, C, D, F)."
                                 },
                                 {
                                     "type": "matching",
@@ -485,19 +518,22 @@
                                         "2": 0,
                                         "3": 3,
                                         "4": 4
-                                    }
+                                    },
+                                    "explanation": "Paris is the capital of France, Tokyo of Japan, Cairo of Egypt, Brasília of Brazil, and Ottawa of Canada."
                                 },
                                 {
                                     "type": "ordering",
                                     "question": "Order tea steps:",
                                     "items": ["Add tea bag", "Boil water", "Pour water"],
-                                    "answer": ["Boil water", "Add tea bag", "Pour water"]
+                                    "answer": ["Boil water", "Add tea bag", "Pour water"],
+                                    "explanation": "You must boil the water first. Then, add the tea bag to the cup before pouring the hot water over it."
                                 },
                                 {
                                     "type": "multiple_choice",
-                                    "question": "'Ambiguous' means:",
-                                    "options": ["Clear", "Uncertain", "Definite", "Determined","test"],
-                                    "answer": "Uncertain"
+                                    "question": "'Concise' means:", // Changed question for variety
+                                    "options": ["Lengthy", "Wordy", "Brief", "Complicated"],
+                                    "answer": "Brief",
+                                    "explanation": "'Concise' means expressing much in few words; it's the opposite of lengthy or wordy."
                                 },
                                 ]
                         },
@@ -506,15 +542,17 @@
                             "questions": [
                                 {
                                     "type": "multiple_choice",
-                                    "question": "Correct tense: 'She ___ school.'",
+                                    "question": "Correct tense: 'She ___ to school every day.'", // Added frequency
                                     "options": ["go", "goes", "going", "went"],
-                                    "answer": "goes"
+                                    "answer": "goes",
+                                     "explanation": "For third-person singular subjects (like 'She') in the present simple tense (used for routines like 'every day'), we add '-es' to verbs ending in 'o'."
                                 },
                                 {
                                     "type": "multiple_choice",
-                                    "question": "Correct tag: 'test'",
-                                    "options": ["aren't you", "don't you", "isn't you", "won't you","test","test11"],
-                                    "answer": "aren't you"
+                                    "question": "Correct tag: 'You are studying, ___?'", // Corrected question
+                                    "options": ["aren't you", "don't you", "isn't you", "won't you"],
+                                    "answer": "aren't you",
+                                    "explanation": "Question tags use the opposite form of the auxiliary verb ('are' becomes 'aren't') and the same subject pronoun ('you')."
                                 }
                             ]
                         }
@@ -599,24 +637,24 @@
                                     "type": "multiple_choice",
                                     "question": "ما معنى كلمة 'البر' في قوله تعالى 'لن تنالوا البر حتى تنفقوا مما تحبون'؟",
                                     "options": ["الخير", "الصدق", "العدل", "الوفاء"],
-                                    "answer": "الخير"
+                                    "answer": "الخير",
+                                    "explanation": "البر هو اسم جامع لكل أنواع الخير والطاعة."
                                 },
                                 {
                                     "type": "ordering",
                                     "question": "رتب مراحل الوحي حسب نزولها:",
                                     "items": ["اقرأ باسم ربك", "المدثر", "الفاتحة"],
-                                    "answer": ["اقرأ باسم ربك", "المدثر", "الفاتحة"]
+                                    "answer": ["اقرأ باسم ربك", "المدثر", "الفاتحة"],
+                                    "explanation": "أول ما نزل من القرآن هو صدر سورة العلق ('اقرأ')، ثم تلاها فترة انقطاع، ثم نزلت سورة المدثر، وتعتبر الفاتحة أول سورة كاملة نزلت."
                                 },
                                 {
                                     "type": "matching",
                                     "question": "صل بين المصطلح وتعريفه:",
                                     "prompts": ["التجويد", "التفسير", "الناسخ والمنسوخ"],
                                     "matches": ["علم كيفية النطق الصحيح للقرآن", "علم بيان معاني القرآن", "علم الآيات التي تغير حكمها"],
-                                    "answer": {
-                                        "0": 0,
-                                        "1": 1,
-                                        "2": 2
-                                    }
+                                    "answer": { "0": 0, "1": 1, "2": 2 },
+                                    "explanation": "التجويد يتعلق بالنطق، التفسير ببيان المعنى، والناسخ والمنسوخ بتغير الأحكام."
+                                 }
                                 }
                             ]
                         },
@@ -1426,6 +1464,8 @@
                 // If confirmed or not in quiz view, proceed
                 if (!quizViewElement.classList.contains('hidden')) {
                     // No need to call showTopicList here, handleSectionClick will manage views
+                     // *** Explicitly call cleanup when starting a new quiz from quiz view ***
+                     cleanupQuizView();
                 }
                 const s=l.dataset.subject,sem=l.dataset.semester,u=l.dataset.unit,les=l.dataset.lesson;
                 handleSectionClick(s,sem,u,les);
@@ -1454,9 +1494,7 @@
             updateContent(); // Refresh content and stats display
 
             // Cleanup quiz-specific things
-            if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
-            if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
-            quizState = {currentQuestionIndex:0,correctAnswers:0,totalQuestions:0,startTime:null,endTime:null,selectedAnswers:[],questions:[],originalQuestions:[],subject:'',unit:'',lesson:'',semester:'',matchingState:{selectedPromptElement:null, selectedMatchElement: null, userPairs:{}}};
+            cleanupQuizView(); // <-- Use the cleanup function
 
             // Optional: Scroll to top of container
             mainContainerElement.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1470,6 +1508,36 @@
                  // Scroll to the top of the quiz view
                  quizViewElement.scrollIntoView({behavior:'smooth',block:'start'});
             }
+        }
+        // *** Added Cleanup Function ***
+        function cleanupQuizView() {
+            // Disconnect MutationObserver if it exists
+            if (matchingArrowObserver) {
+                matchingArrowObserver.disconnect();
+                matchingArrowObserver = null;
+            }
+            // Remove SVG element if it exists
+            if (matchingSvgElement && matchingSvgElement.parentNode) {
+                matchingSvgElement.remove();
+                matchingSvgElement = null;
+            }
+            // Destroy SortableJS instances (if using Drag-and-Drop alternative)
+            quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
+
+            // Reset quiz state (important parts)
+            quizState = {
+                currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: 0,
+                startTime: null, endTime: null, selectedAnswers: [], questions: [],
+                originalQuestions: [], subject: '', unit: '', lesson: '', semester: '',
+                matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] } // Reset matching state including sortable instances
+            };
+             // Clear dynamic containers just in case
+             if (quizContainerElement) quizContainerElement.innerHTML = '';
+             if (feedbackContainerElement) {
+                 feedbackContainerElement.innerHTML = '';
+                 feedbackContainerElement.classList.add('hidden');
+             }
+             if (quizButtonsContainerElement) quizButtonsContainerElement.innerHTML = '';
         }
 
         // --- Core Functions ---
@@ -1526,7 +1594,14 @@
 
         function startQuiz(subj,sem,unit,lesson,oQ){
             const sQ = shuffleArray(oQ);
-            quizState = {currentQuestionIndex:0,correctAnswers:0,totalQuestions:sQ.length,startTime:new Date(),endTime:null,selectedAnswers:new Array(sQ.length).fill(null),questions:sQ,originalQuestions:oQ,subject:subj,unit:unit,lesson:lesson,semester:sem,matchingState:{selectedPromptElement:null, selectedMatchElement: null, userPairs:{}}};
+            // Reset state (partially done by cleanupQuizView, but ensure full reset here)
+             quizState = {
+                currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: sQ.length,
+                startTime: new Date(), endTime: null, selectedAnswers: new Array(sQ.length).fill(null),
+                questions: sQ, originalQuestions: oQ,
+                subject: subj, unit: unit, lesson: lesson, semester: sem,
+                matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] } // Reset matching state
+            };
 
             const isRTL = RTL_SUBJECTS.includes(subj);
             setRtlLayout(isRTL); // Set layout for the quiz
@@ -1549,13 +1624,17 @@
                 return;
             }
 
-            // Clear previous content
+            // Clear previous content & cleanup specific things
             quizContainerElement.innerHTML='';
             feedbackContainerElement.innerHTML='';
             feedbackContainerElement.classList.add('hidden');
             quizButtonsContainerElement.innerHTML='';
-            if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
+             // Cleanup potential leftovers from previous question types
             if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
+            if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
+             quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
+             quizState.matchingState = { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] }; // Ensure clean state
+
 
             // Create question wrapper
             const qW=document.createElement('div');
@@ -2090,14 +2169,14 @@
             try{
                 switch(cQ.type){
                     case "matching":
-                        result = checkMatching(cQ);
+                        result = checkMatching(cQ); // <-- Modified function below
                         break;
                     case "ordering":
-                        result = checkOrdering(cQ);
+                        result = checkOrdering(cQ); // <-- Modified function below
                         break;
                     case "multiple_choice":
                     default:
-                        result = checkMultipleChoice(cQ);
+                        result = checkMultipleChoice(cQ); // <-- Modified function below
                         break;
                 }
             } catch(e){
@@ -2108,13 +2187,13 @@
             // Store user's answer (or null if none selected)
             quizState.selectedAnswers[quizState.currentQuestionIndex]=result.userResponse;
 
-            // Update score if correct (checkMatching/Ordering might return partial scores in future if needed)
+            // Update score if correct
             if(result.scoreIncrement > 0) {
                 quizState.correctAnswers+=result.scoreIncrement;
             }
 
             // Display feedback
-            feedbackContainerElement.innerHTML=result.feedback;
+            feedbackContainerElement.innerHTML=result.feedback; // This now includes the explanation
             feedbackContainerElement.classList.remove('hidden');
 
             // Disable inputs after answering
@@ -2134,213 +2213,202 @@
             }
         }
 
-        function checkMultipleChoice(q){
-            const sR=document.querySelector('input[name="question-option"]:checked');
-            const strings=getStrings();
+        // *** MODIFIED checkMultipleChoice ***
+        function checkMultipleChoice(q) {
+            const sR = document.querySelector('input[name="question-option"]:checked');
+            const strings = getStrings();
 
-            // Handle case where no option was selected
-            if(!sR){
-                return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.selectAnswerPrompt || 'Please select an answer.'}</div>`,userResponse:null,scoreIncrement:0};
+            if (!sR) {
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.selectAnswerPrompt || 'Please select an answer.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            const sI=parseInt(sR.value,10); // Selected index
-            const cAT=q.answer; // Correct answer text
-            const sAT=q.options?.[sI]; // Selected answer text
-            const iC=sAT===cAT; // Is Correct?
+            const sI = parseInt(sR.value, 10);
+            const cAT = q.answer;
+            const sAT = q.options?.[sI];
+            const iC = sAT === cAT;
 
-            // Apply visual feedback to options
-            document.querySelectorAll('.option-label').forEach((l,i)=>{
-                const ip=l.querySelector('input');
-                if(q.options?.[i]===cAT){ // Highlight the correct option
+            document.querySelectorAll('.option-label').forEach((l, i) => {
+                const ip = l.querySelector('input');
+                if (q.options?.[i] === cAT) {
                     l.classList.add('correct-option');
                 }
-                if(ip && ip.checked && !iC){ // If this was the selected INCORRECT option
+                if (ip && ip.checked && !iC) {
                     l.classList.add('incorrect-option');
                 }
             });
 
-            // Generate feedback HTML
-            const fH=iC
+            // Generate primary feedback HTML
+            let fH = iC
                 ? `<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`
-                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct answer:'} ${cAT||'N/A'}</span></div>`;
+                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct answer:'} ${cAT || 'N/A'}</span></div>`;
 
-            return{isCorrect:iC,feedback:fH,userResponse:sI,scoreIncrement:iC?1:0};
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                // Check if explanation needs specific text direction
+                const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"'; // Basic check for Arabic characters
+                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`; // Append explanation HTML with directionality hint
+            }
+            // *** END ADD EXPLANATION ***
+
+            return { isCorrect: iC, feedback: fH, userResponse: sI, scoreIncrement: iC ? 1 : 0 };
         }
 
-        function checkMatching(q){
-            const uP=quizState.matchingState.userPairs; // User's pairs {promptIndex: matchIndex}
-            const cP=q.answer||{}; // Correct pairs {promptIndex: correctMatchIndex}
-            const tCP=Object.keys(cP).length; // Total number of correct pairs defined
-            let cMC=0; // Correctly matched count
-            const strings=getStrings();
+        // *** MODIFIED checkMatching ***
+        function checkMatching(q) {
+            const uP = quizState.matchingState.userPairs;
+            const cP = q.answer || {};
+            const tCP = Object.keys(cP).length;
+            let cMC = 0;
+            const strings = getStrings();
 
-            // Handle case where the question has no correct answer defined (e.g., placeholder)
-            if(tCP===0){
-                // Mark all user attempts visually? Or just give neutral feedback?
-                // For now, neutral feedback.
-                return{isCorrect:true,feedback:`<div class="correct-feedback">${strings.matchingNoMatchNeeded || 'No matching needed.'}</div>`,userResponse:uP,scoreIncrement:0}; // No score if no answers defined
+            if (tCP === 0) {
+                return { isCorrect: true, feedback: `<div class="correct-feedback">${strings.matchingNoMatchNeeded || 'No matching needed.'}</div>`, userResponse: uP, scoreIncrement: 0 };
             }
 
-            // Calculate how many user pairs match the correct pairs
-            for(const pI in cP){
-                 // Use == for potential string/number comparison from dataset/answer
-                if(uP.hasOwnProperty(pI) && uP[pI] == cP[pI]){
+            for (const pI in cP) {
+                if (uP.hasOwnProperty(pI) && uP[pI] == cP[pI]) { // Use == safety
                     cMC++;
                 }
             }
 
-            // Determine correctness status
-            const iFC = cMC===tCP && Object.keys(uP).length === tCP; // Fully correct (all matched, and no extras)
-            const iPC = cMC > 0 && !iFC; // Partially correct (some right, but not all, or extra attempts)
+            const iFC = cMC === tCP && Object.keys(uP).length === tCP;
+            const iPC = cMC > 0 && !iFC;
 
-            // Generate feedback message
-            let fH="";
-            if(iFC) {
-                fH=`<div class="correct-feedback">${strings.matchingAllCorrect || 'Correct! ✓ All matched.'}</div>`;
-            } else if(iPC) {
-                fH=`<div class="partial-feedback">${(strings.matchingPartialCorrect || 'Partial correct: {correct}/{total}.').replace('{correct}',cMC).replace('{total}',tCP)}</div>`;
-            } else { // No matches correct
-                fH=`<div class="incorrect-feedback">${(strings.matchingNoneCorrect || 'Incorrect: 0/{total} matched.').replace('{total}',tCP)}</div>`;
+            // Generate primary feedback message
+            let fH = "";
+            if (iFC) {
+                fH = `<div class="correct-feedback">${strings.matchingAllCorrect || 'Correct! ✓ All matched.'}</div>`;
+            } else if (iPC) {
+                fH = `<div class="partial-feedback">${(strings.matchingPartialCorrect || 'Partial correct: {correct}/{total}.').replace('{correct}', cMC).replace('{total}', tCP)}</div>`;
+            } else {
+                fH = `<div class="incorrect-feedback">${(strings.matchingNoneCorrect || 'Incorrect: 0/{total} matched.').replace('{total}', tCP)}</div>`;
             }
+
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
+            }
+            // *** END ADD EXPLANATION ***
 
             // Apply visual feedback to arrows and items
-            for(const pI in uP){
-                 if (uP.hasOwnProperty(pI)) {
-                    const uMI=uP[pI]; // User's matched index
-                    const cMI=cP[pI]; // Correct matched index for this prompt
-                    const isPairCorrect = cMI !== undefined && uMI == cMI;
+            for (const pI in uP) {
+                if (uP.hasOwnProperty(pI)) {
+                    const uMI = uP[pI];
+                    const cMI = cP[pI];
+                    const isPairCorrect = cMI !== undefined && uMI == cMI; // Use == safety
 
-                    const line=matchingSvgElement?.querySelector(`#arrow-${pI}`);
-                    const promptEl=document.getElementById(`prompt-${pI}`);
-                    const userMatchEl=document.getElementById(`match-${uMI}`);
+                    const line = matchingSvgElement?.querySelector(`#arrow-${pI}`);
+                    const promptEl = document.getElementById(`prompt-${pI}`);
+                    const userMatchEl = document.getElementById(`match-${uMI}`);
 
-                    if(!line || !promptEl || !userMatchEl) continue; // Skip if elements missing
+                    if (!line || !promptEl || !userMatchEl) continue;
 
-                    if(isPairCorrect){
-                        line.style.stroke='var(--correct-border)';
+                    if (isPairCorrect) {
+                        line.style.stroke = 'var(--correct-border)';
                         line.querySelector('polygon')?.setAttribute('fill', 'var(--correct-border)');
-                        promptEl.style.borderColor='var(--correct-border)'; // Optional: border highlight
-                        userMatchEl.style.borderColor='var(--correct-border)';// Optional: border highlight
+                        promptEl.style.borderColor = 'var(--correct-border)';
+                        userMatchEl.style.borderColor = 'var(--correct-border)';
                     } else {
-                        line.style.stroke='var(--incorrect-border)';
+                        line.style.stroke = 'var(--incorrect-border)';
                         line.querySelector('polygon')?.setAttribute('fill', 'var(--incorrect-border)');
-                        promptEl.style.borderColor='var(--incorrect-border)'; // Optional: border highlight
-                        userMatchEl.style.borderColor='var(--incorrect-border)';// Optional: border highlight
-
-                        // Optionally: Draw the correct arrow faintly? (More complex)
+                        promptEl.style.borderColor = 'var(--incorrect-border)';
+                        userMatchEl.style.borderColor = 'var(--incorrect-border)';
                     }
-                 }
+                }
             }
 
-            // Note: Matching is typically all-or-nothing score-wise in simple quizzes
-            return{isCorrect:iFC,feedback:fH,userResponse:uP,scoreIncrement:iFC?1:0};
+            return { isCorrect: iFC, feedback: fH, userResponse: uP, scoreIncrement: iFC ? 1 : 0 };
         }
 
-        function checkOrdering(q){
-            const oI=q.items||[]; // Original items text array
-            const cAO=q.answer||[]; // Correct answer order (array of item texts)
-            const nI=oI.length; // Number of items
-            const strings=getStrings();
+        // *** MODIFIED checkOrdering ***
+        function checkOrdering(q) {
+            const oI = q.items || [];
+            const cAO = q.answer || [];
+            const nI = oI.length;
+            const strings = getStrings();
 
-            // Basic validation
-            if(nI===0||!Array.isArray(cAO)||nI!==cAO.length){
-                console.error("Invalid ordering question data:",q);
-                return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingInvalidData || 'Error: Invalid ordering setup.'}</div>`,userResponse:null,scoreIncrement:0};
+            if (nI === 0 || !Array.isArray(cAO) || nI !== cAO.length) {
+                console.error("Invalid ordering question data:", q);
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingInvalidData || 'Error: Invalid ordering setup.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            const uOM={}; // User Order Map: {originalItemIndex: selectedPosition}
-            const selectedPositions=new Set(); // To check for duplicates
-            let allSelected=true;
-            let hasDuplicates=false;
+            const uOM = {};
+            const selectedPositions = new Set();
+            let allSelected = true;
+            let hasDuplicates = false;
 
-            // Get user selections from dropdowns
-            const selectElements=document.querySelectorAll("#ordering-list .ordering-select");
-            if(selectElements.length!==nI){ // Should match number of items
-                 console.error("Ordering Error: Select element count mismatch.");
-                 return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSelectionError || 'Error processing selections.'}</div>`,userResponse:null,scoreIncrement:0};
+            const selectElements = document.querySelectorAll("#ordering-list .ordering-select");
+            if (selectElements.length !== nI) {
+                console.error("Ordering Error: Select element count mismatch.");
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSelectionError || 'Error processing selections.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            selectElements.forEach(s=>{
-                 const itemIndex = parseInt(s.dataset.itemIndex, 10); // Get original index of the item linked to this select
-                 const selectedValue = s.value; // Selected position (1-based string)
-
-                 if(selectedValue===""){
-                     allSelected=false; // Not all items have been assigned a position
-                 } else {
-                     const position = parseInt(selectedValue, 10);
-                     if(isNaN(position)||position<1||position>nI){
-                         allSelected=false; // Invalid position selected
-                         return;
-                     }
-                     uOM[itemIndex]=position; // Store { originalIndex: position }
-                     if(selectedPositions.has(position)){
-                         hasDuplicates=true; // Same position used more than once
-                     }
-                     selectedPositions.add(position);
-                 }
+            selectElements.forEach(s => {
+                const itemIndex = parseInt(s.dataset.itemIndex, 10);
+                const selectedValue = s.value;
+                if (selectedValue === "") {
+                    allSelected = false;
+                } else {
+                    const position = parseInt(selectedValue, 10);
+                    if (isNaN(position) || position < 1 || position > nI) { allSelected = false; return; }
+                    uOM[itemIndex] = position;
+                    if (selectedPositions.has(position)) { hasDuplicates = true; }
+                    selectedPositions.add(position);
+                }
             });
 
-            // Check if all items were assigned a position
-            if(!allSelected){
-                return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSelectAll || 'Please select an order for all items.'}</div>`,userResponse:uOM,scoreIncrement:0};
+            if (!allSelected) { return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSelectAll || 'Please select an order for all items.'}</div>`, userResponse: uOM, scoreIncrement: 0 }; }
+            if (hasDuplicates || selectedPositions.size !== nI) {
+                const numText = nI > 1 ? (strings.orderingUseEachNumOncePlural || 'numbers 1-{n}').replace('{n}', nI) : (strings.orderingUseEachNumOnceSingular || 'number 1');
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${(strings.orderingDuplicateUse || 'Please use each order {nums} exactly once.').replace('{nums}', numText)}</div>`, userResponse: uOM, scoreIncrement: 0 };
             }
 
-            // Check for duplicate position usage
-            if(hasDuplicates || selectedPositions.size !== nI){ // Size check covers missing numbers too
-                 const numText = nI > 1
-                    ? (strings.orderingUseEachNumOncePlural || 'numbers 1-{n}').replace('{n}',nI)
-                    : (strings.orderingUseEachNumOnceSingular || 'number 1');
-                 return{isCorrect:false,feedback:`<div class="incorrect-feedback">${(strings.orderingDuplicateUse || 'Please use each order {nums} exactly once.').replace('{nums}', numText)}</div>`,userResponse:uOM,scoreIncrement:0};
-            }
-
-            // Construct the user's ordered array based on their selections
-            const userOrderedItems=new Array(nI).fill(null);
+            const userOrderedItems = new Array(nI).fill(null);
             let constructionOk = true;
-            for(const itemIndexStr in uOM){
-                 if(uOM.hasOwnProperty(itemIndexStr)){
-                     const itemIndex = parseInt(itemIndexStr, 10);
-                     const itemText = oI[itemIndex]; // Get the text of the original item
-                     const userPosition = uOM[itemIndex] - 1; // User's chosen position (0-based index)
-
-                     if(itemText===undefined || userPosition<0 || userPosition>=nI || userOrderedItems[userPosition] !== null){
-                         constructionOk=false; // Error during construction (shouldn't happen if previous checks pass)
-                         break;
-                     }
-                     userOrderedItems[userPosition]=itemText; // Place the item text at the user's chosen position
-                 }
+            for (const itemIndexStr in uOM) {
+                if (uOM.hasOwnProperty(itemIndexStr)) {
+                    const itemIndex = parseInt(itemIndexStr, 10);
+                    const itemText = oI[itemIndex];
+                    const userPosition = uOM[itemIndex] - 1;
+                    if (itemText === undefined || userPosition < 0 || userPosition >= nI || userOrderedItems[userPosition] !== null) { constructionOk = false; break; }
+                    userOrderedItems[userPosition] = itemText;
+                }
+            }
+            if (!constructionOk || userOrderedItems.some(i => i === null)) {
+                console.error("Ordering Error: Failed to construct user sequence.", uOM, userOrderedItems);
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSequenceError || 'Error processing sequence.'}</div>`, userResponse: userOrderedItems, scoreIncrement: 0 };
             }
 
-            if(!constructionOk || userOrderedItems.some(i=>i===null)){ // Final check
-                 console.error("Ordering Error: Failed to construct user sequence.", uOM, userOrderedItems);
-                 return{isCorrect:false,feedback:`<div class="incorrect-feedback">${strings.orderingSequenceError || 'Error processing sequence.'}</div>`,userResponse:userOrderedItems,scoreIncrement:0};
-            }
-
-            // Compare user's ordered array with the correct answer array
             const iC = JSON.stringify(userOrderedItems) === JSON.stringify(cAO);
 
-            // Generate feedback HTML
-            const fH=iC
+            // Generate primary feedback HTML
+            let fH = iC
                 ? `<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`
                 : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct order:'} ${cAO.join(" → ")}</span></div>`;
 
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
+            }
+            // *** END ADD EXPLANATION ***
+
             // Apply visual feedback to selects
-            selectElements.forEach(s=>{
+            selectElements.forEach(s => {
                 const itemIndex = parseInt(s.dataset.itemIndex, 10);
                 const itemText = oI[itemIndex];
-                const userSelectedPosition = uOM[itemIndex]; // Position chosen by user (1-based)
-                const correctPosition = cAO.indexOf(itemText) + 1; // Correct position (1-based)
-
-                if(userSelectedPosition===correctPosition){
-                    s.style.borderColor="var(--correct-border)";
-                    s.style.backgroundColor="var(--correct-bg)";
+                const userSelectedPosition = uOM[itemIndex];
+                const correctPosition = cAO.indexOf(itemText) + 1;
+                if (userSelectedPosition === correctPosition) {
+                    s.style.borderColor = "var(--correct-border)"; s.style.backgroundColor = "var(--correct-bg)";
                 } else {
-                    s.style.borderColor="var(--incorrect-border)";
-                    s.style.backgroundColor="var(--incorrect-bg)";
+                    s.style.borderColor = "var(--incorrect-border)"; s.style.backgroundColor = "var(--incorrect-bg)";
                 }
-                s.style.borderWidth="2px"; // Make feedback more visible
+                s.style.borderWidth = "2px";
             });
 
-            return{isCorrect:iC,feedback:fH,userResponse:userOrderedItems,scoreIncrement:iC?1:0};
+            return { isCorrect: iC, feedback: fH, userResponse: userOrderedItems, scoreIncrement: iC ? 1 : 0 };
         }
 
         function disableInputs(){
@@ -2504,14 +2572,14 @@
                     try{
                         switch(q.type){
                             case"matching":
-                                reviewMatchingReview(q,userAnswer,contentArea);
+                                reviewMatchingReview(q,userAnswer,contentArea); // <-- Modified below
                                 break;
                             case"ordering":
-                                reviewOrderingReview(q,userAnswer,contentArea);
+                                reviewOrderingReview(q,userAnswer,contentArea); // <-- Modified below
                                 break;
                             case"multiple_choice":
                             default:
-                                reviewMultipleChoiceReview(q,userAnswer,contentArea);
+                                reviewMultipleChoiceReview(q,userAnswer,contentArea); // <-- Modified below
                                 break;
                         }
                     } catch(e) {
@@ -2551,6 +2619,7 @@
             quizContainerElement.scrollIntoView({behavior:'smooth',block:'start'});
         }
 
+        // calculateReviewStatus remains the same as it determines the overall status, not the detailed display
         function calculateReviewStatus(q, uA){
             let correctnessClass='incorrect'; // Default to incorrect
             let statusText = getStrings().reviewStatusIncorrect || '✗ Incorrect';
@@ -2627,132 +2696,144 @@
             return { correctnessClass, statusText };
         }
 
-        function reviewMultipleChoiceReview(q, uAI, c){ // uAI is User Answer Index
+        // *** MODIFIED reviewMultipleChoiceReview ***
+        function reviewMultipleChoiceReview(q, uAI, c) { // uAI is User Answer Index
             const strings = getStrings();
-            const d=document.createElement("div");
-            d.className="review-mc-answer";
+            const d = document.createElement("div");
+            d.className = "review-mc-answer";
 
-            const userSelectedText=(uAI!==null&&q.options?.[uAI]!==undefined)
+            const userSelectedText = (uAI !== null && q.options?.[uAI] !== undefined)
                 ? q.options[uAI]
                 : `(${strings.reviewStatusUnanswered || "No answer"})`; // Handle unanswered
 
-            const isCorrect=(uAI!==null && userSelectedText===q.answer);
+            const isCorrect = (uAI !== null && userSelectedText === q.answer);
 
-            // Build HTML for user's answer with correct/incorrect styling
-            let userAnswerHTML=`<span class="user-answer-text`;
-            if(uAI===null) userAnswerHTML+=`">`; // No specific style for unanswered text itself
-            else if(isCorrect) userAnswerHTML+=` correct">`;
-            else userAnswerHTML+=` incorrect">`; // Incorrect will have line-through via CSS
-            userAnswerHTML+=`${userSelectedText}</span>`;
+            let userAnswerHTML = `<span class="user-answer-text`;
+            if (uAI === null) userAnswerHTML += `">`; // No specific style for unanswered text itself
+            else if (isCorrect) userAnswerHTML += ` correct">`;
+            else userAnswerHTML += ` incorrect">`; // Incorrect will have line-through via CSS
+            userAnswerHTML += `${userSelectedText}</span>`;
 
-            d.innerHTML=`<p><strong>${strings.resultsYourAnswerLabel || 'Your Answer:'}</strong> ${userAnswerHTML}</p>`;
+            let htmlContent = `<p><strong>${strings.resultsYourAnswerLabel || 'Your Answer:'}</strong> ${userAnswerHTML}</p>`;
 
-            // If incorrect, show the correct answer
-            if(!isCorrect) { // Also show correct if unanswered
-                 d.innerHTML+=`<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer||"N/A"}</span></p>`;
+            // Show correct answer if user was incorrect OR unanswered
+            if (!isCorrect) {
+                htmlContent += `<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer || "N/A"}</span></p>`;
             }
+
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                htmlContent += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
+            }
+            // *** END ADD EXPLANATION ***
+
+            d.innerHTML = htmlContent;
             c.appendChild(d);
         }
 
-        function reviewMatchingReview(q, uP, c){ // uP is User Pairs {promptIdx: matchIdx}
+        // *** MODIFIED reviewMatchingReview ***
+        function reviewMatchingReview(q, userPairs, container) {
             const strings = getStrings();
-            const d=document.createElement("div");
-            d.className="review-matching-answer";
-            d.innerHTML=`<p><strong>${strings.matchingMatchesHeader || 'Matches'}:</strong></p>`;
+            const reviewDiv = document.createElement("div");
+            reviewDiv.className = "review-matching-answer"; // Use existing class
 
-            const grid=document.createElement("div");
-            grid.className="review-matching-grid";
+            const correctPairs = q.answer || {};
+            const promptsList = q.prompts || [];
+            const matchesList = q.matches || [];
 
-            const promptsCol=document.createElement("div");
-            const matchesCol=document.createElement("div");
-            promptsCol.className="review-matching-column";
-            matchesCol.className="review-matching-column";
+            // Build the grid HTML (copied logic from previous implementation for display)
+            let gridHtml = `<div class="review-matching-grid">`;
+            const promptsCol = `<div class="review-matching-column">`;
+            const matchesCol = `<div class="review-matching-column">`;
+            let promptsColContent = '';
+            let matchesColContent = '';
 
-            const correctPairs=q.answer||{};
-            const promptsList=q.prompts||[];
-            const matchesList=q.matches||[];
+            promptsList.forEach((promptText, promptIndex) => {
+                const userMatchIndex = userPairs ? userPairs[promptIndex] : null;
+                const correctMatchIndex = correctPairs[promptIndex];
+                const isPairCorrect = (userMatchIndex !== null && userMatchIndex == correctMatchIndex); // Use == safety
 
-            // Iterate through the prompts to ensure all are displayed in order
-            promptsList.forEach((promptText,promptIndex)=>{
-                const userMatchIndex=uP?uP[promptIndex]:null; // User's selected match for this prompt
-                const correctMatchIndex=correctPairs[promptIndex]; // Correct match for this prompt
+                const promptDivClass = isPairCorrect ? "review-matched-pair-correct" : "review-matched-pair-incorrect";
+                promptsColContent += `<div class="${promptDivClass}">${promptIndex + 1}. ${promptText}</div>`;
 
-                const isPairCorrect=(userMatchIndex!==null && userMatchIndex == correctMatchIndex); // Use == for safety
+                const correctMatchText = (correctMatchIndex !== undefined && matchesList[correctMatchIndex] !== undefined) ? matchesList[correctMatchIndex] : "(N/A)";
+                const userMatchText = (userMatchIndex !== null && matchesList[userMatchIndex] !== undefined) ? matchesList[userMatchIndex] : `(${strings.reviewStatusUnanswered || 'Unanswered'})`;
 
-                const promptDiv=document.createElement("div");
-                promptDiv.textContent=`${promptIndex+1}. ${promptText}`;
-
-                const matchDiv=document.createElement("div");
-                const userMatchText = (userMatchIndex!==null&&matchesList[userMatchIndex]!==undefined)
-                    ? matchesList[userMatchIndex]
-                    : `(${strings.reviewStatusUnanswered || 'Unanswered'})`;
-                const correctMatchText = (correctMatchIndex!==undefined&&matchesList[correctMatchIndex]!==undefined)
-                    ? matchesList[correctMatchIndex]
-                    :"(N/A)"; // Should not happen if data is valid
-
+                let matchDivContent = '';
                 if (isPairCorrect) {
-                    promptDiv.className="review-matched-pair-correct";
-                    matchDiv.textContent=correctMatchText; // Show only the correct match text
-                    matchDiv.className="review-matched-pair-correct";
+                    matchDivContent = correctMatchText;
+                    matchesColContent += `<div class="review-matched-pair-correct">${matchDivContent}</div>`;
                 } else {
-                    promptDiv.className="review-matched-pair-incorrect";
-                    // Show user's incorrect answer (struck through) and the correct answer
-                    matchDiv.innerHTML=`<span style="text-decoration:line-through;">${userMatchText}</span> <span style="font-weight:500;">(${correctMatchText})</span>`;
-                    matchDiv.className="review-matched-pair-incorrect";
+                    matchDivContent = `<span style="text-decoration:line-through;">${userMatchText}</span> <span style="font-weight:500;">(${correctMatchText})</span>`;
+                    matchesColContent += `<div class="review-matched-pair-incorrect">${matchDivContent}</div>`;
                 }
-                promptsCol.appendChild(promptDiv);
-                matchesCol.appendChild(matchDiv);
             });
 
-            grid.append(promptsCol,matchesCol);
-            d.appendChild(grid);
-            c.appendChild(d);
+            gridHtml += promptsCol + promptsColContent + `</div>` + matchesCol + matchesColContent + `</div></div>`; // Close columns and grid
+
+            // Start building final HTML content
+            let htmlContent = `<p><strong>${strings.matchingMatchesHeader || 'Matches'}:</strong></p>` + gridHtml;
+
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                htmlContent += `<div class="feedback-explanation"${dirAttr} style="margin-top: 15px;">${q.explanation}</div>`;
+            }
+            // *** END ADD EXPLANATION ***
+
+            reviewDiv.innerHTML = htmlContent;
+            container.appendChild(reviewDiv);
         }
 
-        function reviewOrderingReview(q, uOI, c){ // uOI is User Ordered Items array
+        // *** MODIFIED reviewOrderingReview ***
+        function reviewOrderingReview(q, uOI, c) { // uOI is User Ordered Items array
             const strings = getStrings();
-            const d=document.createElement("div");
-            d.className="review-ordering-answer";
+            const d = document.createElement("div");
+            d.className = "review-ordering-answer";
 
-            const correctOrder=q.answer||[];
-            const isFullyCorrect=uOI && Array.isArray(uOI) && JSON.stringify(uOI)===JSON.stringify(correctOrder);
+            const correctOrder = q.answer || [];
 
-            // Header for the section
-            d.innerHTML=`<p><strong>${(strings.orderingInstruction || 'Ordering:').split(':')[0]}:</strong></p>`; // Use first part of instruction as label
+            // Header
+            let htmlContent = `<p><strong>${(strings.orderingInstruction || 'Ordering:').split(':')[0]}:</strong></p>`;
 
-            const list=document.createElement("div");
-            list.className="review-ordering-list";
+            // Build the list HTML
+            let listHtml = `<div class="review-ordering-list">`;
+            correctOrder.forEach((correctItemText, correctIndex) => {
+                const itemDiv = document.createElement("div"); // Use createElement to set style easily
+                itemDiv.className = "review-ordering-list-item";
 
-            // Display the CORRECT order, showing where the user placed each item
-            correctOrder.forEach((correctItemText,correctIndex)=>{
-                const itemDiv=document.createElement("div");
-                itemDiv.className="review-ordering-list-item";
+                const userIndex = uOI ? uOI.indexOf(correctItemText) : -1;
+                const userPosition = (userIndex !== -1) ? userIndex + 1 : null;
+                const correctPosition = correctIndex + 1;
 
-                const userIndex = uOI ? uOI.indexOf(correctItemText) : -1; // Find where user placed this correct item
-                const userPosition = (userIndex !== -1) ? userIndex + 1 : null; // User's position (1-based) or null if not placed
-                const correctPosition = correctIndex + 1; // Correct position (1-based)
-
-                let numberSpanHTML='';
+                let numberSpanHTML = '';
                 if (userPosition === correctPosition) {
-                    // User placed it correctly
-                    numberSpanHTML=`<span class="review-order-number review-order-correct">${correctPosition}.</span>`;
-                    itemDiv.style.backgroundColor='var(--correct-bg)'; // Visual cue: correct
+                    numberSpanHTML = `<span class="review-order-number review-order-correct">${correctPosition}.</span>`;
+                    itemDiv.style.backgroundColor = 'var(--correct-bg)';
                 } else if (userPosition !== null) {
-                    // User placed it, but in the wrong position
-                    numberSpanHTML=`<span class="review-order-number review-order-incorrect">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
-                    itemDiv.style.backgroundColor='var(--incorrect-bg)'; // Visual cue: incorrect
+                    numberSpanHTML = `<span class="review-order-number review-order-incorrect">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
+                    itemDiv.style.backgroundColor = 'var(--incorrect-bg)';
                 } else {
-                    // User did not place this item (or answered incorrectly/partially)
-                    numberSpanHTML=`<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`; // NP = Not Placed
-                     // Visual cue: missed/unanswered (using partial style for visibility)
-                    itemDiv.style.backgroundColor='var(--partial-bg)';
+                    numberSpanHTML = `<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
+                    itemDiv.style.backgroundColor = 'var(--partial-bg)';
                 }
 
-                itemDiv.innerHTML=`${numberSpanHTML} ${correctItemText}`;
-                list.appendChild(itemDiv);
+                itemDiv.innerHTML = `${numberSpanHTML} ${correctItemText}`;
+                listHtml += itemDiv.outerHTML; // Add the styled item's HTML
             });
+             listHtml += `</div>`; // Close list
 
-            d.appendChild(list);
+            htmlContent += listHtml;
+
+            // *** ADD EXPLANATION ***
+            if (q.explanation) {
+                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                htmlContent += `<div class="feedback-explanation"${dirAttr} style="margin-top: 15px;">${q.explanation}</div>`;
+            }
+            // *** END ADD EXPLANATION ***
+
+            d.innerHTML = htmlContent;
             c.appendChild(d);
         }
 
@@ -2840,4 +2921,3 @@
 
 </body>
 </html>
-```
