@@ -2373,6 +2373,8 @@
 
                 // --- Arrow Drawing ---
         // *** CORRECTED drawArrow function ***
+                // --- Arrow Drawing ---
+        // *** REVISED drawArrow function (Focus on Visual Edges) ***
         function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
             const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
             // Ensure SVG element exists or try to find it again
@@ -2390,49 +2392,51 @@
             const svgRect = matchingSvgElement.getBoundingClientRect();
             const pR = pE.getBoundingClientRect(); // Prompt Rect
             const mR = mE.getBoundingClientRect(); // Match Rect
-            // Ensure mainContainerElement is defined and accessible here
             const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
+            let leftElementRect, rightElementRect;
 
-            // Calculate Y midpoints (same for LTR/RTL)
-            // Use Math.round to potentially avoid sub-pixel rendering issues
-            startY = Math.round(pR.top + pR.height / 2 - svgRect.top);
-            endY = Math.round(mR.top + mR.height / 2 - svgRect.top);
-
+            // Determine which element is physically on the left/right
             if (isRTL) {
-                // RTL: Prompt(pE) is on the RIGHT, Match(mE) is on the LEFT. Arrow goes RIGHT-to-LEFT.
-                // Start Point: Left edge of Prompt (pR) element.
-                startX = Math.round(pR.left - svgRect.left);
-                // End Point: Right edge of Match (mR) element.
-                endX = Math.round(mR.right - svgRect.left);
-
+                rightElementRect = pR; // Prompt is on the right in RTL
+                leftElementRect = mR;  // Match is on the left in RTL
             } else { // LTR
-                // LTR: Prompt(pE) is on the LEFT, Match(mE) is on the RIGHT. Arrow goes LEFT-to-RIGHT.
-                // Start Point: Right edge of Prompt (pR) element.
-                startX = Math.round(pR.right - svgRect.left);
-                // End Point: Left edge of Match (mR) element.
-                endX = Math.round(mR.left - svgRect.left);
+                leftElementRect = pR;  // Prompt is on the left in LTR
+                rightElementRect = mR; // Match is on the right in LTR
             }
 
-            // Find or create the line element
+            // Calculate Y midpoints (relative to SVG) - These are consistent
+            startY = Math.round(leftElementRect.top + leftElementRect.height / 2 - svgRect.top);
+            endY = Math.round(rightElementRect.top + rightElementRect.height / 2 - svgRect.top);
+
+            // Calculate X coordinates (relative to SVG)
+            // Start X: Right edge of the element physically on the LEFT
+            startX = Math.round(leftElementRect.right - svgRect.left);
+            // End X: Left edge of the element physically on the RIGHT
+            endX = Math.round(rightElementRect.left - svgRect.left);
+
+            // --- Find or create the line element ---
             let line = matchingSvgElement.querySelector(`#arrow-${pI}`);
             if (!line) {
                 line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.id = `arrow-${pI}`;
+                // Ensure lines added later appear above earlier ones (if needed, usually not)
+                // matchingSvgElement.appendChild(line); // Add before setting attributes
+                matchingSvgElement.insertBefore(line, matchingSvgElement.firstChild?.nextSibling); // Insert after defs maybe?
+
                 line.style.opacity = '0'; // Start invisible for fade-in
                 line.style.transition = 'stroke 0.3s ease, opacity 0.3s ease';
-                matchingSvgElement.appendChild(line);
             }
 
-             // Safety check for coordinates
+             // --- Safety check for coordinates ---
             if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) || !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
                 console.error("drawArrow: Invalid coordinates calculated.", { startX, startY, endX, endY, pI, isRTL });
-                line.style.opacity = '0'; // Keep invisible if coords are bad
+                if(line) line.style.opacity = '0'; // Keep invisible if coords are bad
                 return;
             }
 
-            // Set line attributes
+            // --- Set line attributes ---
             line.setAttribute('x1', startX);
             line.setAttribute('y1', startY);
             line.setAttribute('x2', endX);
@@ -2441,7 +2445,7 @@
             line.setAttribute('stroke-width', '2');
             line.setAttribute('marker-end', 'url(#arrowhead)');
 
-            // Fade in smoothly
+            // --- Fade in smoothly ---
             requestAnimationFrame(() => {
                 // Check if line still exists in case it was removed quickly
                 if (matchingSvgElement && matchingSvgElement.contains(line)) {
