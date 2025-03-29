@@ -2372,126 +2372,141 @@
 
 
         function drawArrow(promptElement, matchElement, promptIndex) {
-    const svgContainer = matchingSvgElement; // Use the global variable
-    // Ensure mainContainerElement is accessible
-    const mainContainerElement = document.getElementById('main-container'); // Replace with your actual main container ID or reference
-    const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
+    console.log(`drawArrow START for index: ${promptIndex}`, { promptId: promptElement?.id, matchId: matchElement?.id });
 
+    // Ensure global/scoped variables are accessible
+    const svgContainer = typeof matchingSvgElement !== 'undefined' ? matchingSvgElement : null;
+    const mainContainerElement = typeof mainContainerElement !== 'undefined' ? mainContainerElement : document.getElementById('main-container'); // Or your actual container reference
+    const outerDiv = document.getElementById(`matching-outer-${quizState?.currentQuestionIndex}`); // Added optional chaining for quizState
+
+    // --- Initial Element Check ---
     if (!svgContainer || !promptElement || !matchElement || !outerDiv || !mainContainerElement) {
-        console.warn("drawArrow: Missing required elements.", {
-            svg: !!svgContainer,
-            prompt: promptElement?.id,
-            match: matchElement?.id,
-            outer: !!outerDiv,
-            main: !!mainContainerElement,
+        console.warn("drawArrow EXIT: Missing required elements.", {
+            svgContainer: !!svgContainer,
+            promptElement: !!promptElement,
+            matchElement: !!matchElement,
+            outerDiv: !!outerDiv,
+            mainContainerElement: !!mainContainerElement,
+            promptId: promptElement?.id,
+            matchId: matchElement?.id,
             index: promptIndex
         });
-        return;
+        return; // Exit early if essential elements are missing
     }
+    console.log("drawArrow: All initial elements found.", { svgContainer, promptElement, matchElement, outerDiv, mainContainerElement });
 
     try {
+        // --- Get Bounding Rects ---
         const svgRect = svgContainer.getBoundingClientRect();
         const promptRect = promptElement.getBoundingClientRect();
         const matchRect = matchElement.getBoundingClientRect();
+        console.log('drawArrow - Rects:', { svgRect, promptRect, matchRect });
+
+        // Check if rects have zero size (might indicate hidden elements)
+        if (promptRect.width === 0 || promptRect.height === 0 || matchRect.width === 0 || matchRect.height === 0) {
+             console.warn(`drawArrow WARN: promptRect or matchRect has zero dimensions for index ${promptIndex}. Elements might be hidden or not rendered.`, { promptRect, matchRect });
+             // Decide if you want to return here or try drawing anyway
+             // return;
+        }
+
         const isRTL = mainContainerElement.classList.contains('rtl-layout');
+        console.log('drawArrow - isRTL:', isRTL);
 
         let startX, startY, endX, endY;
 
-        // Calculate midpoints relative to the SVG container's top-left corner
-        const promptMidY = promptRect.top + promptRect.height / 2 - svgRect.top;
-        const matchMidY = matchRect.top + matchRect.height / 2 - svgRect.top;
+        // --- Calculate Midpoints ---
+        // Check svgRect dimensions before using them for offsets
+        if (svgRect.width === 0 && svgRect.height === 0 && svgRect.top === 0 && svgRect.left === 0) {
+            console.warn(`drawArrow WARN: svgRect has zero dimensions or default values. Using absolute coordinates as fallback. Index: ${promptIndex}`, svgRect);
+            // Fallback: use absolute midpoints (less ideal, might be offset if SVG is scrolled)
+             promptMidY = promptRect.top + promptRect.height / 2;
+             matchMidY  = matchRect.top + matchRect.height / 2;
+        } else {
+             promptMidY = promptRect.top + promptRect.height / 2 - svgRect.top;
+             matchMidY  = matchRect.top + matchRect.height / 2 - svgRect.top;
+        }
 
-        // --- CORRECTED COORDINATE LOGIC FOR LTR/RTL ---
-        // x1,y1 is always near the prompt, x2,y2 is always near the match (where marker-end goes)
+
+        // --- Calculate Start/End X based on RTL/LTR ---
         if (isRTL) {
-            // RTL: Prompt on Right, Match on Left. Arrow points Left (<--).
-            // Start (x1) on the Prompt's LEFT edge (facing the center gap)
-            startX = promptRect.left - svgRect.left;
+            startX = (promptRect.left) - (svgRect.left); // Prompt = Right Col -> Use Left Edge
             startY = promptMidY;
-            // End (x2) on the Match's RIGHT edge (facing the center gap)
-            endX = matchRect.right - svgRect.left;
+            endX = (matchRect.right) - (svgRect.left); // Match = Left Col -> Use Right Edge
             endY = matchMidY;
         } else { // LTR
-            // LTR: Prompt on Left, Match on Right. Arrow points Right (-->).
-            // Start (x1) on the Prompt's RIGHT edge (facing the center gap)
-            startX = promptRect.right - svgRect.left;
+            startX = (promptRect.right) - (svgRect.left); // Prompt = Left Col -> Use Right Edge
             startY = promptMidY;
-            // End (x2) on the Match's LEFT edge (facing the center gap)
-            endX = matchRect.left - svgRect.left;
+            endX = (matchRect.left) - (svgRect.left); // Match = Right Col -> Use Left Edge
             endY = matchMidY;
         }
-        // --- END CORRECTED COORDINATE LOGIC ---
+        console.log('drawArrow - Calculated Raw Coords:', { startX, startY, endX, endY });
 
-        // Safety check for coordinates
+        // --- Coordinate Validity Check ---
         if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) ||
             !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
-            console.error("drawArrow: Invalid coordinates calculated.", { startX, startY, endX, endY, promptIndex, isRTL });
-            return;
+            console.error(`drawArrow EXIT: Invalid coordinates calculated for index ${promptIndex}. Check element visibility/layout.`, {
+                startX, startY, endX, endY, promptIndex, isRTL,
+                promptRect, matchRect, svgRect // Include rects in error for context
+             });
+            return; // Exit if coordinates are bad
         }
+        console.log('drawArrow: Coordinates are valid numbers.');
 
-        // Find existing line or create a new one
+        // --- Find or Create Line ---
         let line = svgContainer.querySelector(`#arrow-${promptIndex}`);
         const isNewLine = !line;
+        console.log(`drawArrow: Line search result for #arrow-${promptIndex}`, { line: !!line, isNewLine });
+
         if (isNewLine) {
             line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            if (!line) { // Check if element creation failed (highly unlikely but possible)
+                 console.error(`drawArrow EXIT: Failed to create SVG 'line' element for index ${promptIndex}.`);
+                 return;
+            }
             line.id = `arrow-${promptIndex}`;
             line.style.transition = 'opacity 0.3s ease-in-out';
-            line.style.opacity = '0'; // Start invisible for new lines
+            line.style.opacity = '0';
+            console.log(`drawArrow: Created new line element, ID: ${line.id}`);
             svgContainer.appendChild(line);
+             console.log(`drawArrow: Appended line #arrow-${promptIndex} to svgContainer.`);
+        } else {
+            console.log(`drawArrow: Found existing line element, ID: ${line.id}`);
         }
 
-        // Set line attributes (position, style, marker)
+        // --- Set Line Attributes ---
+        console.log(`drawArrow: Setting attributes for line ${line.id}`, { x1: startX, y1: startY, x2: endX, y2: endY });
         line.setAttribute('x1', startX);
         line.setAttribute('y1', startY);
         line.setAttribute('x2', endX);
         line.setAttribute('y2', endY);
         line.setAttribute('stroke', 'var(--accent-color, black)');
         line.setAttribute('stroke-width', '2');
-
-        // --- ALWAYS Use marker-end ---
-        // The coordinate calculation now correctly defines the line direction (L->R or R->L)
-        // so orient="auto" on marker-end should work for both cases.
         line.removeAttribute('marker-start'); // Clean up just in case
         line.setAttribute('marker-end', 'url(#arrowhead)');
+        console.log(`drawArrow: Attributes set for line ${line.id}.`);
 
-        // Fade in if it's a new line, otherwise ensure it's visible
-        if (isNewLine) {
-             requestAnimationFrame(() => {
-                 // Double rAF sometimes helps ensure transition applies correctly
-                 requestAnimationFrame(() => {
-                    line.style.opacity = '1';
-                 });
-             });
-        } else {
-             line.style.opacity = '1'; // Ensure existing line is visible
-        }
+
+        // --- Fade In ---
+        // Ensure opacity is applied even for existing lines in case it was reset
+        // Use timeout to ensure attributes are set and transition can apply
+        setTimeout(() => {
+             if (line && line.style) { // Check if line still exists and has style property
+                 line.style.opacity = '1';
+                 console.log(`drawArrow: Opacity set to 1 for line ${line.id}.`);
+             } else {
+                  console.warn(`drawArrow WARN: Line ${promptIndex} not found or invalid during opacity update.`);
+             }
+        }, 50); // Small delay (instead of rAF for simplicity here)
+
 
     } catch (e) {
-        console.error("Error during drawArrow:", e, { promptIndex });
+        console.error(`Error during drawArrow for index ${promptIndex}:`, e, {
+             promptId: promptElement?.id,
+             matchId: matchElement?.id,
+         });
     }
+     console.log(`drawArrow END for index: ${promptIndex}`);
 }
-
-// --- SVG Marker Definition Reminder ---
-// Make sure you have this in your SVG <defs>
-// Adjust refX so the TIP of the arrow aligns with the line end (x2, y2)
-/*
-<svg id="matching-svg-container-XYZ" ...>
-  <defs>
-    <marker
-      id="arrowhead"
-      viewBox="0 0 10 10"
-      refX="8" <--- Adjust this value (often slightly less than markerWidth/viewBox width)
-      refY="5"
-      markerUnits="strokeWidth"
-      markerWidth="4"
-      markerHeight="4"
-      orient="auto"> <--- Should now orient correctly based on line direction
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent-color, black)"></path>
-    </marker>
-  </defs>
-  <!-- Lines will be added here -->
-</svg>
-*/
 
         function removeArrow(pI){
             if(!matchingSvgElement)return;
