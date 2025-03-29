@@ -2374,15 +2374,21 @@
                 // --- Arrow Drawing ---
         // *** CORRECTED drawArrow function ***
                 // --- Arrow Drawing ---
-        // *** REVISED drawArrow function (Focus on Visual Edges) ***
-                // --- Arrow Drawing ---
-        // *** REVISED drawArrow function (Focus on Visual Edges) ***
-        function drawArrow(promptElement, matchElement, promptIndex) {
+       function drawArrow(promptElement, matchElement, promptIndex) {
     const svgContainer = matchingSvgElement; // Use the global variable
+    // Ensure mainContainerElement is accessible, e.g., from a global scope or passed in
+    const mainContainerElement = document.getElementById('main-container'); // Replace with your actual main container ID or reference
     const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
 
-    if (!svgContainer || !promptElement || !matchElement || !outerDiv) {
-        console.warn("drawArrow: Missing required elements (SVG, prompt, match, or outer div). Prompt:", promptElement?.id, "Match:", matchElement?.id, "Index:", promptIndex);
+    if (!svgContainer || !promptElement || !matchElement || !outerDiv || !mainContainerElement) {
+        console.warn("drawArrow: Missing required elements.", {
+            svg: !!svgContainer,
+            prompt: promptElement?.id,
+            match: matchElement?.id,
+            outer: !!outerDiv,
+            main: !!mainContainerElement, // Added check
+            index: promptIndex
+        });
         return;
     }
 
@@ -2390,38 +2396,47 @@
         const svgRect = svgContainer.getBoundingClientRect();
         const promptRect = promptElement.getBoundingClientRect();
         const matchRect = matchElement.getBoundingClientRect();
-        // Ensure mainContainerElement is accessible here or passed as an argument if needed
-        // Assuming mainContainerElement is globally accessible or in scope:
         const isRTL = mainContainerElement.classList.contains('rtl-layout');
 
         let startX, startY, endX, endY;
+        let markerAttribute = ''; // Determine which marker to use
+        let markerUrl = 'url(#arrowhead)'; // Assuming a single marker definition
 
         // Calculate midpoints relative to the SVG container's top-left corner
         const promptMidY = promptRect.top + promptRect.height / 2 - svgRect.top;
         const matchMidY = matchRect.top + matchRect.height / 2 - svgRect.top;
 
-        // Define start/end points based on LTR/RTL layout
-        // The arrow *always* points towards the matchElement.
-        // x1,y1 is the start (near prompt), x2,y2 is the end (near match, where arrowhead goes).
-        if (isRTL) {
-            // --- CORRECTED RTL LOGIC ---
-            // Start: Left edge of prompt item (which is visually on the right)
-            startX = promptRect.left - svgRect.left;
-            startY = promptMidY;
-            // End: Right edge of match item (which is visually on the left) - Arrowhead points here
-            endX = matchRect.right - svgRect.left;
-            endY = matchMidY;
-            // --- END CORRECTION ---
-        } else { // LTR
-            // Start: Right edge of prompt item (visually on the left)
-            startX = promptRect.right - svgRect.left;
-            startY = promptMidY;
-            // End: Left edge of match item (visually on the right) - Arrowhead points here
-            endX = matchRect.left - svgRect.left;
-            endY = matchMidY;
-        }
+        // --- COORDINATE LOGIC (Reverted to Original LTR-style) ---
+        // Always calculate from the right edge of the first column item
+        // to the left edge of the second column item.
+        // The *meaning* of prompt/match flips in RTL, but the calculation is consistent.
 
-        // Safety check for coordinates being valid numbers
+        if (isRTL) {
+             // Prompt is on Right, Match is on Left.
+             // startX should be the right edge of the *Prompt* element.
+             // endX should be the left edge of the *Match* element.
+             startX = promptRect.right - svgRect.left;
+             startY = promptMidY;
+             endX   = matchRect.left - svgRect.left;
+             endY   = matchMidY;
+             // Arrowhead needs to be at the START of this R->L line, pointing left.
+             markerAttribute = 'marker-start';
+
+        } else { // LTR
+             // Prompt is on Left, Match is on Right.
+             // startX is the right edge of the Prompt element.
+             // endX is the left edge of the Match element.
+             startX = promptRect.right - svgRect.left;
+             startY = promptMidY;
+             endX   = matchRect.left - svgRect.left;
+             endY   = matchMidY;
+             // Arrowhead needs to be at the END of this L->R line, pointing right.
+             markerAttribute = 'marker-end';
+        }
+        // --- END COORDINATE LOGIC ---
+
+
+        // Safety check for coordinates
         if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) ||
             !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
             console.error("drawArrow: Invalid coordinates calculated.", { startX, startY, endX, endY, promptIndex, isRTL });
@@ -2430,52 +2445,66 @@
 
         // Find existing line or create a new one
         let line = svgContainer.querySelector(`#arrow-${promptIndex}`);
-        if (!line) {
+        const isNewLine = !line;
+        if (isNewLine) {
             line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.id = `arrow-${promptIndex}`;
-            // It's generally better to apply transitions via CSS classes if possible,
-            // but setting initial opacity to 0 for JS fade-in is fine too.
-            line.style.transition = 'opacity 0.3s ease-in-out'; // Add transition for smoothness
-            line.style.opacity = '0'; // Start invisible
-            svgContainer.appendChild(line); // Append to SVG
+            line.style.transition = 'opacity 0.3s ease-in-out';
+            line.style.opacity = '0'; // Start invisible for new lines
+            svgContainer.appendChild(line);
         }
 
-        // Set line attributes (position, style, marker)
+        // --- IMPORTANT: Clear previous markers before setting the new one ---
+        line.removeAttribute('marker-start');
+        line.removeAttribute('marker-end');
+        // --- Set potentially different marker attribute based on RTL/LTR ---
+        if (markerAttribute) {
+            line.setAttribute(markerAttribute, markerUrl);
+        }
+
+        // Set line attributes (position, style)
         line.setAttribute('x1', startX);
         line.setAttribute('y1', startY);
         line.setAttribute('x2', endX);
         line.setAttribute('y2', endY);
-        // Ensure CSS variable is defined or fallback
         line.setAttribute('stroke', 'var(--accent-color, black)'); // Added fallback
         line.setAttribute('stroke-width', '2');
-        line.setAttribute('marker-end', 'url(#arrowhead)'); // Attach the arrowhead marker
 
-        // Use requestAnimationFrame or a short setTimeout to allow the browser
-        // to apply the initial opacity: 0 before transitioning to opacity: 1
-        requestAnimationFrame(() => {
-            // Force reflow might be needed in some complex scenarios, but usually rAF is enough
-            // line.getBoundingClientRect(); // Optional: force reflow
-            line.style.opacity = '1';
-        });
+
+        // Fade in if it's a new line, otherwise ensure it's visible
+        if (isNewLine) {
+            // Using double rAF for potentially better timing consistency
+             requestAnimationFrame(() => {
+                 requestAnimationFrame(() => {
+                    line.style.opacity = '1';
+                 });
+             });
+        } else {
+             line.style.opacity = '1'; // Ensure existing line is visible
+        }
+
 
     } catch (e) {
         console.error("Error during drawArrow:", e, { promptIndex });
     }
 }
 
-// Ensure you have the arrowhead marker defined in your SVG, usually once:
+
+// --- SVG Marker Definition ---
+// Place this ONCE inside your main <svg> element's <defs> section.
 /*
 <svg id="matching-svg-container-XYZ" ...>
   <defs>
     <marker
       id="arrowhead"
-      markerWidth="10"
-      markerHeight="7"
-      refX="8" <--- Adjust this based on marker shape/size and stroke-width to avoid overlap
-      refY="3.5"
-      orient="auto"
-      markerUnits="strokeWidth">
-      <polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-color, black)" /> <--- Use same color
+      viewBox="0 0 10 10" <--- Using viewBox can sometimes simplify things
+      refX="1"  <--- *** CRITICAL ADJUSTMENT *** For marker-start, this should likely be a SMALL POSITIVE number (e.g., 1 or 2) to attach correctly inside the line start. Experiment!
+      refY="5"  <--- Midpoint of viewBox
+      markerUnits="strokeWidth"
+      markerWidth="4" <--- Adjust size as needed
+      markerHeight="4" <--- Adjust size as needed
+      orient="auto"> <--- 'auto' should orient based on line direction AT THE ATTACHMENT POINT (start or end)
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent-color, black)"></path> <--- Example path for arrowhead
     </marker>
   </defs>
   <!-- Lines will be added here by drawArrow -->
