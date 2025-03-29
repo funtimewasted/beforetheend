@@ -133,7 +133,11 @@
         .rtl-layout .btn > span:first-child { margin-left: 0; margin-right: 6px; }
         .rtl-layout #stats-table th, .rtl-layout #stats-table td { text-align: right; }
         .rtl-layout #stats-table td:first-child, .rtl-layout #stats-table th:first-child { padding-left: 10px; padding-right: 0; }
-
+                /* ADD THIS RULE for RTL Matching Item Text Alignment */
+        .rtl-layout .matching-item {
+            text-align: right; /* Ensure text inside items aligns right */
+        }
+        /* --- END OF ADDED RULE --- */
 
         /* Welcome View */
         #welcome-view { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; background-color: var(--body-bg); color: var(--text-color); padding: 40px 20px; }
