@@ -99,7 +99,13 @@
         .rtl-layout .question-text strong { margin-right: 0; margin-left: 5px; }
         .rtl-layout .option-label { flex-direction: row-reverse; }
         .rtl-layout .option-input { margin-right: 0; margin-left: 15px; }
-        .rtl-layout .matching-container { flex-direction: row-reverse; } /* Flip columns */
+
+        /* --- REPLACED RULE --- */
+        #main-container.rtl-layout .matching-container {
+            flex-direction: row-reverse; /* Flip columns */
+        }
+        /* --- END REPLACEMENT --- */
+
         .rtl-layout .matching-column h4 { text-align: right; }
         .rtl-layout .ordering-item { flex-direction: row-reverse; }
         .rtl-layout .ordering-select { margin-right: 0; margin-left: 15px; }
