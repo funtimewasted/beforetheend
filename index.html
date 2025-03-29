@@ -2372,7 +2372,7 @@
 
 
         // --- Arrow Drawing ---
-        function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
+                function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
             const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
             // Ensure SVG element exists or try to find it again
             if (!matchingSvgElement) {
@@ -2380,42 +2380,36 @@
                 if (svgContainer) { matchingSvgElement = svgContainer; }
                  else { console.error("drawArrow: SVG element '#matching-arrow-svg' not found within outerDiv:", outerDiv?.id); return; }
             }
-            if (!pE || !mE || !outerDiv) {
-                 console.warn("drawArrow: Missing required elements (prompt, match, or outer div). Prompt:", pE?.id, "Match:", mE?.id, "Index:", pI);
+            if (!pE || !mE || !outerDiv || !matchingSvgElement) { // Added check for matchingSvgElement
+                 console.warn("drawArrow: Missing required elements (prompt, match, outer div, or SVG). Prompt:", pE?.id, "Match:", mE?.id, "Index:", pI);
                  return;
             }
 
             const svgRect = matchingSvgElement.getBoundingClientRect();
             const pR = pE.getBoundingClientRect();
             const mR = mE.getBoundingClientRect();
+            // Ensure mainContainerElement is defined and accessible here
             const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
-            // Calculate midpoints relative to the SVG container
+            // Calculate midpoints relative to the SVG container (Vertical is same for LTR/RTL)
             const promptMidY = pR.top + pR.height / 2 - svgRect.top;
             const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
 
             if (isRTL) {
-                // Start at the LEFT edge of the MATCH item (which is physically on the left in RTL)
-                startX = mR.left - svgRect.left;
-                startY = matchMidY;
-                // End at the RIGHT edge of the PROMPT item (physically on the right in RTL)
-                endX   = pR.right - svgRect.left;
-                endY   = promptMidY;
-                 // Swap which element determines start/end based on RTL click logic if needed
-                 // But visually, the arrow still goes from the item physically on the right (prompt)
-                 // to the item physically on the left (match). The coordinates above reflect this physical layout.
-                 // Let's try starting from the PROMPT (right side) and ending at MATCH (left side) regardless of click order
-                 startX = pR.left - svgRect.left;   // Left edge of prompt (which is actually the start point visually)
-                 startY = promptMidY;
-                 endX = mR.right - svgRect.left; // Right edge of match (the visual end point)
-                 endY = matchMidY;
-
+                // RTL: Prompt(pE) is on the RIGHT, Match(mE) is on the LEFT.
+                // Arrow should start visually from the LEFT edge of the prompt item.
+                startX = pR.left - svgRect.left;
+                startY = promptMidY;
+                // Arrow should end visually at the RIGHT edge of the match item.
+                endX   = mR.right - svgRect.left;
+                endY   = matchMidY;
             } else { // LTR
-                // Start at the RIGHT edge of the PROMPT item
+                // LTR: Prompt(pE) is on the LEFT, Match(mE) is on the RIGHT.
+                // Arrow should start visually from the RIGHT edge of the prompt item.
                 startX = pR.right - svgRect.left;
                 startY = promptMidY;
-                // End at the LEFT edge of the MATCH item
+                // Arrow should end visually at the LEFT edge of the match item.
                 endX   = mR.left - svgRect.left;
                 endY   = matchMidY;
             }
@@ -2451,7 +2445,6 @@
                 line.style.opacity = '1';
             });
         }
-
 
         function removeArrow(pI){
             if(!matchingSvgElement)return;
