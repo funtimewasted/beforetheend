@@ -27,9 +27,10 @@
             --shadow-color: rgba(0,0,0,0.05); --matched-item-bg: #e5e7eb;
             --matched-item-border: #9ca3af; --modal-overlay-bg: rgba(15, 23, 42, 0.6);
             --modal-bg: #ffffff;           --lesson-stat-text: #475569;
-            --lesson-perfect-bg: #e0fadf;  --lesson-perfect-border: #54c780;
-            --lesson-perfect-text: #065f46;--lesson-imperfect-bg: #ffe9e9;
-            --lesson-imperfect-border: #f79494; --lesson-imperfect-text: #b91c1c;
+            /* --- Use these for the gradient/border logic --- */
+            --lesson-perfect-bg: #e0fadf;  /* Base for 100% gradient part */
+            --lesson-perfect-border: #54c780; /* Border color for 100% */
+            /* No longer need imperfect bg/border for the main box style */
             --table-border: #e2e8f0;       --table-header-bg: #f1f5f9;
         }
 
@@ -54,12 +55,12 @@
             --shadow-color: rgba(0,0,0,0.2); --matched-item-bg: #475569;
             --matched-item-border: #64748b; --modal-overlay-bg: rgba(0, 0, 0, 0.7);
             --modal-bg: #1e293b;          --lesson-stat-text: #94a3b8;
-            --lesson-perfect-bg: #064e3b; --lesson-perfect-border: #10b981;
-            --lesson-perfect-text: #a7f3d0;--lesson-imperfect-bg: #7f1d1d;
-            --lesson-imperfect-border: #f87171; --lesson-imperfect-text: #fecaca;
+             /* --- Dark theme gradient/border variables --- */
+            --lesson-perfect-bg: #064e3b;  /* Base for 100% gradient part */
+            --lesson-perfect-border: #10b981; /* Border color for 100% */
+             /* No longer need imperfect bg/border for the main box style */
             --table-border: #334155;       --table-header-bg: #0f172a;
         }
-
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -73,23 +74,24 @@
         .rtl-layout [dir="ltr"] * { direction: ltr; } /* Allow overriding for specific LTR content */
 
         .rtl-layout .header { text-align: right; }
-        /* Added rule for header buttons */
         .rtl-layout .header .header-buttons { flex-direction: row-reverse; }
         .rtl-layout .nav-btn { flex-direction: row-reverse; }
         .rtl-layout .nav-btn span:first-child { margin-left: 0; margin-right: 6px; }
+        /* --- MODIFIED: Base RTL border --- */
         .rtl-layout .section-content {
-            text-align: right; border-left-width: 1px; border-left-color: var(--button-border);
-            border-right-width: 4px; border-right-color: transparent;
+            text-align: right;
+            border-left-width: 1px; border-left-color: var(--button-border); /* Standard thin border */
+            border-right-width: 4px; border-right-color: transparent; /* Thick side starts transparent */
         }
-        .rtl-layout .section-content.lesson-complete-perfect { border-right-color: var(--lesson-perfect-border); border-left-color: var(--lesson-perfect-border); }
-        .rtl-layout .section-content.lesson-complete-imperfect { border-right-color: var(--lesson-imperfect-border); border-left-color: var(--lesson-imperfect-border); }
+        /* --- REMOVED: Specific RTL border colors for lesson-complete classes --- */
+
         .rtl-layout .lesson-title-text { margin-right: 0; margin-left: 10px; }
         .rtl-layout .lesson-stats-display { margin-left: 10px; margin-right: auto; }
         .rtl-layout .lesson-q-count { margin-left: 0; margin-right: 10px; }
         .rtl-layout #quiz-header { text-align: right; }
         .rtl-layout #quiz-header #back-to-topics-btn { flex-direction: row-reverse; }
-        #back-to-topics-btn > span:first-child, /* LTR Arrow */
-        .rtl-layout #back-to-topics-btn > span:first-child { /* RTL Arrow */
+        #back-to-topics-btn > span:first-child,
+        .rtl-layout #back-to-topics-btn > span:first-child {
             display: inline-block; margin: 0 4px;
         }
         .rtl-layout .question-progress { text-align: left; }
@@ -103,9 +105,8 @@
         .rtl-layout .ordering-select { margin-right: 0; margin-left: 15px; }
         .rtl-layout #feedback-container { text-align: right; }
         .rtl-layout .incorrect-feedback span { text-align: right; }
-        /* RTL: Adjust Explanation Alignment */
         .rtl-layout .feedback-explanation { text-align: right; }
-        .rtl-layout .feedback-explanation[dir="ltr"] { text-align: left; } /* Keep LTR explanations left-aligned */
+        .rtl-layout .feedback-explanation[dir="ltr"] { text-align: left; }
         .rtl-layout #quiz-buttons-container { justify-content: flex-start; }
         .rtl-layout .results-actions .back-to-topics-btn { margin-left: 0; margin-right: auto; }
         .rtl-layout .review-actions .back-to-topics-btn { margin-left: 0; margin-right: auto; }
@@ -120,7 +121,7 @@
         .rtl-layout .review-matching-column div { text-align: right; }
         .rtl-layout .review-ordering-list-item { flex-direction: row-reverse; }
         .rtl-layout .review-order-number { margin-right: 0; margin-left: 8px; }
-        .rtl-layout #settings-modal *, .rtl-layout #stats-modal * { direction: rtl; } /* Apply to stats modal too */
+        .rtl-layout #settings-modal *, .rtl-layout #stats-modal * { direction: rtl; }
         .rtl-layout .modal-header { flex-direction: row-reverse; }
         .rtl-layout .theme-options label { flex-direction: row-reverse; }
         .rtl-layout .theme-options input[type="radio"] { margin-right: 0; margin-left: 10px;}
@@ -129,9 +130,7 @@
         .rtl-layout .question-review.correct { border-right-color: var(--correct-border); }
         .rtl-layout .question-review.incorrect { border-right-color: var(--incorrect-border); }
         .rtl-layout .question-review.partial { border-right-color: var(--partial-border); }
-        /* Ensure icons in buttons display correctly */
         .rtl-layout .btn > span:first-child { margin-left: 0; margin-right: 6px; }
-        /* RTL Table Styles */
         .rtl-layout #stats-table th, .rtl-layout #stats-table td { text-align: right; }
         .rtl-layout #stats-table td:first-child, .rtl-layout #stats-table th:first-child { padding-left: 10px; padding-right: 0; }
 
@@ -149,8 +148,8 @@
         .container.initially-hidden { opacity: 0; pointer-events: none; }
 
         .header { display: flex; justify-content: space-between; align-items: center; text-align: left; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .header h1 { font-size: 24px; margin: 0; color: var(--text-heading); flex-grow: 1; } /* Allow title to grow */
-        .header .header-buttons { display: flex; gap: 10px; } /* Container for buttons */
+        .header h1 { font-size: 24px; margin: 0; color: var(--text-heading); flex-grow: 1; }
+        .header .header-buttons { display: flex; gap: 10px; }
         #settings-btn, #stats-btn { background: none; border: 1px solid var(--button-border); color: var(--text-muted); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 20px; line-height: 1; transition: all 0.2s ease; }
         #settings-btn:hover, #stats-btn:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); color: var(--text-color); }
 
@@ -163,14 +162,8 @@
         .nav-btn:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); }
         .nav-btn.active { background-color: var(--button-active-bg); color: var(--button-active-text); border-color: var(--button-active-bg); }
 
-        /* --- CSS FIX: Corrected rule for active nav button icon color --- */
-        body.dark-theme .nav-btn.active span {
-            filter: none;
-        }
-        body:not(.dark-theme) .nav-btn.active span {
-            filter: brightness(0) invert(1);
-        }
-        /* --- End CSS Fix --- */
+        body.dark-theme .nav-btn.active span { filter: none; }
+        body:not(.dark-theme) .nav-btn.active span { filter: brightness(0) invert(1); }
 
         .semester-toggle { display: flex; gap: 5px; background-color: var(--feedback-bg); padding: 4px; border-radius: 6px; border: 1px solid var(--button-border); }
         .semester-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; background: none; color: var(--text-muted); transition: all 0.2s ease; }
@@ -183,17 +176,39 @@
         .section { background-color: var(--container-bg); border-radius: 12px; padding: 20px 25px; box-shadow: 0 1px 3px var(--shadow-color); border: 1px solid var(--border-color); margin-bottom: 20px; }
         .semester-content > .section:last-of-type { margin-bottom: 0; }
         .section-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: var(--text-heading); }
-        .section-content { padding: 12px 15px; background-color: var(--button-bg); border-radius: 8px; border: 1px solid var(--button-border); margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; font-size: 15px; color: var(--button-text); display: flex; justify-content: space-between; align-items: center; text-align: left; position: relative; overflow: hidden; border-left-width: 4px; border-left-color: transparent; }
+        /* --- MODIFIED: Base section-content style --- */
+        .section-content {
+            padding: 12px 15px;
+            background-color: var(--button-bg); /* Default background */
+            border-radius: 8px;
+            border: 1px solid var(--button-border); /* Default border */
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background 0.3s ease; /* Added background transition for gradient */
+            font-size: 15px;
+            color: var(--button-text); /* Default text color */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-left-width: 4px; /* Thick border on left */
+            border-left-color: transparent; /* Start transparent */
+        }
         .section-content:last-child { margin-bottom: 0; }
-        .section-content:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); transform: translateY(-1px); }
-        .section-content.lesson-complete-perfect { background-color: var(--lesson-perfect-bg); border-color: var(--lesson-perfect-border); border-left-color: var(--lesson-perfect-border); }
-        .section-content.lesson-complete-perfect span, .section-content.lesson-complete-perfect .lesson-stats-display { color: var(--lesson-perfect-text); font-weight: 500; }
-        .section-content.lesson-complete-imperfect { background-color: var(--lesson-imperfect-bg); border-color: var(--lesson-imperfect-border); border-left-color: var(--lesson-imperfect-border); }
-        .section-content.lesson-complete-imperfect span, .section-content.lesson-complete-imperfect .lesson-stats-display { color: var(--lesson-imperfect-text); font-weight: 500; }
+        .section-content:hover {
+            background-color: var(--button-hover-bg); /* Keep hover effect */
+            border-color: var(--border-color-hover);
+            transform: translateY(-1px);
+        }
+        /* --- REMOVED: Background/Border/Text color rules for .lesson-complete-perfect/.imperfect --- */
+
         .lesson-title-text { flex-grow: 1; margin-right: 10px; }
         .lesson-stats-display { font-size: 0.8em; color: var(--lesson-stat-text); font-weight: 500; white-space: nowrap; flex-shrink: 0; margin-left: auto; padding: 0 10px; }
         .lesson-q-count { font-size: 0.8em; color: var(--lesson-stat-text); font-weight: 400; white-space: nowrap; flex-shrink: 0; }
-        .section-content.lesson-complete-perfect .lesson-q-count, .section-content.lesson-complete-imperfect .lesson-q-count { color: inherit; opacity: 0.8; }
+        /* --- REMOVED: Specific color overrides for q-count in completed lessons --- */
+
         .semester-content { display: none; }
         .semester-content.active { display: block; }
 
@@ -225,9 +240,9 @@
         .matching-item:hover { background-color: var(--button-hover-bg); border-color: var(--border-color-hover); }
         .matching-item.selected { background-color: var(--accent-color-light); border-color: var(--accent-color); font-weight: 500; }
         .matching-item.matched { background-color: var(--matched-item-bg); border-color: var(--matched-item-border); cursor: pointer; opacity: 1.0; }
-        .matching-item:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; } /* Basic focus style if needed */
+        .matching-item:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
         #matching-arrow-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
-        #matching-arrow-svg line { stroke: var(--accent-color); stroke-width: 2; transition: stroke 0.3s ease, opacity 0.3s ease; marker-end: url(#arrowhead); } /* Added stroke transition */
+        #matching-arrow-svg line { stroke: var(--accent-color); stroke-width: 2; transition: stroke 0.3s ease, opacity 0.3s ease; marker-end: url(#arrowhead); }
         #matching-arrow-svg #arrowhead polygon { fill: var(--accent-color); transition: fill 0.3s ease; }
 
         /* Ordering */
@@ -248,33 +263,15 @@
         .correct-option .option-text { color: var(--correct-text) !important; }
         .incorrect-option { background-color: var(--incorrect-bg) !important; border-color: var(--incorrect-border) !important; }
         .incorrect-option .option-text { color: var(--incorrect-text) !important; }
-        /* --- START: Added Explanation CSS --- */
         .feedback-explanation {
-            margin-top: 12px; /* Space between feedback/answer and explanation */
-            padding-top: 12px;
-            border-top: 1px solid var(--feedback-border); /* Separator line */
-            font-size: 0.9em; /* Slightly smaller font */
-            color: var(--text-muted); /* Muted text color */
-            line-height: 1.6; /* Improve readability */
-            text-align: left; /* Ensure LTR text aligns left even in RTL layout */
-        }
-        /* Ensure explanation text direction is LTR if content is always LTR */
-        .feedback-explanation[dir="ltr"] {
-            direction: ltr;
+            margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--feedback-border);
+            font-size: 0.9em; color: var(--text-muted); line-height: 1.6;
             text-align: left;
         }
-        .rtl-layout .feedback-explanation {
-            text-align: right; /* Align right in RTL layout */
-        }
-        .rtl-layout .feedback-explanation[dir="ltr"] {
-            text-align: left; /* Override if explanation content is LTR */
-        }
-        /* Review screen specific margin */
-        .review-answer-content .feedback-explanation {
-            margin-top: 15px;
-        }
-        /* --- END: Added Explanation CSS --- */
-
+        .feedback-explanation[dir="ltr"] { direction: ltr; text-align: left; }
+        .rtl-layout .feedback-explanation { text-align: right; }
+        .rtl-layout .feedback-explanation[dir="ltr"] { text-align: left; }
+        .review-answer-content .feedback-explanation { margin-top: 15px; }
 
         /* Button container */
         #quiz-buttons-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
@@ -339,7 +336,6 @@
         .review-matching-column div { padding: 5px 8px; margin-bottom: 5px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--container-bg); }
         .review-matched-pair-correct { background-color: var(--correct-bg) !important; border-color: var(--correct-border) !important; color: var(--correct-text) !important; }
         .review-matched-pair-incorrect { background-color: var(--incorrect-bg) !important; border-color: var(--incorrect-border) !important; }
-        /* NOTE: The following rules for '.review-matched-pair-incorrect span' are standard CSS and were correct */
         body.dark-theme .review-matched-pair-incorrect span { color: var(--incorrect-text) !important; opacity: 0.7; }
         body.dark-theme .review-matched-pair-incorrect span + span { color: var(--correct-text) !important; opacity: 1; }
         body:not(.dark-theme) .review-matched-pair-incorrect span { color: var(--incorrect-text) !important; opacity: 0.7; }
@@ -354,12 +350,12 @@
         #settings-modal, #stats-modal { position: fixed; inset: 0; background-color: var(--modal-overlay-bg); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #settings-modal.visible, #stats-modal.visible { opacity: 1; pointer-events: auto; }
         .modal-content { background-color: var(--modal-bg); padding: 25px 30px; border-radius: 12px; box-shadow: 0 5px 20px var(--shadow-color); width: 90%; max-width: 450px; border: 1px solid var(--border-color); position: relative; transform: scale(0.95); transition: transform 0.3s ease; max-height: 90vh; display: flex; flex-direction: column; }
-        #stats-modal .modal-content { max-width: 700px; } /* Wider modal for stats table */
+        #stats-modal .modal-content { max-width: 700px; }
         #settings-modal.visible .modal-content, #stats-modal.visible .modal-content { transform: scale(1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .modal-title { font-size: 20px; font-weight: 600; color: var(--text-heading); }
         .modal-close-btn { font-size: 24px; background: none; border: none; color: var(--text-muted); cursor: pointer; line-height: 1; padding: 0 5px; }
-        .modal-body { margin-bottom: 20px; overflow-y: auto; flex-grow: 1;} /* Allow body to scroll */
+        .modal-body { margin-bottom: 20px; overflow-y: auto; flex-grow: 1;}
         .modal-section { margin-bottom: 20px; }
         .modal-section h4 { font-size: 16px; font-weight: 500; color: var(--text-heading); margin: 0 0 12px 0; }
         .modal-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); text-align: right; flex-shrink: 0; }
@@ -372,10 +368,10 @@
         #stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: fixed; }
         #stats-table th, #stats-table td { border: 1px solid var(--table-border); padding: 8px 10px; text-align: center; font-size: 14px; white-space: nowrap; }
         #stats-table th { background-color: var(--table-header-bg); font-weight: 600; color: var(--text-heading); }
-        #stats-table td:first-child, #stats-table th:first-child { text-align: left; font-weight: 500; padding-right: 10px; } /* Align first column text */
+        #stats-table td:first-child, #stats-table th:first-child { text-align: left; font-weight: 500; padding-right: 10px; }
         #stats-table td { color: var(--text-muted); }
         #stats-table tr:last-child td { border-bottom: none; }
-        #stats-table th:last-child, #stats-table td:last-child { font-weight: bold; color: var(--text-color); } /* Highlight Total column */
+        #stats-table th:last-child, #stats-table td:last-child { font-weight: bold; color: var(--text-color); }
 
 
         /* --- END OF styles.css --- */
@@ -384,7 +380,6 @@
 <body>
 
     <!-- Welcome View -->
-    <!-- TODO: Replace [Name], [Names] placeholders below -->
     <div id="welcome-view">
         <h1>Welcome!</h1> <p>Practice makes perfect.</p>
         <div class="info-section"><strong>By:</strong><span>ابراهيم</span></div>
@@ -397,8 +392,8 @@
     <div class="container initially-hidden">
         <div class="header">
             <h1>Question Bank</h1>
-            <div class="header-buttons"> <!-- Added wrapper for buttons -->
-                <button id="stats-btn" title="View Statistics">📊</button> <!-- Changed icon -->
+            <div class="header-buttons">
+                <button id="stats-btn" title="View Statistics">📊</button>
                 <button id="settings-btn" title="Settings">⚙️</button>
             </div>
         </div>
@@ -423,7 +418,7 @@
                 <button class="btn back-to-topics-btn" id="back-to-topics-btn" onclick="showTopicList()"><span>⬅️</span> <span class="btn-text">Back to Topics</span></button>
             </div>
             <div id="quiz-container"></div>
-            <div id="feedback-container" class="feedback-container hidden"></div> <!-- Updated class name -->
+            <div id="feedback-container" class="feedback-container hidden"></div>
             <div id="quiz-buttons-container" class="quiz-buttons"></div>
         </div>
     </div>
@@ -794,244 +789,244 @@
                     "title": "الحياة السياسية في الأردن",
                     "lessons": [
                         { "title": "تأسيس الإمارة الأردنية", "questions": [
-    {
-        "type": "multiple_choice",
-        "question": "على ماذا استولت فرنسا؟",
-        "options": [
-            "دمشق",
-            "بغداد",
-            "القدس",
-            "عمان"
-        ],
-        "answer": "دمشق",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "احدى التالية ليست من تبعات استيلاء فرنسا على دمشق:",
-        "options": [
-            "انتهاء الحكومة العربية في دمشق",
-            "لجوء القيادات السياسية العربية الى ملك الحجاز",
-            "ايفاد الامير فيصل بن الحسين الى بلاد الشام",
-            "استشهاد يوسف العظمة."
-        ],
-        "answer": "ايفاد الامير فيصل بن الحسين الى بلاد الشام",
-        "explanation": "اوفد الامير عبدالله بن الحسين، واستشهد يوسف العظمة في معركة ميلسون (الفصل الاول)."
-    },
-    {
-        "type": "multiple_choice",
-        "question": "سبب لجوء القيادات العربية السياسية الى الحسين بن علي ملك الحجاز:",
-        "options": [
-            "استيلاء فرنسا على دمشق",
-            "انشاء كيان عربي موحد",
-            "طلب المعدات العسكرية",
-            "عقد مؤتمر حوار وطني"
-        ],
-        "answer": "استيلاء فرنسا على دمشق",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "اوفد الشريف الحسين بن علي:",
-        "options": [
-            "نجله الاول الحسين بن عبدالله",
-            "نجله الثاني عبدالله بن الحسين",
-            "ابنه الوحيد فيصل بن الحسين",
-            "نجله الاول عبدالله بن الحسين"
-        ],
-        "answer": "نجله الثاني عبدالله بن الحسين",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "ما الكيان الذي استولى على دمشق؟",
-        "options": [
-            "بريطانيا",
-            "فرنسا",
-            "الحركات الثورية.",
-            "اسبانيا"
-        ],
-        "answer": "فرنسا",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "مطلب القيادات السياسية العربية من ملك الحجاز:",
-        "options": [
-            "الدعم السياسي ضد فرنسا",
-            "ايفاد احد انجاله لقيادة الحركة العربية",
-            "امداد الحركة العربية بالمعدات اللازمة.",
-            "انشاء كيان عسكري موحد للوقوف في وجه فرنسا."
-        ],
-        "answer": "ايفاد احد انجاله لقيادة الحركة العربية",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "متى وصل الامير عبدالله الى معان؟",
-        "options": [
-            "21 تشرين الاول 1920",
-            "21 تشرين الثاني 1920",
-            "1 تشرين الثاني 1921",
-            "1 تشرين الاول 1921"
-        ],
-        "answer": "21 تشرين الثاني 1920",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "المكان الذي اصدر فيه بيان تحدث عن تحرير سورية:",
-        "options": [
-            "دمشق",
-            "عمان",
-            "معان",
-            "الحجاز"
-        ],
-        "answer": "معان",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "احدى التالية من البيان الذي اصدره الامير عبدالله بن الحسين في معان:",
-        "options": [
-            "استقلال سورية العربية",
-            "اعادة الحكم الاسلامي والخلافة",
-            "تحرير سورية واعادة الحكم العربي"
-        ],
-        "answer": "تحرير سورية واعادة الحكم العربي",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "التف حول الامير عبدالله عدد من الشخصيات في معان:",
-        "options": [
-            "الفلسطينية والسورية",
-            "السورية والعربية",
-            "الاردنية والعربية",
-            "البريطانية والعربية"
-        ],
-        "answer": "الاردنية والعربية",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "انعقد المؤتمر البريطاني في القاهرة في:",
-        "options": [
-            "اذار 1921",
-            "ايار 1921",
-            "اذار 1920",
-            "ايار 1920"
-        ],
-        "answer": "اذار 1921",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "ترأس المؤتمر البريطاني في القاهرة:",
-        "options": [
-            "الخديوي المصري",
-            "وزير الدفاع السوري",
-            "وزير المستعمرات البريطاني",
-            "المندوب السامي البريطاني"
-        ],
-        "answer": "وزير المستعمرات البريطاني",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "وزير المستعمرات البريطاني هو:",
-        "options": [
-            "ونستون تشرتشل",
-            "هربرت صموئيل",
-            "كنغ كرين"
-        ],
-        "answer": "ونستون تشرتشل",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "المندوب السامي البريطاني هو:",
-        "options": [
-            "هربرت صموئيل",
-            "كنغ كرين",
-            "ونستون تشرتشل"
-        ],
-        "answer": "هربرت صموئيل",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "الهدف من المؤتمر البريطاني في القاهرة:",
-        "options": [
-            "التوصل الى حل مع معضلة فلسطين",
-            "محاربة الحركات العربية الرامية الى تحرير سورية ولبنان",
-            "بحث مستقبل وجود بريطانيا في المنطقة",
-            "اعلان اعادة الحكم العربي لما كان عليه برئاسة الشريف الحسين"
-        ],
-        "answer": "بحث مستقبل وجود بريطانيا في المنطقة",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "الذي رشح ليكون ملكا على العراق هو:",
-        "options": [
-            "فيصل بن الحسين",
-            "عبدالله بن الحسين",
-            "الحسين بن علي",
-            "يوسف العظمة"
-        ],
-        "answer": "فيصل بن الحسين",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "الذي دعاه وزير المستعمرات لاجتماع القدس:",
-        "options": [
-            "حزب الاستقلال السوري",
-            "عبدالله بن الحسين",
-            "فيصل بن الحسين",
-            "ملك الحجاز"
-        ],
-        "answer": "عبدالله بن الحسين",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "الاجتماع الذي تم فيه الاتفاق على اقامة حكومة وطنية شرقي الاردن:",
-        "options": [
-            "مؤتمر القاهرة",
-            "اجتماع ميلسون",
-            "اجتماع القدس",
-            "اجتماع عمان"
-        ],
-        "answer": "اجتماع القدس",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "النظام الذي فرضته عصبة الامم المتحدة على شرقي الاردن وفلسطين هو:",
-        "options": [
-            "الاقطاعي",
-            "الوكالة",
-            "الانتداب",
-            "الاستعمار"
-        ],
-        "answer": "الانتداب",
-        "explanation": ""
-    },
-    {
-        "type": "multiple_choice",
-        "question": "احدى التالية ليست من بنود اتفاق القدس:",
-        "options": [
-            "اقامة حكومة وطنية في شرقي الاردن برئاسة الامير عبدالله",
-            "استقلال الاردن استقلالا اداريا تاما",
-            "تساعدها بريطانيا مالياً لتوطيد الامن فيه",
-            "تسترشد هذه الحكومة بالمندوب السامي البريطاني"
-        ],
-        "answer": "تسترشد هذه الحكومة بالمندوب السامي البريطاني", // Note: Answer still doesn't include the period from the option text
-        "explanation": ""
-    }
-] },
+                            {
+                                "type": "multiple_choice",
+                                "question": "على ماذا استولت فرنسا؟",
+                                "options": [
+                                    "دمشق",
+                                    "بغداد",
+                                    "القدس",
+                                    "عمان"
+                                ],
+                                "answer": "دمشق",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "احدى التالية ليست من تبعات استيلاء فرنسا على دمشق:",
+                                "options": [
+                                    "انتهاء الحكومة العربية في دمشق",
+                                    "لجوء القيادات السياسية العربية الى ملك الحجاز",
+                                    "ايفاد الامير فيصل بن الحسين الى بلاد الشام",
+                                    "استشهاد يوسف العظمة."
+                                ],
+                                "answer": "ايفاد الامير فيصل بن الحسين الى بلاد الشام",
+                                "explanation": "اوفد الامير عبدالله بن الحسين، واستشهد يوسف العظمة في معركة ميلسون (الفصل الاول)."
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "سبب لجوء القيادات العربية السياسية الى الحسين بن علي ملك الحجاز:",
+                                "options": [
+                                    "استيلاء فرنسا على دمشق",
+                                    "انشاء كيان عربي موحد",
+                                    "طلب المعدات العسكرية",
+                                    "عقد مؤتمر حوار وطني"
+                                ],
+                                "answer": "استيلاء فرنسا على دمشق",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "اوفد الشريف الحسين بن علي:",
+                                "options": [
+                                    "نجله الاول الحسين بن عبدالله",
+                                    "نجله الثاني عبدالله بن الحسين",
+                                    "ابنه الوحيد فيصل بن الحسين",
+                                    "نجله الاول عبدالله بن الحسين"
+                                ],
+                                "answer": "نجله الثاني عبدالله بن الحسين",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "ما الكيان الذي استولى على دمشق؟",
+                                "options": [
+                                    "بريطانيا",
+                                    "فرنسا",
+                                    "الحركات الثورية.",
+                                    "اسبانيا"
+                                ],
+                                "answer": "فرنسا",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "مطلب القيادات السياسية العربية من ملك الحجاز:",
+                                "options": [
+                                    "الدعم السياسي ضد فرنسا",
+                                    "ايفاد احد انجاله لقيادة الحركة العربية",
+                                    "امداد الحركة العربية بالمعدات اللازمة.",
+                                    "انشاء كيان عسكري موحد للوقوف في وجه فرنسا."
+                                ],
+                                "answer": "ايفاد احد انجاله لقيادة الحركة العربية",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "متى وصل الامير عبدالله الى معان؟",
+                                "options": [
+                                    "21 تشرين الاول 1920",
+                                    "21 تشرين الثاني 1920",
+                                    "1 تشرين الثاني 1921",
+                                    "1 تشرين الاول 1921"
+                                ],
+                                "answer": "21 تشرين الثاني 1920",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "المكان الذي اصدر فيه بيان تحدث عن تحرير سورية:",
+                                "options": [
+                                    "دمشق",
+                                    "عمان",
+                                    "معان",
+                                    "الحجاز"
+                                ],
+                                "answer": "معان",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "احدى التالية من البيان الذي اصدره الامير عبدالله بن الحسين في معان:",
+                                "options": [
+                                    "استقلال سورية العربية",
+                                    "اعادة الحكم الاسلامي والخلافة",
+                                    "تحرير سورية واعادة الحكم العربي"
+                                ],
+                                "answer": "تحرير سورية واعادة الحكم العربي",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "التف حول الامير عبدالله عدد من الشخصيات في معان:",
+                                "options": [
+                                    "الفلسطينية والسورية",
+                                    "السورية والعربية",
+                                    "الاردنية والعربية",
+                                    "البريطانية والعربية"
+                                ],
+                                "answer": "الاردنية والعربية",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "انعقد المؤتمر البريطاني في القاهرة في:",
+                                "options": [
+                                    "اذار 1921",
+                                    "ايار 1921",
+                                    "اذار 1920",
+                                    "ايار 1920"
+                                ],
+                                "answer": "اذار 1921",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "ترأس المؤتمر البريطاني في القاهرة:",
+                                "options": [
+                                    "الخديوي المصري",
+                                    "وزير الدفاع السوري",
+                                    "وزير المستعمرات البريطاني",
+                                    "المندوب السامي البريطاني"
+                                ],
+                                "answer": "وزير المستعمرات البريطاني",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "وزير المستعمرات البريطاني هو:",
+                                "options": [
+                                    "ونستون تشرتشل",
+                                    "هربرت صموئيل",
+                                    "كنغ كرين"
+                                ],
+                                "answer": "ونستون تشرتشل",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "المندوب السامي البريطاني هو:",
+                                "options": [
+                                    "هربرت صموئيل",
+                                    "كنغ كرين",
+                                    "ونستون تشرتشل"
+                                ],
+                                "answer": "هربرت صموئيل",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "الهدف من المؤتمر البريطاني في القاهرة:",
+                                "options": [
+                                    "التوصل الى حل مع معضلة فلسطين",
+                                    "محاربة الحركات العربية الرامية الى تحرير سورية ولبنان",
+                                    "بحث مستقبل وجود بريطانيا في المنطقة",
+                                    "اعلان اعادة الحكم العربي لما كان عليه برئاسة الشريف الحسين"
+                                ],
+                                "answer": "بحث مستقبل وجود بريطانيا في المنطقة",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "الذي رشح ليكون ملكا على العراق هو:",
+                                "options": [
+                                    "فيصل بن الحسين",
+                                    "عبدالله بن الحسين",
+                                    "الحسين بن علي",
+                                    "يوسف العظمة"
+                                ],
+                                "answer": "فيصل بن الحسين",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "الذي دعاه وزير المستعمرات لاجتماع القدس:",
+                                "options": [
+                                    "حزب الاستقلال السوري",
+                                    "عبدالله بن الحسين",
+                                    "فيصل بن الحسين",
+                                    "ملك الحجاز"
+                                ],
+                                "answer": "عبدالله بن الحسين",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "الاجتماع الذي تم فيه الاتفاق على اقامة حكومة وطنية شرقي الاردن:",
+                                "options": [
+                                    "مؤتمر القاهرة",
+                                    "اجتماع ميلسون",
+                                    "اجتماع القدس",
+                                    "اجتماع عمان"
+                                ],
+                                "answer": "اجتماع القدس",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "النظام الذي فرضته عصبة الامم المتحدة على شرقي الاردن وفلسطين هو:",
+                                "options": [
+                                    "الاقطاعي",
+                                    "الوكالة",
+                                    "الانتداب",
+                                    "الاستعمار"
+                                ],
+                                "answer": "الانتداب",
+                                "explanation": ""
+                            },
+                            {
+                                "type": "multiple_choice",
+                                "question": "احدى التالية ليست من بنود اتفاق القدس:",
+                                "options": [
+                                    "اقامة حكومة وطنية في شرقي الاردن برئاسة الامير عبدالله",
+                                    "استقلال الاردن استقلالا اداريا تاما",
+                                    "تساعدها بريطانيا مالياً لتوطيد الامن فيه",
+                                    "تسترشد هذه الحكومة بالمندوب السامي البريطاني"
+                                ],
+                                "answer": "تسترشد هذه الحكومة بالمندوب السامي البريطاني", // Note: Answer still doesn't include the period from the option text
+                                "explanation": ""
+                            }
+                        ] },
                         { "title": "استقلال المملكة الأردنية الهاشمية", "questions": [] },
                         { "title": "تطور الحياة السياسية في الأردن بين عامي (1948-1957)", "questions": [] },
                         { "title": "تطور الحياة السياسية في الأردن بين عامي (1958-1999)", "questions": [] },
@@ -1200,7 +1195,7 @@
             ]
         }
     }
-};
+}; // --- Keep your full topicsData here ---
 
         function generateSemesterContent(subject, semester) {
             const sanitizedSubject = subject.replace(/\s+/g, '-'); const id = `${sanitizedSubject}-${semester}`;
@@ -1219,16 +1214,15 @@
         // --- START OF questions.js ---
         let quizState = { currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: 0, startTime: null, endTime: null, selectedAnswers: [], questions: [], originalQuestions: [], subject: '', unit: '', lesson: '', semester: '', matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {} } };
         let allLessonStats = {};
-        let subjectTotalQuestions = {}; // <--- Global variable to store pre-calculated totals
+        let subjectTotalQuestions = {};
 
         const LS_THEME_KEY = 'quizAppTheme';
         const LS_VISITED_KEY = 'quizAppVisited';
         const LS_STATS_KEY = 'quizAppLessonStats';
-        const RTL_SUBJECTS = ["اللغة العربية", "دين", "التاريخ"]; // <-- Define RTL subjects
-        // Define the exact order of subjects for the stats table
+        const RTL_SUBJECTS = ["اللغة العربية", "دين", "التاريخ"];
         const STATS_SUBJECT_ORDER = ["التاريخ", "دين", "اللغة العربية", "english"];
 
-        // --- UI String Translations (Expanded) ---
+        // Define UI Strings
         const uiStrings = {
             en: {
                 firstSemester: "First Semester", secondSemester: "Second Semester",
@@ -1332,8 +1326,117 @@
 
         // --- Lesson Stats Management ---
         function loadLessonStats(){try{const s=localStorage.getItem(LS_STATS_KEY);allLessonStats=s?JSON.parse(s):{};}catch(e){console.error("Failed to load lesson stats:",e);allLessonStats={};}}
-        function saveLessonStats(subj,sem,unit,lesson,score,total,time){const k=getLessonStorageKey(subj,sem,unit,lesson);const e=allLessonStats[k];let u=!1;if(!e||!e.totalQuestions){allLessonStats[k]={bestScore:score,totalQuestions:total,bestTime:time};u=!0;}else{if(score>e.bestScore){e.bestScore=score;e.bestTime=time;e.totalQuestions=total;u=!0;}else if(score===e.bestScore&&time<e.bestTime){e.bestTime=time;u=!0;}if(total!==e.totalQuestions){e.totalQuestions=total;u=!0;}}if(u)try{localStorage.setItem(LS_STATS_KEY,JSON.stringify(allLessonStats));}catch(e){console.error("Failed to save lesson stats:",e);}}
-        function updateLessonBoxDisplays(){const a=document.querySelector('.semester-content.active');if(!a)return;const l=a.querySelectorAll('.section-content');l.forEach(b=>{const s=b.dataset.subject,sem=b.dataset.semester,u=b.dataset.unit,les=b.dataset.lesson,dS=b.querySelector('.lesson-stats-display'),qC=b.querySelector('.lesson-q-count');if(!s||!sem||!u||!les||!dS)return;const k=getLessonStorageKey(s,sem,u,les),st=allLessonStats[k];b.classList.remove('lesson-complete-perfect','lesson-complete-imperfect');dS.textContent='';if(qC)qC.style.display='';if(st&&st.totalQuestions>0){const sT=`🏆 ${st.bestScore}/${st.totalQuestions}`,tT=`⏱️ ${formatTime(st.bestTime)}`;dS.textContent=`${sT} | ${tT}`;if(st.bestScore===st.totalQuestions)b.classList.add('lesson-complete-perfect');else b.classList.add('lesson-complete-imperfect');}else{if(qC)qC.style.display='';}});}
+        function saveLessonStats(subj,sem,unit,lesson,score,total,time){
+            const k=getLessonStorageKey(subj,sem,unit,lesson);
+            const currentStat = allLessonStats[k];
+            let shouldUpdate = false;
+
+            // First time saving or stored total is different from current total (update required)
+            if (!currentStat || !currentStat.totalQuestions || currentStat.totalQuestions !== total) {
+                allLessonStats[k] = { bestScore: score, totalQuestions: total, bestTime: time };
+                shouldUpdate = true;
+            } else {
+                // Existing stat, check for improvement
+                if (score > currentStat.bestScore) {
+                    currentStat.bestScore = score;
+                    currentStat.bestTime = time; // Update time only when score improves
+                    // Keep stored totalQuestions as is, it matches the current 'total'
+                    shouldUpdate = true;
+                } else if (score === currentStat.bestScore && time < currentStat.bestTime) {
+                    currentStat.bestTime = time; // Update time if score is same but time is better
+                    shouldUpdate = true;
+                }
+                // No need to explicitly update totalQuestions here if it hasn't changed
+            }
+
+            if (shouldUpdate) {
+                try {
+                    localStorage.setItem(LS_STATS_KEY, JSON.stringify(allLessonStats));
+                } catch (e) {
+                    console.error("Failed to save lesson stats:", e);
+                }
+            }
+        }
+
+        // --- MODIFIED: updateLessonBoxDisplays (Gradient Logic) ---
+        function updateLessonBoxDisplays() {
+            const activeSemesterContent = document.querySelector('.semester-content.active');
+            if (!activeSemesterContent) return;
+
+            const lessonBoxes = activeSemesterContent.querySelectorAll('.section-content');
+            lessonBoxes.forEach(box => {
+                const subj = box.dataset.subject;
+                const sem = box.dataset.semester;
+                const unit = box.dataset.unit;
+                const lesson = box.dataset.lesson;
+                const statsDisplaySpan = box.querySelector('.lesson-stats-display');
+                const qCountSpan = box.querySelector('.lesson-q-count');
+
+                if (!subj || !sem || !unit || !lesson || !statsDisplaySpan || !qCountSpan) {
+                    // console.warn("Missing data attributes or spans for lesson box:", box);
+                    return; // Skip if essential data is missing
+                }
+
+                // Always get the CURRENT question count
+                const currentQuestionCount = getLessonQuestionCount(subj, sem, unit, lesson);
+
+                // Update the (X Qs) display
+                const countText = currentQuestionCount === 1 ? "1 Q" : `${currentQuestionCount} Qs`;
+                qCountSpan.textContent = `(${countText})`;
+                qCountSpan.style.display = ''; // Ensure it's visible
+
+                // Reset styles initially - Background and Borders
+                box.style.background = ''; // Clear potential inline gradient
+                box.style.borderColor = 'var(--button-border)'; // Reset to default border color
+                box.style.borderLeftColor = 'transparent'; // Reset thick border color (LTR)
+                box.style.borderRightColor = 'transparent'; // Reset thick border color (RTL)
+                statsDisplaySpan.textContent = '';
+
+                // Check for stored stats
+                const storageKey = getLessonStorageKey(subj, sem, unit, lesson);
+                const storedStat = allLessonStats[storageKey];
+                // Check if main container exists and has the rtl-layout class
+                const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
+
+
+                // Use current count for display and style logic
+                if (storedStat && storedStat.bestScore !== undefined && currentQuestionCount > 0) {
+                    const score = storedStat.bestScore;
+                    const percentage = Math.round((score / currentQuestionCount) * 100);
+
+                    // Display score using CURRENT total
+                    const scoreText = `🏆 ${score}/${currentQuestionCount}`;
+                    const timeText = `⏱️ ${formatTime(storedStat.bestTime)}`;
+                    statsDisplaySpan.textContent = `${scoreText} | ${timeText}`;
+
+                    // Apply Gradient Background
+                    const direction = isRTL ? 'to left' : 'to right';
+                    const completeColor = 'var(--lesson-perfect-bg)'; // Use defined variable
+                    const incompleteColor = 'var(--button-bg)'; // Use default button background for incomplete part
+
+                    box.style.background = `linear-gradient(${direction}, ${completeColor} ${percentage}%, ${incompleteColor} ${percentage}%)`;
+
+                    // Apply special border *only* if 100% complete
+                    if (percentage === 100) {
+                        const perfectBorderColor = 'var(--lesson-perfect-border)';
+                        box.style.borderColor = perfectBorderColor; // Set all borders first
+                        if (isRTL) {
+                            box.style.borderRightColor = perfectBorderColor; // Override thick border side
+                            // Keep border widths as defined in base CSS (1px left, 4px right)
+                        } else {
+                            box.style.borderLeftColor = perfectBorderColor; // Override thick border side
+                             // Keep border widths as defined in base CSS (4px left, 1px right)
+                        }
+                    }
+                    // If not 100%, the borders remain default/transparent as set initially
+
+                } else if (storedStat && currentQuestionCount === 0) {
+                    // Stats exist but lesson now has 0 questions -> Clear display, keep borders default
+                    statsDisplaySpan.textContent = '';
+                }
+                 // If no stored stats, spans/styles are already cleared/reset above.
+            });
+        }
 
         // --- UI Language Update ---
         function updateUiLanguage(lang = 'en') {
@@ -1473,7 +1576,19 @@
         function applyTheme(t){document.body.classList.toggle('dark-theme',t==='dark');const r=settingsModalElement?.querySelectorAll('input[name="theme"]');if(r)r.forEach(rd=>rd.checked=rd.value===t);}
         function handleThemeChange(e){const n=e.target.value;applyTheme(n);localStorage.setItem(LS_THEME_KEY,n);}
         function loadAndApplyTheme(){const s=localStorage.getItem(LS_THEME_KEY);const c=s||'dark';applyTheme(c);if(!s)localStorage.setItem(LS_THEME_KEY,'dark');}
-        function toggleSettingsModal(s){if(!settingsModalElement)return;if(s){const c=localStorage.getItem(LS_THEME_KEY)||'dark';const r=settingsModalElement.querySelectorAll('input[name="theme"]');r.forEach(rd=>rd.checked=rd.value===c);settingsModalElement.classList.remove('hidden');setTimeout(()=>settingsModalElement.classList.add('visible'),10);}else{settingsModalElement.classList.remove('visible');setTimeout(()=>settingsModalElement.classList.add('hidden'),300);}}
+        function toggleSettingsModal(s){
+            if(!settingsModalElement)return;
+            if(s){
+                const c=localStorage.getItem(LS_THEME_KEY)||'dark';
+                const r=settingsModalElement.querySelectorAll('input[name="theme"]');
+                r.forEach(rd=>rd.checked=rd.value===c);
+                settingsModalElement.classList.remove('hidden');
+                setTimeout(()=>settingsModalElement.classList.add('visible'),10);
+            } else {
+                settingsModalElement.classList.remove('visible');
+                setTimeout(()=>settingsModalElement.classList.add('hidden'),300);
+            }
+        }
 
         // --- Function to calculate total questions per subject from topicsData ---
         function calculateSubjectTotals() {
@@ -1514,7 +1629,6 @@
             }
         }
 
-        // --- MODIFIED: calculateOverallStats ---
         function calculateOverallStats() {
             const subjectStats = {};
             // Initialize stats object using the pre-calculated totals
@@ -1568,8 +1682,6 @@
             return { subjectStats, overallAnswered, overallTotal, overallTime };
         }
 
-
-        // --- populateStatsModal (Uses the output of calculateOverallStats) ---
         function populateStatsModal() {
             const { subjectStats, overallAnswered, overallTotal, overallTime } = calculateOverallStats();
             const tbody = document.getElementById('stats-table-body');
@@ -1621,7 +1733,26 @@
         }
 
         // --- Welcome Screen Logic ---
-        function handleWelcome(){if(!welcomeViewElement||!mainContainerElement)return;const h=localStorage.getItem(LS_VISITED_KEY);if(h){welcomeViewElement.classList.add('hidden');mainContainerElement.classList.remove('initially-hidden');setTimeout(()=>{mainContainerElement.style.opacity=1;},50);}else{welcomeViewElement.classList.remove('hidden');mainContainerElement.classList.add('initially-hidden');mainContainerElement.style.opacity=0;const b=welcomeViewElement.querySelector('.get-started-btn');if(b)b.addEventListener('click',()=>{localStorage.setItem(LS_VISITED_KEY,'true');welcomeViewElement.classList.add('hidden');mainContainerElement.classList.remove('initially-hidden');setTimeout(()=>{mainContainerElement.style.opacity=1;},50);},{once:true});}}
+        function handleWelcome(){
+            if(!welcomeViewElement||!mainContainerElement)return;
+            const hasVisited = localStorage.getItem(LS_VISITED_KEY);
+            if(hasVisited){
+                welcomeViewElement.classList.add('hidden');
+                mainContainerElement.classList.remove('initially-hidden');
+                setTimeout(()=>{mainContainerElement.style.opacity=1;},50);
+            } else {
+                welcomeViewElement.classList.remove('hidden');
+                mainContainerElement.classList.add('initially-hidden');
+                mainContainerElement.style.opacity=0;
+                const startButton=welcomeViewElement.querySelector('.get-started-btn');
+                if(startButton) startButton.addEventListener('click',()=>{
+                    localStorage.setItem(LS_VISITED_KEY,'true');
+                    welcomeViewElement.classList.add('hidden');
+                    mainContainerElement.classList.remove('initially-hidden');
+                    setTimeout(()=>{mainContainerElement.style.opacity=1;},50);
+                },{once:true});
+            }
+        }
 
         // --- DOM Ready Listener ---
         document.addEventListener('DOMContentLoaded',()=>{
@@ -1641,10 +1772,10 @@
             statsModalElement = document.getElementById('stats-modal');
 
             // Initial Setup
-            calculateSubjectTotals(); // Calculate totals from topicsData
+            calculateSubjectTotals(); // Calculate totals from topicsData FIRST
             loadAndApplyTheme();
             loadLessonStats();
-            handleWelcome();
+            handleWelcome(); // Handle welcome screen visibility
             const initialSubjectBtn = document.querySelector('.nav-btn.active');
             const initialSubject = initialSubjectBtn?.dataset.subject || 'english';
             const initialLang = RTL_SUBJECTS.includes(initialSubject) ? 'ar' : 'en';
@@ -1660,15 +1791,17 @@
                 const resetBtn=document.getElementById('reset-data-button');
                 if(resetBtn) resetBtn.addEventListener('click',resetSavedData);
                 settingsModalElement.addEventListener('click',(e)=>{if(e.target===settingsModalElement)toggleSettingsModal(false);});
-                 // Close button inside modal
                 const closeHeaderBtn = document.getElementById('settings-modal-close-header');
                 if (closeHeaderBtn) closeHeaderBtn.addEventListener('click', () => toggleSettingsModal(false));
+                const closeFooterBtn = document.getElementById('settings-modal-close-footer');
+                 if (closeFooterBtn) closeFooterBtn.addEventListener('click', () => toggleSettingsModal(false));
             }
             if (statsModalElement) {
                 statsModalElement.addEventListener('click', (e) => { if (e.target === statsModalElement) toggleStatsModal(false); });
-                 // Close button inside modal
                 const closeHeaderBtn = document.getElementById('stats-modal-close-header');
                 if (closeHeaderBtn) closeHeaderBtn.addEventListener('click', () => toggleStatsModal(false));
+                const closeFooterBtn = document.getElementById('stats-modal-close-footer');
+                if (closeFooterBtn) closeFooterBtn.addEventListener('click', () => toggleStatsModal(false));
             }
 
 
@@ -1693,20 +1826,21 @@
             });});
 
             // Lesson Click
-            if(contentElement) contentElement.addEventListener('click',(e)=>{const l=e.target.closest('.section-content');if(l){
-                const strings = getStrings();
-                const confirmMsg = strings.leaveQuizConfirm || "Leave quiz?";
-                // Only confirm if actually in quiz view
-                if (!quizViewElement.classList.contains('hidden') && !confirm(confirmMsg)) return;
-                // If confirmed or not in quiz view, proceed
-                if (!quizViewElement.classList.contains('hidden')) {
-                    // No need to call showTopicList here, handleSectionClick will manage views
-                     // *** Explicitly call cleanup when starting a new quiz from quiz view ***
-                     cleanupQuizView();
+            if(contentElement) contentElement.addEventListener('click',(e)=>{
+                const lessonBox=e.target.closest('.section-content');
+                if(lessonBox){
+                    const strings = getStrings();
+                    const confirmMsg = strings.leaveQuizConfirm || "Leave quiz?";
+                    // Only confirm if actually in quiz view
+                    if (!quizViewElement.classList.contains('hidden') && !confirm(confirmMsg)) return;
+                    // If confirmed or not in quiz view, proceed
+                    if (!quizViewElement.classList.contains('hidden')) {
+                         cleanupQuizView();
+                    }
+                    const s=lessonBox.dataset.subject,sem=lessonBox.dataset.semester,u=lessonBox.dataset.unit,les=lessonBox.dataset.lesson;
+                    handleSectionClick(s,sem,u,les);
                 }
-                const s=l.dataset.subject,sem=l.dataset.semester,u=l.dataset.unit,les=l.dataset.lesson;
-                handleSectionClick(s,sem,u,les);
-            }});
+            });
 
             window.addEventListener('resize',debounce(updateAllArrowPositions,250));
 
@@ -1746,7 +1880,6 @@
                  quizViewElement.scrollIntoView({behavior:'smooth',block:'start'});
             }
         }
-        // *** Added Cleanup Function ***
         function cleanupQuizView() {
             // Disconnect MutationObserver if it exists
             if (matchingArrowObserver) {
@@ -1779,13 +1912,13 @@
 
         // --- Core Functions ---
         function updateContent() {
-            const aSBtn = document.querySelector('.nav-btn[data-subject].active');
-            const aSemBtn = document.querySelector('.semester-btn.active');
-            if (!aSBtn || !aSemBtn || !contentElement) return;
-            const actSub = aSBtn.dataset.subject;
-            const actSem = aSemBtn.dataset.semester;
-            const sanSub = actSub.replace(/\s+/g, '-');
-            const isRTL = RTL_SUBJECTS.includes(actSub);
+            const activeSubjectBtn = document.querySelector('.nav-btn[data-subject].active');
+            const activeSemesterBtn = document.querySelector('.semester-btn.active');
+            if (!activeSubjectBtn || !activeSemesterBtn || !contentElement) return;
+            const activeSubject = activeSubjectBtn.dataset.subject;
+            const activeSemester = activeSemesterBtn.dataset.semester;
+            const sanitizedSubject = activeSubject.replace(/\s+/g, '-');
+            const isRTL = RTL_SUBJECTS.includes(activeSubject);
             const lang = isRTL ? 'ar' : 'en';
 
             setRtlLayout(isRTL); // Set RTL layout first
@@ -1797,15 +1930,15 @@
             contentElement.querySelectorAll('.semester-content').forEach(c => c.classList.remove('active'));
 
             // Find and show the active semester content
-            const cId = `${sanSub}-${actSem}`;
-            const sCE = contentElement.querySelector(`#${cId}`);
-            if (sCE) {
-                sCE.classList.add('active');
-                updateLessonBoxDisplays(); // Update the stats display for the visible lessons
+            const contentId = `${sanitizedSubject}-${activeSemester}`;
+            const semesterContentElement = contentElement.querySelector(`#${contentId}`);
+            if (semesterContentElement) {
+                semesterContentElement.classList.add('active');
+                updateLessonBoxDisplays(); // Update the stats/gradient display for the visible lessons
             } else {
-                console.warn(`Semester content ID "#${cId}" not found.`);
+                console.warn(`Semester content ID "#${contentId}" not found.`);
                 // Optionally display a message in the content area
-                contentElement.innerHTML = `<p>Content for ${actSub} - ${actSem} not found.</p>`;
+                contentElement.innerHTML = `<p>Content for ${activeSubject} - ${activeSemester} not found.</p>`;
             }
         }
 
@@ -1816,10 +1949,10 @@
                 return;
             }
             try{
-                const oQ=getQuestions(subj,sem,unit,lesson);
+                const originalQuestions = getQuestions(subj,sem,unit,lesson);
                 showQuizView(); // Show the quiz view area *before* trying to populate it
-                if(oQ?.length) {
-                    startQuiz(subj,sem,unit,lesson,oQ);
+                if(originalQuestions?.length) {
+                    startQuiz(subj,sem,unit,lesson,originalQuestions);
                 } else {
                     showError(subj,unit,lesson); // Show specific error if no questions found
                 }
@@ -1829,13 +1962,13 @@
             }
         }
 
-        function startQuiz(subj,sem,unit,lesson,oQ){
-            const sQ = shuffleArray(oQ);
-            // Reset state (partially done by cleanupQuizView, but ensure full reset here)
+        function startQuiz(subj,sem,unit,lesson,originalQuestions){
+            const shuffledQuestions = shuffleArray(originalQuestions);
+            // Reset state
              quizState = {
-                currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: sQ.length,
-                startTime: new Date(), endTime: null, selectedAnswers: new Array(sQ.length).fill(null),
-                questions: sQ, originalQuestions: oQ,
+                currentQuestionIndex: 0, correctAnswers: 0, totalQuestions: shuffledQuestions.length,
+                startTime: new Date(), endTime: null, selectedAnswers: new Array(shuffledQuestions.length).fill(null),
+                questions: shuffledQuestions, originalQuestions: originalQuestions,
                 subject: subj, unit: unit, lesson: lesson, semester: sem,
                 matchingState: { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] } // Reset matching state
             };
@@ -1854,8 +1987,8 @@
         function displayQuestion(){
             if(!quizContainerElement||!feedbackContainerElement||!quizButtonsContainerElement)return;
 
-            const cQ=quizState.questions[quizState.currentQuestionIndex];
-            if(!cQ){ // Should not happen if totalQuestions > 0, but good safeguard
+            const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
+            if(!currentQuestion){ // Safeguard
                 console.warn("DisplayQuestion called but no current question found. Index:", quizState.currentQuestionIndex);
                 displayResults(); // Go to results if out of bounds
                 return;
@@ -1866,110 +1999,108 @@
             feedbackContainerElement.innerHTML='';
             feedbackContainerElement.classList.add('hidden');
             quizButtonsContainerElement.innerHTML='';
-             // Cleanup potential leftovers from previous question types
             if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
             if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
-             quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
-             quizState.matchingState = { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] }; // Ensure clean state
+            quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
+            quizState.matchingState = { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] }; // Ensure clean state
 
 
             // Create question wrapper
-            const qW=document.createElement('div');
-            qW.className='question-display-wrapper';
+            const questionWrapper=document.createElement('div');
+            questionWrapper.className='question-display-wrapper';
 
             // Progress text
-            const pT=document.createElement('div');
-            pT.className='question-progress';
-            pT.textContent=`Q ${quizState.currentQuestionIndex+1}/${quizState.totalQuestions}`;
-            qW.appendChild(pT);
+            const progressText=document.createElement('div');
+            progressText.className='question-progress';
+            progressText.textContent=`Q ${quizState.currentQuestionIndex+1}/${quizState.totalQuestions}`;
+            questionWrapper.appendChild(progressText);
 
             // Question text
-            const qT=document.createElement('p');
-            qT.className='question-text';
-            qT.innerHTML=`<strong>Q:</strong> ${cQ.question||'?'}`; // Use innerHTML for potential formatting
-            qW.appendChild(qT);
+            const questionText=document.createElement('p');
+            questionText.className='question-text';
+            questionText.innerHTML=`<strong>Q:</strong> ${currentQuestion.question||'?'}`; // Use innerHTML for potential formatting
+            questionWrapper.appendChild(questionText);
 
             // Wrapper for the specific question type content
-            const tW=document.createElement('div');
-            tW.className='question-type-wrapper';
+            const typeWrapper=document.createElement('div');
+            typeWrapper.className='question-type-wrapper';
 
             // Render based on type
             try{
-                switch(cQ.type){
+                switch(currentQuestion.type){
                     case "matching":
-                        renderMatching(cQ,tW);
-                        // Use requestAnimationFrame to ensure elements are in DOM before observing/drawing
+                        renderMatching(currentQuestion,typeWrapper);
                         requestAnimationFrame(setupArrowObserver);
                         break;
                     case "ordering":
-                        renderOrdering(cQ,tW);
+                        renderOrdering(currentQuestion,typeWrapper);
                         break;
                     case "multiple_choice":
                     default: // Default to multiple choice
-                        renderMultipleChoice(cQ,tW);
+                        renderMultipleChoice(currentQuestion,typeWrapper);
                         break;
                 }
             } catch(e) {
-                console.error("Render error for question type", cQ.type, e);
-                tW.innerHTML=`<p style="color:red;">Error displaying this question.</p>`;
+                console.error("Render error for question type", currentQuestion.type, e);
+                typeWrapper.innerHTML=`<p style="color:red;">Error displaying this question.</p>`;
             }
 
-            qW.appendChild(tW);
-            quizContainerElement.appendChild(qW);
+            questionWrapper.appendChild(typeWrapper);
+            quizContainerElement.appendChild(questionWrapper);
 
             // Add buttons
-            const sB=document.createElement('button');
-            sB.className='btn submit-btn';
-            sB.id='submit-btn';
-            sB.innerHTML=`<span class="btn-text"></span>`; // Text set by updateUiLanguage
-            sB.onclick=checkAnswer;
+            const submitButton=document.createElement('button');
+            submitButton.className='btn submit-btn';
+            submitButton.id='submit-btn';
+            submitButton.innerHTML=`<span class="btn-text"></span>`; // Text set by updateUiLanguage
+            submitButton.onclick=checkAnswer;
 
-            const nB=document.createElement('button');
-            nB.className='btn next-btn hidden'; // Start hidden
-            nB.id='next-btn';
-            nB.innerHTML=`<span class="btn-text"></span>`; // Text set by updateUiLanguage
-            nB.onclick=nextQuestion;
+            const nextButton=document.createElement('button');
+            nextButton.className='btn next-btn hidden'; // Start hidden
+            nextButton.id='next-btn';
+            nextButton.innerHTML=`<span class="btn-text"></span>`; // Text set by updateUiLanguage
+            nextButton.onclick=nextQuestion;
 
-            quizButtonsContainerElement.append(sB,nB);
+            quizButtonsContainerElement.append(submitButton,nextButton);
 
             // Disable submit button initially for types requiring selection
-            sB.disabled = true;
-            if(cQ.type === 'multiple_choice' || cQ.type === 'ordering' || cQ.type === 'matching') {
+            submitButton.disabled = true;
+            if(currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'ordering' || currentQuestion.type === 'matching') {
                  // Keep disabled, will be enabled by interaction handlers
             } else {
-                 sB.disabled = false; // Enable for unknown/simple types
+                 submitButton.disabled = false; // Enable for unknown/simple types
             }
 
             updateUiLanguage(getCurrentLang()); // Ensure button text is set correctly
         }
 
         // --- Rendering Functions ---
-        function renderMultipleChoice(q,c){
-            if(!q.options?.length) { c.textContent='Error: No options provided.'; return; }
-            const oD=document.createElement('div');
-            oD.className='options-container';
-            q.options.forEach((o,i)=>{
+        function renderMultipleChoice(q,container){
+            if(!q.options?.length) { container.textContent='Error: No options provided.'; return; }
+            const optionsDiv=document.createElement('div');
+            optionsDiv.className='options-container';
+            q.options.forEach((optionText,i)=>{
                 const id=`option-${i}`;
-                const l=document.createElement('label');
-                l.className='option-label';
-                l.htmlFor=id;
-                const inp=document.createElement('input');
-                inp.type='radio';
-                inp.name='question-option';
-                inp.value=i;
-                inp.id=id;
-                inp.className='option-input';
-                inp.addEventListener('change',()=>{
-                    const s=document.getElementById('submit-btn');
-                    if(s) s.disabled=false; // Enable submit on selection
+                const label=document.createElement('label');
+                label.className='option-label';
+                label.htmlFor=id;
+                const input=document.createElement('input');
+                input.type='radio';
+                input.name='question-option';
+                input.value=i;
+                input.id=id;
+                input.className='option-input';
+                input.addEventListener('change',()=>{
+                    const submitBtn=document.getElementById('submit-btn');
+                    if(submitBtn) submitBtn.disabled=false; // Enable submit on selection
                 });
-                const t=document.createElement('span');
-                t.className='option-text';
-                t.textContent=o;
-                l.append(inp,t);
-                oD.appendChild(l);
+                const text=document.createElement('span');
+                text.className='option-text';
+                text.textContent=optionText;
+                label.append(input,text);
+                optionsDiv.appendChild(label);
             });
-            c.appendChild(oD);
+            container.appendChild(optionsDiv);
         }
 
         function renderMatching(question, container) {
@@ -2048,8 +2179,8 @@
              outer.appendChild(matchCont); // Add columns container to the outer div
         }
 
-        function renderOrdering(q,c){
-            if(!q.items?.length) { c.textContent='Error: Ordering data invalid.'; return; }
+        function renderOrdering(q,container){
+            if(!q.items?.length) { container.textContent='Error: Ordering data invalid.'; return; }
             const strings = getStrings();
             const numItems = q.items.length;
 
@@ -2058,16 +2189,16 @@
             instr.className='ordering-instructions';
             const instructionText = strings.orderingInstruction || '';
             instr.textContent = numItems > 0 ? instructionText.replace('{num}', `1-${numItems}`) : instructionText.replace('{num}', 'N/A');
-            c.appendChild(instr);
+            container.appendChild(instr);
 
             // Container for items
-            const oC=document.createElement('div');
-            oC.className='ordering-container';
-            oC.id='ordering-list'; // ID for targeting selects
+            const orderingContainer=document.createElement('div');
+            orderingContainer.className='ordering-container';
+            orderingContainer.id='ordering-list'; // ID for targeting selects
 
             // Function to check if all selects have a value
             const checkCompletion=()=>{
-                const allSelects=oC.querySelectorAll('.ordering-select');
+                const allSelects=orderingContainer.querySelectorAll('.ordering-select');
                 const allSelected = Array.from(allSelects).every(select => select.value !== "");
                 const submitBtn=document.getElementById('submit-btn');
                 if(submitBtn) submitBtn.disabled=!allSelected;
@@ -2080,13 +2211,13 @@
 
             // Create items with selects
             shuffledItems.forEach(({text: itemText, originalIndex}) => {
-                const d=document.createElement('div');
-                d.className='ordering-item';
-                d.dataset.originalIndex=originalIndex; // Store original index if needed
+                const itemDiv=document.createElement('div');
+                itemDiv.className='ordering-item';
+                itemDiv.dataset.originalIndex=originalIndex; // Store original index if needed
 
-                const s=document.createElement('select');
-                s.className='ordering-select';
-                s.dataset.itemIndex=originalIndex; // Link select to the original item index
+                const selectElement=document.createElement('select');
+                selectElement.className='ordering-select';
+                selectElement.dataset.itemIndex=originalIndex; // Link select to the original item index
 
                 // Default placeholder option
                 const defaultOpt=document.createElement('option');
@@ -2094,26 +2225,26 @@
                 defaultOpt.textContent="-";
                 defaultOpt.selected=true;
                 defaultOpt.disabled=true; // Make placeholder unselectable after choosing
-                s.appendChild(defaultOpt);
+                selectElement.appendChild(defaultOpt);
 
                 // Populate order numbers
                 for(let j=1;j<=numItems;j++){
                     const opt=document.createElement('option');
                     opt.value=j;
                     opt.textContent=j;
-                    s.appendChild(opt);
+                    selectElement.appendChild(opt);
                 }
 
-                s.addEventListener('change', checkCompletion); // Check completion on change
+                selectElement.addEventListener('change', checkCompletion); // Check completion on change
 
-                const sp=document.createElement('span');
-                sp.className='ordering-text';
-                sp.textContent=itemText;
+                const textSpan=document.createElement('span');
+                textSpan.className='ordering-text';
+                textSpan.textContent=itemText;
 
-                d.append(s,sp);
-                oC.appendChild(d);
+                itemDiv.append(selectElement,textSpan);
+                orderingContainer.appendChild(itemDiv);
             });
-            c.appendChild(oC);
+            container.appendChild(orderingContainer);
         }
 
         // --- Interaction Handlers ---
@@ -2121,7 +2252,7 @@
             const clickedItem = event.target.closest('.matching-item');
             if (!clickedItem || clickedItem.disabled) return; // Ignore if disabled (after submit)
 
-            const isRTL = mainContainerElement.classList.contains('rtl-layout');
+            const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
             const isPrompt = clickedItem.classList.contains('prompt-item');
             const isMatch = clickedItem.classList.contains('match-item');
             const isAlreadyMatched = clickedItem.classList.contains('matched');
@@ -2195,7 +2326,7 @@
                      currentSelectedMatch.classList.remove('selected');
                      currentSelectedMatch.classList.add('matched');
                      clickedItem.classList.add('matched'); // Mark prompt as matched too
-                     drawArrow(clickedItem, currentSelectedMatch, promptIndex); // Draw arrow (prompt -> match)
+                     drawArrow(clickedItem, currentSelectedMatch, promptIndex); // Draw arrow (prompt -> match) NOTE: Swapped args for RTL
 
                      // Reset selection
                      quizState.matchingState.selectedMatchElement = null;
@@ -2252,7 +2383,7 @@
 
 
         // --- Arrow Drawing ---
-        function drawArrow(pE, mE, pI) {
+        function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
             const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
             // Ensure SVG element exists or try to find it again
             if (!matchingSvgElement) {
@@ -2268,7 +2399,7 @@
             const svgRect = matchingSvgElement.getBoundingClientRect();
             const pR = pE.getBoundingClientRect();
             const mR = mE.getBoundingClientRect();
-            const isRTL = mainContainerElement.classList.contains('rtl-layout');
+            const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
             // Calculate midpoints relative to the SVG container
@@ -2276,12 +2407,21 @@
             const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
 
             if (isRTL) {
-                // Start at the LEFT edge of the MATCH item
+                // Start at the LEFT edge of the MATCH item (which is physically on the left in RTL)
                 startX = mR.left - svgRect.left;
                 startY = matchMidY;
-                // End at the RIGHT edge of the PROMPT item
+                // End at the RIGHT edge of the PROMPT item (physically on the right in RTL)
                 endX   = pR.right - svgRect.left;
                 endY   = promptMidY;
+                 // Swap which element determines start/end based on RTL click logic if needed
+                 // But visually, the arrow still goes from the item physically on the right (prompt)
+                 // to the item physically on the left (match). The coordinates above reflect this physical layout.
+                 // Let's try starting from the PROMPT (right side) and ending at MATCH (left side) regardless of click order
+                 startX = pR.left - svgRect.left;   // Left edge of prompt (which is actually the start point visually)
+                 startY = promptMidY;
+                 endX = mR.right - svgRect.left; // Right edge of match (the visual end point)
+                 endY = matchMidY;
+
             } else { // LTR
                 // Start at the RIGHT edge of the PROMPT item
                 startX = pR.right - svgRect.left;
@@ -2308,7 +2448,6 @@
                 return;
             }
 
-
             // Set line attributes
             line.setAttribute('x1', startX);
             line.setAttribute('y1', startY);
@@ -2324,6 +2463,7 @@
             });
         }
 
+
         function removeArrow(pI){
             if(!matchingSvgElement)return;
             const l=matchingSvgElement.querySelector(`#arrow-${pI}`);
@@ -2338,6 +2478,10 @@
             if(!matchingSvgElement || !quizState || !quizState.questions[quizState.currentQuestionIndex] || quizState.questions[quizState.currentQuestionIndex].type !== 'matching') {
                  return;
             }
+             const currentQuestionIndex = quizState.currentQuestionIndex; // Cache index
+             const outerDiv = document.getElementById(`matching-outer-${currentQuestionIndex}`);
+             if (!outerDiv) return; // Need the outer div for relative positioning
+
             const userPairs = quizState.matchingState.userPairs;
             for (const promptIndex in userPairs) {
                  if (userPairs.hasOwnProperty(promptIndex)) {
@@ -2399,21 +2543,21 @@
                 matchingArrowObserver = null;
             }
 
-            const cQ=quizState.questions[quizState.currentQuestionIndex];
+            const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
             let result = {isCorrect:false, feedback:'', userResponse:null, scoreIncrement:0};
             const strings = getStrings(); // Get current language strings
 
             try{
-                switch(cQ.type){
+                switch(currentQuestion.type){
                     case "matching":
-                        result = checkMatching(cQ); // <-- Modified function below
+                        result = checkMatching(currentQuestion);
                         break;
                     case "ordering":
-                        result = checkOrdering(cQ); // <-- Modified function below
+                        result = checkOrdering(currentQuestion);
                         break;
                     case "multiple_choice":
                     default:
-                        result = checkMultipleChoice(cQ); // <-- Modified function below
+                        result = checkMultipleChoice(currentQuestion);
                         break;
                 }
             } catch(e){
@@ -2450,217 +2594,232 @@
             }
         }
 
-        // *** MODIFIED checkMultipleChoice ***
         function checkMultipleChoice(q) {
-            const sR = document.querySelector('input[name="question-option"]:checked');
+            const selectedRadio = document.querySelector('input[name="question-option"]:checked');
             const strings = getStrings();
 
-            if (!sR) {
+            if (!selectedRadio) {
                 return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.selectAnswerPrompt || 'Please select an answer.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            const sI = parseInt(sR.value, 10);
-            const cAT = q.answer;
-            const sAT = q.options?.[sI];
-            const iC = sAT === cAT;
+            const selectedIndex = parseInt(selectedRadio.value, 10);
+            const correctAnswerText = q.answer;
+            const selectedAnswerText = q.options?.[selectedIndex];
+            const isCorrect = selectedAnswerText === correctAnswerText;
 
-            document.querySelectorAll('.option-label').forEach((l, i) => {
-                const ip = l.querySelector('input');
-                if (q.options?.[i] === cAT) {
-                    l.classList.add('correct-option');
+            document.querySelectorAll('.option-label').forEach((label, i) => {
+                const input = label.querySelector('input');
+                if (q.options?.[i] === correctAnswerText) {
+                    label.classList.add('correct-option');
                 }
-                if (ip && ip.checked && !iC) {
-                    l.classList.add('incorrect-option');
+                if (input && input.checked && !isCorrect) {
+                    label.classList.add('incorrect-option');
                 }
             });
 
             // Generate primary feedback HTML
-            let fH = iC
+            let feedbackHTML = isCorrect
                 ? `<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`
-                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct answer:'} ${cAT || 'N/A'}</span></div>`;
+                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct answer:'} ${correctAnswerText || 'N/A'}</span></div>`;
 
-            // *** ADD EXPLANATION ***
+            // Add Explanation
             if (q.explanation) {
-                // Check if explanation needs specific text direction
                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"'; // Basic check for Arabic characters
-                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`; // Append explanation HTML with directionality hint
+                feedbackHTML += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`; // Append explanation HTML with directionality hint
             }
-            // *** END ADD EXPLANATION ***
 
-            return { isCorrect: iC, feedback: fH, userResponse: sI, scoreIncrement: iC ? 1 : 0 };
+            return { isCorrect: isCorrect, feedback: feedbackHTML, userResponse: selectedIndex, scoreIncrement: isCorrect ? 1 : 0 };
         }
 
-        // *** MODIFIED checkMatching ***
         function checkMatching(q) {
-            const uP = quizState.matchingState.userPairs;
-            const cP = q.answer || {};
-            const tCP = Object.keys(cP).length;
-            let cMC = 0;
+            const userPairs = quizState.matchingState.userPairs;
+            const correctPairs = q.answer || {};
+            const totalCorrectPairs = Object.keys(correctPairs).length;
+            let correctlyMatchedCount = 0;
             const strings = getStrings();
 
-            if (tCP === 0) {
-                return { isCorrect: true, feedback: `<div class="correct-feedback">${strings.matchingNoMatchNeeded || 'No matching needed.'}</div>`, userResponse: uP, scoreIncrement: 0 };
+            if (totalCorrectPairs === 0) { // Handle case where no matching is defined as correct
+                return { isCorrect: true, feedback: `<div class="correct-feedback">${strings.matchingNoMatchNeeded || 'No matching needed.'}</div>`, userResponse: userPairs, scoreIncrement: 0 };
             }
 
-            for (const pI in cP) {
-                if (uP.hasOwnProperty(pI) && uP[pI] == cP[pI]) { // Use == safety
-                    cMC++;
+            for (const promptIndex in correctPairs) {
+                if (userPairs.hasOwnProperty(promptIndex) && userPairs[promptIndex] == correctPairs[promptIndex]) { // Use == safety for potential type difference
+                    correctlyMatchedCount++;
                 }
             }
 
-            const iFC = cMC === tCP && Object.keys(uP).length === tCP;
-            const iPC = cMC > 0 && !iFC;
+            const isFullyCorrect = correctlyMatchedCount === totalCorrectPairs && Object.keys(userPairs).length === totalCorrectPairs;
+            const isPartiallyCorrect = correctlyMatchedCount > 0 && !isFullyCorrect;
 
             // Generate primary feedback message
-            let fH = "";
-            if (iFC) {
-                fH = `<div class="correct-feedback">${strings.matchingAllCorrect || 'Correct! ✓ All matched.'}</div>`;
-            } else if (iPC) {
-                fH = `<div class="partial-feedback">${(strings.matchingPartialCorrect || 'Partial correct: {correct}/{total}.').replace('{correct}', cMC).replace('{total}', tCP)}</div>`;
+            let feedbackHTML = "";
+            if (isFullyCorrect) {
+                feedbackHTML = `<div class="correct-feedback">${strings.matchingAllCorrect || 'Correct! ✓ All matched.'}</div>`;
+            } else if (isPartiallyCorrect) {
+                feedbackHTML = `<div class="partial-feedback">${(strings.matchingPartialCorrect || 'Partial correct: {correct}/{total}.').replace('{correct}', correctlyMatchedCount).replace('{total}', totalCorrectPairs)}</div>`;
             } else {
-                fH = `<div class="incorrect-feedback">${(strings.matchingNoneCorrect || 'Incorrect: 0/{total} matched.').replace('{total}', tCP)}</div>`;
+                feedbackHTML = `<div class="incorrect-feedback">${(strings.matchingNoneCorrect || 'Incorrect: 0/{total} matched.').replace('{total}', totalCorrectPairs)}</div>`;
             }
 
-            // *** ADD EXPLANATION ***
+             // Add Explanation
             if (q.explanation) {
-                const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
-                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
+                 const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
+                feedbackHTML += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
             }
-            // *** END ADD EXPLANATION ***
 
             // Apply visual feedback to arrows and items
-            for (const pI in uP) {
-                if (uP.hasOwnProperty(pI)) {
-                    const uMI = uP[pI];
-                    const cMI = cP[pI];
-                    const isPairCorrect = cMI !== undefined && uMI == cMI; // Use == safety
+            for (const promptIndex in userPairs) {
+                if (userPairs.hasOwnProperty(promptIndex)) {
+                    const userMatchIndex = userPairs[promptIndex];
+                    const correctMatchIndex = correctPairs[promptIndex];
+                    const isPairCorrect = correctMatchIndex !== undefined && userMatchIndex == correctMatchIndex; // Use == safety
 
-                    const line = matchingSvgElement?.querySelector(`#arrow-${pI}`);
-                    const promptEl = document.getElementById(`prompt-${pI}`);
-                    const userMatchEl = document.getElementById(`match-${uMI}`);
+                    const line = matchingSvgElement?.querySelector(`#arrow-${promptIndex}`);
+                    const promptEl = document.getElementById(`prompt-${promptIndex}`);
+                    const userMatchEl = document.getElementById(`match-${userMatchIndex}`);
 
-                    if (!line || !promptEl || !userMatchEl) continue;
+                    if (!line || !promptEl || !userMatchEl) continue; // Skip if elements are missing
 
                     if (isPairCorrect) {
                         line.style.stroke = 'var(--correct-border)';
-                        line.querySelector('polygon')?.setAttribute('fill', 'var(--correct-border)');
+                        const arrowhead = line.parentNode.querySelector('#arrowhead polygon'); // Find arrowhead within SVG
+                        if (arrowhead) arrowhead.setAttribute('fill', 'var(--correct-border)');
                         promptEl.style.borderColor = 'var(--correct-border)';
                         userMatchEl.style.borderColor = 'var(--correct-border)';
                     } else {
                         line.style.stroke = 'var(--incorrect-border)';
-                        line.querySelector('polygon')?.setAttribute('fill', 'var(--incorrect-border)');
+                        const arrowhead = line.parentNode.querySelector('#arrowhead polygon');
+                         if (arrowhead) arrowhead.setAttribute('fill', 'var(--incorrect-border)');
                         promptEl.style.borderColor = 'var(--incorrect-border)';
                         userMatchEl.style.borderColor = 'var(--incorrect-border)';
+                        // Optional: Draw correct arrow if user was wrong
+                        // if (correctMatchIndex !== undefined) { drawCorrectArrow(...) }
                     }
                 }
             }
+            // Optional: Draw arrows for correct pairs the user missed entirely
 
-            return { isCorrect: iFC, feedback: fH, userResponse: uP, scoreIncrement: iFC ? 1 : 0 };
+            // Score is 1 only if fully correct for matching
+            return { isCorrect: isFullyCorrect, feedback: feedbackHTML, userResponse: userPairs, scoreIncrement: isFullyCorrect ? 1 : 0 };
         }
 
-        // *** MODIFIED checkOrdering ***
+
         function checkOrdering(q) {
-            const oI = q.items || [];
-            const cAO = q.answer || [];
-            const nI = oI.length;
+            const originalItems = q.items || [];
+            const correctAnswerOrder = q.answer || [];
+            const numItems = originalItems.length;
             const strings = getStrings();
 
-            if (nI === 0 || !Array.isArray(cAO) || nI !== cAO.length) {
+            if (numItems === 0 || !Array.isArray(correctAnswerOrder) || numItems !== correctAnswerOrder.length) {
                 console.error("Invalid ordering question data:", q);
                 return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingInvalidData || 'Error: Invalid ordering setup.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            const uOM = {};
+            const userOrderMap = {}; // Maps original item index -> user selected position (1-based)
             const selectedPositions = new Set();
             let allSelected = true;
             let hasDuplicates = false;
 
             const selectElements = document.querySelectorAll("#ordering-list .ordering-select");
-            if (selectElements.length !== nI) {
+            if (selectElements.length !== numItems) {
                 console.error("Ordering Error: Select element count mismatch.");
                 return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSelectionError || 'Error processing selections.'}</div>`, userResponse: null, scoreIncrement: 0 };
             }
 
-            selectElements.forEach(s => {
-                const itemIndex = parseInt(s.dataset.itemIndex, 10);
-                const selectedValue = s.value;
+            selectElements.forEach(select => {
+                const itemIndex = parseInt(select.dataset.itemIndex, 10); // Original index of the item text
+                const selectedValue = select.value;
                 if (selectedValue === "") {
                     allSelected = false;
                 } else {
                     const position = parseInt(selectedValue, 10);
-                    if (isNaN(position) || position < 1 || position > nI) { allSelected = false; return; }
-                    uOM[itemIndex] = position;
-                    if (selectedPositions.has(position)) { hasDuplicates = true; }
+                    if (isNaN(position) || position < 1 || position > numItems) {
+                        allSelected = false; // Invalid selection
+                        return; // Skip this select
+                    }
+                    userOrderMap[itemIndex] = position;
+                    if (selectedPositions.has(position)) {
+                        hasDuplicates = true;
+                    }
                     selectedPositions.add(position);
                 }
             });
 
-            if (!allSelected) { return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSelectAll || 'Please select an order for all items.'}</div>`, userResponse: uOM, scoreIncrement: 0 }; }
-            if (hasDuplicates || selectedPositions.size !== nI) {
-                const numText = nI > 1 ? (strings.orderingUseEachNumOncePlural || 'numbers 1-{n}').replace('{n}', nI) : (strings.orderingUseEachNumOnceSingular || 'number 1');
-                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${(strings.orderingDuplicateUse || 'Please use each order {nums} exactly once.').replace('{nums}', numText)}</div>`, userResponse: uOM, scoreIncrement: 0 };
+            if (!allSelected) { return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSelectAll || 'Please select an order for all items.'}</div>`, userResponse: userOrderMap, scoreIncrement: 0 }; }
+            if (hasDuplicates || selectedPositions.size !== numItems) {
+                const numText = numItems > 1 ? (strings.orderingUseEachNumOncePlural || 'numbers 1-{n}').replace('{n}', numItems) : (strings.orderingUseEachNumOnceSingular || 'number 1');
+                return { isCorrect: false, feedback: `<div class="incorrect-feedback">${(strings.orderingDuplicateUse || 'Please use each order {nums} exactly once.').replace('{nums}', numText)}</div>`, userResponse: userOrderMap, scoreIncrement: 0 };
             }
 
-            const userOrderedItems = new Array(nI).fill(null);
+            // Construct the user's ordered array based on their selections
+            const userOrderedItems = new Array(numItems).fill(null);
             let constructionOk = true;
-            for (const itemIndexStr in uOM) {
-                if (uOM.hasOwnProperty(itemIndexStr)) {
+            for (const itemIndexStr in userOrderMap) {
+                if (userOrderMap.hasOwnProperty(itemIndexStr)) {
                     const itemIndex = parseInt(itemIndexStr, 10);
-                    const itemText = oI[itemIndex];
-                    const userPosition = uOM[itemIndex] - 1;
-                    if (itemText === undefined || userPosition < 0 || userPosition >= nI || userOrderedItems[userPosition] !== null) { constructionOk = false; break; }
-                    userOrderedItems[userPosition] = itemText;
+                    const itemText = originalItems[itemIndex]; // Get text from original array
+                    const userPositionIndex = userOrderMap[itemIndex] - 1; // 0-based index
+
+                    if (itemText === undefined || userPositionIndex < 0 || userPositionIndex >= numItems || userOrderedItems[userPositionIndex] !== null) {
+                        constructionOk = false; break; // Error in construction
+                    }
+                    userOrderedItems[userPositionIndex] = itemText;
                 }
             }
             if (!constructionOk || userOrderedItems.some(i => i === null)) {
-                console.error("Ordering Error: Failed to construct user sequence.", uOM, userOrderedItems);
+                console.error("Ordering Error: Failed to construct user sequence.", userOrderMap, userOrderedItems);
                 return { isCorrect: false, feedback: `<div class="incorrect-feedback">${strings.orderingSequenceError || 'Error processing sequence.'}</div>`, userResponse: userOrderedItems, scoreIncrement: 0 };
             }
 
-            const iC = JSON.stringify(userOrderedItems) === JSON.stringify(cAO);
+            // Compare the constructed user order with the correct order
+            const isCorrect = JSON.stringify(userOrderedItems) === JSON.stringify(correctAnswerOrder);
 
             // Generate primary feedback HTML
-            let fH = iC
+            let feedbackHTML = isCorrect
                 ? `<div class="correct-feedback">${strings.correctFeedback || 'Correct! ✓'}</div>`
-                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct order:'} ${cAO.join(" → ")}</span></div>`;
+                : `<div class="incorrect-feedback">${strings.incorrectFeedback || 'Incorrect.'} <span>${strings.correctAnswerIs || 'Correct order:'} ${correctAnswerOrder.join(" → ")}</span></div>`;
 
-            // *** ADD EXPLANATION ***
+            // Add Explanation
             if (q.explanation) {
                  const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
-                fH += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
+                feedbackHTML += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
             }
-            // *** END ADD EXPLANATION ***
 
             // Apply visual feedback to selects
-            selectElements.forEach(s => {
-                const itemIndex = parseInt(s.dataset.itemIndex, 10);
-                const itemText = oI[itemIndex];
-                const userSelectedPosition = uOM[itemIndex];
-                const correctPosition = cAO.indexOf(itemText) + 1;
+            selectElements.forEach(select => {
+                const itemIndex = parseInt(select.dataset.itemIndex, 10);
+                const itemText = originalItems[itemIndex];
+                const userSelectedPosition = userOrderMap[itemIndex]; // 1-based
+                const correctPosition = correctAnswerOrder.indexOf(itemText) + 1; // 1-based
+
                 if (userSelectedPosition === correctPosition) {
-                    s.style.borderColor = "var(--correct-border)"; s.style.backgroundColor = "var(--correct-bg)";
+                    select.style.borderColor = "var(--correct-border)";
+                    select.style.backgroundColor = "var(--correct-bg)";
                 } else {
-                    s.style.borderColor = "var(--incorrect-border)"; s.style.backgroundColor = "var(--incorrect-bg)";
+                    select.style.borderColor = "var(--incorrect-border)";
+                    select.style.backgroundColor = "var(--incorrect-bg)";
                 }
-                s.style.borderWidth = "2px";
+                select.style.borderWidth = "2px"; // Make feedback visually clearer
             });
 
-            return { isCorrect: iC, feedback: fH, userResponse: userOrderedItems, scoreIncrement: iC ? 1 : 0 };
+            // Return userOrderedItems array as the response for review
+            return { isCorrect: isCorrect, feedback: feedbackHTML, userResponse: userOrderedItems, scoreIncrement: isCorrect ? 1 : 0 };
         }
+
 
         function disableInputs(){
             // Disable radio buttons and selects
             document.querySelectorAll('input[name="question-option"], .ordering-select')
-                .forEach(i=>i.disabled=true);
+                .forEach(input=>input.disabled=true);
             // Make radio labels non-clickable
             document.querySelectorAll('.option-label')
-                .forEach(l=>l.style.cursor='default');
+                .forEach(label=>label.style.cursor='default');
             // Make matching items non-clickable
             document.querySelectorAll('.matching-item')
-                .forEach(i=>{
-                    i.style.pointerEvents='none'; // Prevents click events
-                    i.style.cursor='default';
-                    // i.tabIndex = -1; // Remove from tab order if keyboard nav was added
+                .forEach(item=>{
+                    item.style.pointerEvents='none'; // Prevents click events
+                    item.style.cursor='default';
+                    // item.tabIndex = -1; // Remove from tab order if keyboard nav was added
                 });
         }
 
@@ -2690,11 +2849,12 @@
             // Calculate time and score
             const timeTaken=quizState.endTime&&quizState.startTime?Math.round((quizState.endTime-quizState.startTime)/1000):0;
             const timeString=formatTime(timeTaken);
-            const score = quizState.totalQuestions>0?(quizState.correctAnswers/quizState.totalQuestions)*100:0;
+            const score = quizState.totalQuestions > 0 ? (quizState.correctAnswers / quizState.totalQuestions) * 100 : 0;
             const scoreRounded=score.toFixed(0);
 
             // Save stats if there were questions
-            if(quizState.totalQuestions>0){
+            if(quizState.totalQuestions > 0){
+                 // Pass the correct total questions count from the current quiz state
                  saveLessonStats(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.correctAnswers,quizState.totalQuestions,timeTaken);
                  updateLessonBoxDisplays(); // Update the display on the topic list in the background
             }
@@ -2708,9 +2868,9 @@
             const resultMessage = strings[resultMessageKey] || '';
 
             // Create results container
-            const rD=document.createElement('div');
-            rD.className='results-container';
-            rD.innerHTML=`
+            const resultsDiv=document.createElement('div');
+            resultsDiv.className='results-container';
+            resultsDiv.innerHTML=`
                 <h2 class="results-header">${resultMessage}</h2>
                 <div class="results-score">
                     <div class="score-circle">
@@ -2727,42 +2887,42 @@
                     <p data-detail-key="time"><span class="detail-icon">⏱️</span><strong>${strings.resultsTimeLabel || 'Time:'}</strong> <span class="detail-value">${timeString}</span></p>
                 </div>
             `;
-            quizContainerElement.appendChild(rD);
+            quizContainerElement.appendChild(resultsDiv);
 
             // Create action buttons container
-            const aD=document.createElement('div');
-            aD.className='results-actions quiz-buttons'; // Use quiz-buttons for consistent styling
+            const actionsDiv=document.createElement('div');
+            actionsDiv.className='results-actions quiz-buttons'; // Use quiz-buttons for consistent styling
 
             // Redo Button
-            const rB=document.createElement('button');
-            rB.className='btn redo-btn';
-            rB.id='redo-btn';
-            rB.innerHTML=`🔄 <span class="btn-text">${strings.redoQuiz || 'Redo Quiz'}</span>`;
-            rB.onclick=()=>{
+            const redoButton=document.createElement('button');
+            redoButton.className='btn redo-btn';
+            redoButton.id='redo-btn';
+            redoButton.innerHTML=`🔄 <span class="btn-text">${strings.redoQuiz || 'Redo Quiz'}</span>`;
+            redoButton.onclick=()=>{
                  // Restart the quiz with the original questions
                  startQuiz(quizState.subject,quizState.semester,quizState.unit,quizState.lesson,quizState.originalQuestions);
             };
-            aD.appendChild(rB);
+            actionsDiv.appendChild(redoButton);
 
             // Review Button (only if there were questions)
             if(quizState.totalQuestions>0){
-                const revB=document.createElement('button');
-                revB.id='review-btn';
-                revB.className='btn review-btn';
-                revB.innerHTML=`🧐 <span class="btn-text">${strings.reviewAnswers || 'Review Answers'}</span>`;
-                revB.onclick=reviewAnswers;
-                aD.appendChild(revB);
+                const reviewButton=document.createElement('button');
+                reviewButton.id='review-btn';
+                reviewButton.className='btn review-btn';
+                reviewButton.innerHTML=`🧐 <span class="btn-text">${strings.reviewAnswers || 'Review Answers'}</span>`;
+                reviewButton.onclick=reviewAnswers;
+                actionsDiv.appendChild(reviewButton);
             }
 
             // Back to Topics Button
-            const bTB=document.createElement('button');
-            bTB.className='btn back-to-topics-btn'; // Common class for styling
-            bTB.id='back-to-topics-btn-results'; // Specific ID
-            bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;
-            bTB.onclick=showTopicList;
-            aD.appendChild(bTB);
+            const backToTopicsButton=document.createElement('button');
+            backToTopicsButton.className='btn back-to-topics-btn'; // Common class for styling
+            backToTopicsButton.id='back-to-topics-btn-results'; // Specific ID
+            backToTopicsButton.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;
+            backToTopicsButton.onclick=showTopicList;
+            actionsDiv.appendChild(backToTopicsButton);
 
-            quizButtonsContainerElement.appendChild(aD); // Add actions to the button container
+            quizButtonsContainerElement.appendChild(actionsDiv); // Add actions to the button container
         }
 
 
@@ -2778,8 +2938,8 @@
             const strings = getStrings();
             quizTitleElement.textContent = `${strings.reviewTitlePrefix || 'Review'}: ${quizState.lesson || ''}`; // Update title
 
-            const rD=document.createElement('div');
-            rD.className='review-container';
+            const reviewDiv=document.createElement('div');
+            reviewDiv.className='review-container';
 
             // Iterate through each question and its stored answer
             quizState.questions.forEach((q,i)=>{
@@ -2801,7 +2961,7 @@
                     <p class="review-question-text">${q.question||'?'}</p>
                     <div class="review-answer-content" id="review-answer-content-${i}"></div>
                 `;
-                rD.appendChild(questionDiv);
+                reviewDiv.appendChild(questionDiv);
 
                 // Get the content area and render the specific review details
                 const contentArea=questionDiv.querySelector(`#review-answer-content-${i}`);
@@ -2809,14 +2969,14 @@
                     try{
                         switch(q.type){
                             case"matching":
-                                reviewMatchingReview(q,userAnswer,contentArea); // <-- Modified below
+                                reviewMatchingReview(q,userAnswer,contentArea);
                                 break;
                             case"ordering":
-                                reviewOrderingReview(q,userAnswer,contentArea); // <-- Modified below
+                                reviewOrderingReview(q,userAnswer,contentArea);
                                 break;
                             case"multiple_choice":
                             default:
-                                reviewMultipleChoiceReview(q,userAnswer,contentArea); // <-- Modified below
+                                reviewMultipleChoiceReview(q,userAnswer,contentArea);
                                 break;
                         }
                     } catch(e) {
@@ -2828,36 +2988,35 @@
                 }
             });
 
-            quizContainerElement.appendChild(rD); // Add all review questions to the container
+            quizContainerElement.appendChild(reviewDiv); // Add all review questions to the container
 
             // Add action buttons for review view
-            const aD=document.createElement('div');
-            aD.className='review-actions quiz-buttons';
+            const actionsDiv=document.createElement('div');
+            actionsDiv.className='review-actions quiz-buttons';
 
             // Back to Results Button
-            const bRB=document.createElement('button');
-            bRB.className='btn back-btn'; // Generic back button style
-            bRB.id = 'back-btn'; // Specific ID
-            bRB.innerHTML=`<span>←</span> <span class="btn-text">${strings.backToResults || 'Back to Results'}</span>`;
-            bRB.onclick=displayResults; // Go back to the results summary
-            aD.appendChild(bRB);
+            const backToResultsButton=document.createElement('button');
+            backToResultsButton.className='btn back-btn'; // Generic back button style
+            backToResultsButton.id = 'back-btn'; // Specific ID
+            backToResultsButton.innerHTML=`<span>←</span> <span class="btn-text">${strings.backToResults || 'Back to Results'}</span>`;
+            backToResultsButton.onclick=displayResults; // Go back to the results summary
+            actionsDiv.appendChild(backToResultsButton);
 
             // Back to Topics Button
-            const bTB=document.createElement('button');
-            bTB.className='btn back-to-topics-btn';
-            bTB.id = 'back-to-topics-btn-review'; // Specific ID
-            bTB.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;
-            bTB.onclick=showTopicList; // Go directly back to topics
-            aD.appendChild(bTB);
+            const backToTopicsButton=document.createElement('button');
+            backToTopicsButton.className='btn back-to-topics-btn';
+            backToTopicsButton.id = 'back-to-topics-btn-review'; // Specific ID
+            backToTopicsButton.innerHTML=`<span>⬅️</span> <span class="btn-text">${strings.backToTopics || 'Back to Topics'}</span>`;
+            backToTopicsButton.onclick=showTopicList; // Go directly back to topics
+            actionsDiv.appendChild(backToTopicsButton);
 
-            quizButtonsContainerElement.appendChild(aD);
+            quizButtonsContainerElement.appendChild(actionsDiv);
 
             // Scroll to the top of the review container
             quizContainerElement.scrollIntoView({behavior:'smooth',block:'start'});
         }
 
-        // calculateReviewStatus remains the same as it determines the overall status, not the detailed display
-        function calculateReviewStatus(q, uA){
+        function calculateReviewStatus(q, userAnswer){
             let correctnessClass='incorrect'; // Default to incorrect
             let statusText = getStrings().reviewStatusIncorrect || '✗ Incorrect';
             let isCorrect = false;
@@ -2870,18 +3029,19 @@
                         const correctPairs = q.answer || {};
                         const totalCorrectPairs = Object.keys(correctPairs).length;
                         let correctlyMatchedCount = 0;
+                        const userPairs = userAnswer || {}; // Ensure userAnswer is an object
 
-                        if(totalCorrectPairs > 0 && uA && typeof uA === 'object') {
+                        if(totalCorrectPairs > 0 && typeof userPairs === 'object') {
                             for(const pI in correctPairs) {
                                 // Use == for potential type difference (string index vs number value)
-                                if(uA.hasOwnProperty(pI) && uA[pI] == correctPairs[pI]) {
+                                if(userPairs.hasOwnProperty(pI) && userPairs[pI] == correctPairs[pI]) {
                                     correctlyMatchedCount++;
                                 }
                             }
                         }
 
                         // Determine status based on counts
-                        isCorrect = totalCorrectPairs > 0 && correctlyMatchedCount === totalCorrectPairs && Object.keys(uA || {}).length === totalCorrectPairs;
+                        isCorrect = totalCorrectPairs > 0 && correctlyMatchedCount === totalCorrectPairs && Object.keys(userPairs).length === totalCorrectPairs;
                         isPartial = totalCorrectPairs > 0 && correctlyMatchedCount > 0 && !isCorrect;
 
                         if (isCorrect) {
@@ -2892,17 +3052,18 @@
                             statusText = (strings.reviewStatusPartial || "~ Partial ({correct}/{total})")
                                 .replace('{correct}', correctlyMatchedCount)
                                 .replace('{total}', totalCorrectPairs);
-                        } else if (uA === null || Object.keys(uA || {}).length === 0 && totalCorrectPairs > 0) {
-                            // If there were pairs to match, but none were attempted
+                        } else if (userAnswer === null || (typeof userAnswer === 'object' && Object.keys(userAnswer).length === 0 && totalCorrectPairs > 0)) {
+                             // If there were pairs to match, but none were attempted OR userAnswer is explicitly null
                             statusText = strings.reviewStatusUnanswered || 'Unanswered';
+                            correctnessClass = 'incorrect'; // Unanswered is still treated as incorrect status
                         } // else remains 'incorrect'
                         break;
 
                     case"ordering":
-                        // Check if user answer exists and matches the correct answer array
-                        isCorrect = uA && Array.isArray(uA) && q.answer && Array.isArray(q.answer) && JSON.stringify(uA) === JSON.stringify(q.answer);
+                         // userAnswer for ordering is the user-constructed ordered array of items
+                        isCorrect = userAnswer && Array.isArray(userAnswer) && q.answer && Array.isArray(q.answer) && JSON.stringify(userAnswer) === JSON.stringify(q.answer);
 
-                        if (uA === null || !Array.isArray(uA)) {
+                        if (userAnswer === null || !Array.isArray(userAnswer)) {
                             statusText = strings.reviewStatusUnanswered || 'Unanswered';
                             correctnessClass = 'incorrect'; // Unanswered is treated as incorrect
                         } else if (isCorrect) {
@@ -2913,10 +3074,10 @@
 
                     case"multiple_choice":
                     default:
-                        // Check if user answer (index) maps to the correct answer text
-                        isCorrect = uA !== null && q.options && q.answer && q.options[uA] === q.answer;
+                         // userAnswer for MC is the selected index (number or null)
+                        isCorrect = userAnswer !== null && q.options && q.answer && q.options[userAnswer] === q.answer;
 
-                        if (uA === null) { // User didn't select anything
+                        if (userAnswer === null) { // User didn't select anything
                             statusText = strings.reviewStatusUnanswered || 'Unanswered';
                             correctnessClass = 'incorrect'; // Unanswered is incorrect
                         } else if (isCorrect) {
@@ -2933,20 +3094,19 @@
             return { correctnessClass, statusText };
         }
 
-        // *** MODIFIED reviewMultipleChoiceReview ***
-        function reviewMultipleChoiceReview(q, uAI, c) { // uAI is User Answer Index
+        function reviewMultipleChoiceReview(q, userAnswerIndex, container) { // uAI is User Answer Index
             const strings = getStrings();
-            const d = document.createElement("div");
-            d.className = "review-mc-answer";
+            const div = document.createElement("div");
+            div.className = "review-mc-answer";
 
-            const userSelectedText = (uAI !== null && q.options?.[uAI] !== undefined)
-                ? q.options[uAI]
+            const userSelectedText = (userAnswerIndex !== null && q.options?.[userAnswerIndex] !== undefined)
+                ? q.options[userAnswerIndex]
                 : `(${strings.reviewStatusUnanswered || "No answer"})`; // Handle unanswered
 
-            const isCorrect = (uAI !== null && userSelectedText === q.answer);
+            const isCorrect = (userAnswerIndex !== null && userSelectedText === q.answer);
 
             let userAnswerHTML = `<span class="user-answer-text`;
-            if (uAI === null) userAnswerHTML += `">`; // No specific style for unanswered text itself
+            if (userAnswerIndex === null) userAnswerHTML += `">`; // No specific style for unanswered text itself
             else if (isCorrect) userAnswerHTML += ` correct">`;
             else userAnswerHTML += ` incorrect">`; // Incorrect will have line-through via CSS
             userAnswerHTML += `${userSelectedText}</span>`;
@@ -2958,102 +3118,116 @@
                 htmlContent += `<p><strong>${strings.resultsCorrectAnswerLabel || 'Correct Answer:'}</strong> <span class="correct-answer-text">${q.answer || "N/A"}</span></p>`;
             }
 
-            // *** ADD EXPLANATION ***
+            // Add Explanation
             if (q.explanation) {
                  const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
                 htmlContent += `<div class="feedback-explanation"${dirAttr}>${q.explanation}</div>`;
             }
-            // *** END ADD EXPLANATION ***
 
-            d.innerHTML = htmlContent;
-            c.appendChild(d);
+            div.innerHTML = htmlContent;
+            container.appendChild(div);
         }
 
-        // *** MODIFIED reviewMatchingReview ***
-        function reviewMatchingReview(q, userPairs, container) {
+        function reviewMatchingReview(q, userPairs, container) { // userPairs is the map {promptIndex: matchIndex}
             const strings = getStrings();
             const reviewDiv = document.createElement("div");
-            reviewDiv.className = "review-matching-answer"; // Use existing class
+            reviewDiv.className = "review-matching-answer";
 
             const correctPairs = q.answer || {};
             const promptsList = q.prompts || [];
             const matchesList = q.matches || [];
 
-            // Build the grid HTML (copied logic from previous implementation for display)
+            // Build the grid HTML
             let gridHtml = `<div class="review-matching-grid">`;
-            const promptsCol = `<div class="review-matching-column">`;
-            const matchesCol = `<div class="review-matching-column">`;
-            let promptsColContent = '';
-            let matchesColContent = '';
+            let promptsColContent = `<div class="review-matching-column"><h4>${strings.matchingItemsHeader || 'Items'}</h4>`;
+            let matchesColContent = `<div class="review-matching-column"><h4>${strings.matchingMatchesHeader || 'Matches'}</h4>`;
 
             promptsList.forEach((promptText, promptIndex) => {
-                const userMatchIndex = userPairs ? userPairs[promptIndex] : null;
-                const correctMatchIndex = correctPairs[promptIndex];
+                const userMatchIndex = (userPairs && userPairs[promptIndex] !== undefined) ? userPairs[promptIndex] : null;
+                const correctMatchIndex = (correctPairs[promptIndex] !== undefined) ? correctPairs[promptIndex] : null; // Handle potential undefined correct answer
                 const isPairCorrect = (userMatchIndex !== null && userMatchIndex == correctMatchIndex); // Use == safety
 
                 const promptDivClass = isPairCorrect ? "review-matched-pair-correct" : "review-matched-pair-incorrect";
                 promptsColContent += `<div class="${promptDivClass}">${promptIndex + 1}. ${promptText}</div>`;
 
-                const correctMatchText = (correctMatchIndex !== undefined && matchesList[correctMatchIndex] !== undefined) ? matchesList[correctMatchIndex] : "(N/A)";
+                const correctMatchText = (correctMatchIndex !== null && matchesList[correctMatchIndex] !== undefined) ? matchesList[correctMatchIndex] : "(N/A)";
                 const userMatchText = (userMatchIndex !== null && matchesList[userMatchIndex] !== undefined) ? matchesList[userMatchIndex] : `(${strings.reviewStatusUnanswered || 'Unanswered'})`;
 
                 let matchDivContent = '';
+                let matchDivClass = '';
                 if (isPairCorrect) {
                     matchDivContent = correctMatchText;
-                    matchesColContent += `<div class="review-matched-pair-correct">${matchDivContent}</div>`;
+                    matchDivClass = "review-matched-pair-correct";
                 } else {
-                    matchDivContent = `<span style="text-decoration:line-through;">${userMatchText}</span> <span style="font-weight:500;">(${correctMatchText})</span>`;
-                    matchesColContent += `<div class="review-matched-pair-incorrect">${matchDivContent}</div>`;
+                    // Show user's wrong answer crossed out, then correct answer
+                    matchDivContent = `<span class="incorrect">${userMatchText}</span> <span class="correct-answer-text">(${correctMatchText})</span>`;
+                     matchDivClass = "review-matched-pair-incorrect";
+                     // Special handling for unanswered
+                    if (userMatchIndex === null) {
+                        matchDivContent = `<span class="user-answer-text">(${strings.reviewStatusUnanswered || 'Unanswered'})</span> <span class="correct-answer-text">(${correctMatchText})</span>`;
+                    }
                 }
+                 matchesColContent += `<div class="${matchDivClass}">${matchDivContent}</div>`;
             });
 
-            gridHtml += promptsCol + promptsColContent + `</div>` + matchesCol + matchesColContent + `</div></div>`; // Close columns and grid
+            promptsColContent += `</div>`; // Close prompt column
+            matchesColContent += `</div>`; // Close match column
+            gridHtml += promptsColContent + matchesColContent + `</div>`; // Close grid
 
             // Start building final HTML content
             let htmlContent = `<p><strong>${strings.matchingMatchesHeader || 'Matches'}:</strong></p>` + gridHtml;
 
-            // *** ADD EXPLANATION ***
+            // Add Explanation
             if (q.explanation) {
                  const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
                 htmlContent += `<div class="feedback-explanation"${dirAttr} style="margin-top: 15px;">${q.explanation}</div>`;
             }
-            // *** END ADD EXPLANATION ***
 
             reviewDiv.innerHTML = htmlContent;
             container.appendChild(reviewDiv);
         }
 
-        // *** MODIFIED reviewOrderingReview ***
-        function reviewOrderingReview(q, uOI, c) { // uOI is User Ordered Items array
+
+        function reviewOrderingReview(q, userOrderedItems, container) { // uOI is User Ordered Items array or null
             const strings = getStrings();
-            const d = document.createElement("div");
-            d.className = "review-ordering-answer";
+            const div = document.createElement("div");
+            div.className = "review-ordering-answer";
 
             const correctOrder = q.answer || [];
+            const originalItems = q.items || []; // Needed if user didn't answer
 
             // Header
             let htmlContent = `<p><strong>${(strings.orderingInstruction || 'Ordering:').split(':')[0]}:</strong></p>`;
 
-            // Build the list HTML
+            // Build the list HTML showing the CORRECT order
             let listHtml = `<div class="review-ordering-list">`;
             correctOrder.forEach((correctItemText, correctIndex) => {
-                const itemDiv = document.createElement("div"); // Use createElement to set style easily
+                const itemDiv = document.createElement("div");
                 itemDiv.className = "review-ordering-list-item";
 
-                const userIndex = uOI ? uOI.indexOf(correctItemText) : -1;
-                const userPosition = (userIndex !== -1) ? userIndex + 1 : null;
                 const correctPosition = correctIndex + 1;
+                let userPosition = null;
+                let isItemCorrect = false;
+
+                if (userOrderedItems && Array.isArray(userOrderedItems)) {
+                    const userIndex = userOrderedItems.indexOf(correctItemText);
+                    if (userIndex !== -1) {
+                         userPosition = userIndex + 1; // 1-based position user placed it at
+                         isItemCorrect = (userIndex === correctIndex); // Is it in the correct slot?
+                    }
+                }
+                 // If userOrderedItems is null or item not found, userPosition remains null
 
                 let numberSpanHTML = '';
-                if (userPosition === correctPosition) {
+                if (isItemCorrect) { // Correct item in correct position
                     numberSpanHTML = `<span class="review-order-number review-order-correct">${correctPosition}.</span>`;
                     itemDiv.style.backgroundColor = 'var(--correct-bg)';
-                } else if (userPosition !== null) {
-                    numberSpanHTML = `<span class="review-order-number review-order-incorrect">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
+                } else if (userPosition !== null) { // Correct item in INCORRECT position
+                    numberSpanHTML = `<span class="review-order-number review-order-incorrect" style="text-decoration: line-through;">${userPosition}.</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
                     itemDiv.style.backgroundColor = 'var(--incorrect-bg)';
-                } else {
-                    numberSpanHTML = `<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
-                    itemDiv.style.backgroundColor = 'var(--partial-bg)';
+                } else { // Item was missed or user didn't answer
+                     numberSpanHTML = `<span class="review-order-number review-order-incorrect">(${strings.reviewStatusUnanswered || 'NP'})</span> <span class="review-order-number review-order-correct">(${correctPosition}.)</span>`;
+                    itemDiv.style.backgroundColor = 'var(--partial-bg)'; // Maybe different style for completely missed?
                 }
 
                 itemDiv.innerHTML = `${numberSpanHTML} ${correctItemText}`;
@@ -3063,15 +3237,14 @@
 
             htmlContent += listHtml;
 
-            // *** ADD EXPLANATION ***
+            // Add Explanation
             if (q.explanation) {
                  const dirAttr = /[\u0600-\u06FF]/.test(q.explanation) ? '' : ' dir="ltr"';
                 htmlContent += `<div class="feedback-explanation"${dirAttr} style="margin-top: 15px;">${q.explanation}</div>`;
             }
-            // *** END ADD EXPLANATION ***
 
-            d.innerHTML = htmlContent;
-            c.appendChild(d);
+            div.innerHTML = htmlContent;
+            container.appendChild(div);
         }
 
 
@@ -3122,17 +3295,17 @@
             try{
                 const sD=topicsData[subj]?.[sem]; // Semester Data
                 if(!sD?.units){
-                    console.warn(`Units missing for subject/semester: ${subj} -> ${sem}`);
+                    // console.warn(`Units missing for subject/semester: ${subj} -> ${sem}`);
                     return[];
                 }
                 const u=sD.units.find(un=>un?.title===unitT); // Unit
                 if(!u?.lessons){
-                     console.warn(`Unit not found or has no lessons: "${unitT}" in ${subj} -> ${sem}.`);
+                    //  console.warn(`Unit not found or has no lessons: "${unitT}" in ${subj} -> ${sem}.`);
                      return[];
                 }
                 const l=u.lessons.find(ls=>ls?.title===lessonT); // Lesson
                 if(!l){
-                     console.warn(`Lesson not found: "${lessonT}" in unit "${unitT}".`);
+                    //  console.warn(`Lesson not found: "${lessonT}" in unit "${unitT}".`);
                      return[];
                 }
 
@@ -3144,7 +3317,7 @@
                         ...q
                     }));
                 } else {
-                     console.log(`No questions found for lesson "${lessonT}".`);
+                    //  console.log(`No questions found for lesson "${lessonT}".`);
                      return[]; // Return empty array if no questions defined
                 }
             }catch(e){
@@ -3153,6 +3326,34 @@
             }
         }
 
+        // *** Get only the count of questions for a lesson ***
+        function getLessonQuestionCount(subj, sem, unitT, lessonT) {
+            if (!subj || !sem || !unitT || !lessonT) {
+                // console.warn("Missing getLessonQuestionCount parameters:", { subj, sem, unitT, lessonT });
+                return 0; // Return 0 on error or missing params
+            }
+            try {
+                const sD = topicsData[subj]?.[sem]; // Semester Data
+                if (!sD?.units) {
+                    // console.warn(`Units missing for count: ${subj} -> ${sem}`);
+                    return 0;
+                }
+                const u = sD.units.find(un => un?.title === unitT); // Unit
+                if (!u?.lessons) {
+                    // console.warn(`Unit not found or no lessons for count: "${unitT}"`);
+                    return 0;
+                }
+                const l = u.lessons.find(ls => ls?.title === lessonT); // Lesson
+                if (!l || !Array.isArray(l.questions)) {
+                    // console.log(`Lesson or questions array not found for count: "${lessonT}"`);
+                    return 0;
+                }
+                return l.questions.length; // Return the actual current length
+            } catch (e) {
+                console.error("Error retrieving question count:", e);
+                return 0; // Return 0 on unexpected errors
+            }
+        }
         // --- END OF questions.js ---
     </script>
 
