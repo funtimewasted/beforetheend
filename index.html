@@ -99,12 +99,24 @@
         .rtl-layout .question-text strong { margin-right: 0; margin-left: 5px; }
         .rtl-layout .option-label { flex-direction: row-reverse; }
         .rtl-layout .option-input { margin-right: 0; margin-left: 15px; }
+                /* --- ADD THESE RULES FOR COLUMN ORDERING --- */
 
-        /* --- REPLACED RULE --- */
-        #main-container.rtl-layout .matching-container {
-            flex-direction: row-reverse; /* Flip columns */
+        /* Default Order (LTR): Prompts first, Matches second */
+        .matching-container #prompts-column {
+            order: 1;
         }
-        /* --- END REPLACEMENT --- */
+        .matching-container #matches-column {
+            order: 2;
+        }
+
+        /* RTL Order Override: Matches first (visually left), Prompts second (visually right) */
+        #main-container.rtl-layout .matching-container #prompts-column {
+            order: 2; /* Make prompts appear second */
+        }
+        #main-container.rtl-layout .matching-container #matches-column {
+            order: 1; /* Make matches appear first */
+        }
+        /* --- END OF ADDED RULES --- */
 
         .rtl-layout .matching-column h4 { text-align: right; }
         .rtl-layout .ordering-item { flex-direction: row-reverse; }
