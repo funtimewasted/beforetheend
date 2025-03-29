@@ -2371,8 +2371,9 @@
         }
 
 
-        // --- Arrow Drawing ---
-                function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
+                // --- Arrow Drawing ---
+        // *** CORRECTED drawArrow function ***
+        function drawArrow(pE, mE, pI) { // pE = prompt Element, mE = match Element, pI = prompt Index
             const outerDiv = document.getElementById(`matching-outer-${quizState.currentQuestionIndex}`);
             // Ensure SVG element exists or try to find it again
             if (!matchingSvgElement) {
@@ -2380,38 +2381,38 @@
                 if (svgContainer) { matchingSvgElement = svgContainer; }
                  else { console.error("drawArrow: SVG element '#matching-arrow-svg' not found within outerDiv:", outerDiv?.id); return; }
             }
-            if (!pE || !mE || !outerDiv || !matchingSvgElement) { // Added check for matchingSvgElement
+            // Added check for matchingSvgElement existence here
+            if (!pE || !mE || !outerDiv || !matchingSvgElement) {
                  console.warn("drawArrow: Missing required elements (prompt, match, outer div, or SVG). Prompt:", pE?.id, "Match:", mE?.id, "Index:", pI);
                  return;
             }
 
             const svgRect = matchingSvgElement.getBoundingClientRect();
-            const pR = pE.getBoundingClientRect();
-            const mR = mE.getBoundingClientRect();
+            const pR = pE.getBoundingClientRect(); // Prompt Rect
+            const mR = mE.getBoundingClientRect(); // Match Rect
             // Ensure mainContainerElement is defined and accessible here
             const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
-            // Calculate midpoints relative to the SVG container (Vertical is same for LTR/RTL)
-            const promptMidY = pR.top + pR.height / 2 - svgRect.top;
-            const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
+
+            // Calculate Y midpoints (same for LTR/RTL)
+            // Use Math.round to potentially avoid sub-pixel rendering issues
+            startY = Math.round(pR.top + pR.height / 2 - svgRect.top);
+            endY = Math.round(mR.top + mR.height / 2 - svgRect.top);
 
             if (isRTL) {
-                // RTL: Prompt(pE) is on the RIGHT, Match(mE) is on the LEFT.
-                // Arrow should start visually from the LEFT edge of the prompt item.
-                startX = pR.left - svgRect.left;
-                startY = promptMidY;
-                // Arrow should end visually at the RIGHT edge of the match item.
-                endX   = mR.right - svgRect.left;
-                endY   = matchMidY;
+                // RTL: Prompt(pE) is on the RIGHT, Match(mE) is on the LEFT. Arrow goes RIGHT-to-LEFT.
+                // Start Point: Left edge of Prompt (pR) element.
+                startX = Math.round(pR.left - svgRect.left);
+                // End Point: Right edge of Match (mR) element.
+                endX = Math.round(mR.right - svgRect.left);
+
             } else { // LTR
-                // LTR: Prompt(pE) is on the LEFT, Match(mE) is on the RIGHT.
-                // Arrow should start visually from the RIGHT edge of the prompt item.
-                startX = pR.right - svgRect.left;
-                startY = promptMidY;
-                // Arrow should end visually at the LEFT edge of the match item.
-                endX   = mR.left - svgRect.left;
-                endY   = matchMidY;
+                // LTR: Prompt(pE) is on the LEFT, Match(mE) is on the RIGHT. Arrow goes LEFT-to-RIGHT.
+                // Start Point: Right edge of Prompt (pR) element.
+                startX = Math.round(pR.right - svgRect.left);
+                // End Point: Left edge of Match (mR) element.
+                endX = Math.round(mR.left - svgRect.left);
             }
 
             // Find or create the line element
@@ -2442,7 +2443,10 @@
 
             // Fade in smoothly
             requestAnimationFrame(() => {
-                line.style.opacity = '1';
+                // Check if line still exists in case it was removed quickly
+                if (matchingSvgElement && matchingSvgElement.contains(line)) {
+                    line.style.opacity = '1';
+                }
             });
         }
 
