@@ -2372,7 +2372,8 @@
 
         // --- REVISED drawArrow Function ---
         
-function drawArrow(pE, mE, pI) {
+// --- REVISED drawArrow Function ---
+        function drawArrow(pE, mE, pI) {
             // pE = Prompt Element (Items column in LTR, Right column in RTL)
             // mE = Match Element (Matches column in LTR, Left column in RTL)
             // pI = Prompt Index (used for arrow ID)
@@ -2400,36 +2401,34 @@ function drawArrow(pE, mE, pI) {
             const svgRect = matchingSvgElement.getBoundingClientRect();
             const pR = pE.getBoundingClientRect(); // Prompt Element Rect
             const mR = mE.getBoundingClientRect(); // Match Element Rect
-            const isRTL = mainContainerElement.classList.contains('rtl-layout');
+
+            // *** ADDED: Check for RTL Layout ***
+            const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
 
             // Calculate Midpoints relative to SVG Top (Common calculation)
             const promptMidY = pR.top + pR.height / 2 - svgRect.top;
             const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
+            startY = promptMidY; // Visual start Y is always prompt's midpoint
+            endY = matchMidY;     // Visual end Y is always match's midpoint
 
-            // --- Calculate X and Y based on Layout Direction ---
+            // --- Calculate X based on Layout Direction ---
             if (isRTL) {
-                // RTL VISUAL: Match(Left) --> Prompt(Right)
-                // Start Point: LEFT edge of Match element (mE)
-                // End Point:   RIGHT edge of Prompt element (pE)
+                // RTL VISUAL: Prompt(Right) --> Match(Left)
+                // Start Point: LEFT edge of Prompt element (pE)
+                // End Point:   RIGHT edge of Match element (mE)
 
-                startX = mR.left - svgRect.left;   // X: Left edge of the Match element relative to SVG left
-                startY = matchMidY;                // Y: Vertical center of the Match element (VISUAL START)
-
-                endX   = pR.right - svgRect.left;  // X: Right edge of the Prompt element relative to SVG left
-                endY   = promptMidY;               // Y: Vertical center of the Prompt element (VISUAL END)
+                startX = pR.left - svgRect.left;  // X: Left edge of the Prompt element (VISUAL START)
+                endX   = mR.right - svgRect.left; // X: Right edge of the Match element (VISUAL END)
 
             } else {
                 // LTR VISUAL: Prompt(Left) --> Match(Right)
                 // Start Point: RIGHT edge of Prompt element (pE)
                 // End Point:   LEFT edge of Match element (mE)
 
-                startX = pR.right - svgRect.left; // X: Right edge of the Prompt element relative to SVG left
-                startY = promptMidY;              // Y: Vertical center of the Prompt element (VISUAL START)
-
-                endX   = mR.left - svgRect.left;  // X: Left edge of the Match element relative to SVG left
-                endY   = matchMidY;               // Y: Vertical center of the Match element (VISUAL END)
+                startX = pR.right - svgRect.left; // X: Right edge of the Prompt element (VISUAL START)
+                endX   = mR.left - svgRect.left;  // X: Left edge of the Match element (VISUAL END)
             }
 
             // Find or create the line element
