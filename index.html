@@ -241,9 +241,10 @@
         .matching-item.selected { background-color: var(--accent-color-light); border-color: var(--accent-color); font-weight: 500; }
         .matching-item.matched { background-color: var(--matched-item-bg); border-color: var(--matched-item-border); cursor: pointer; opacity: 1.0; }
         .matching-item:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
-        #matching-arrow-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 1; }
-        #matching-arrow-svg line { stroke: var(--accent-color); stroke-width: 2; transition: stroke 0.3s ease, opacity 0.3s ease; marker-end: url(#arrowhead); }
-        #matching-arrow-svg #arrowhead polygon { fill: var(--accent-color); transition: fill 0.3s ease; }
+        /* SVG Styles - Now applied inline in JS for positioning */
+        .matching-svg { /* Basic class, styles mostly inline now */ }
+        .matching-svg line { stroke: var(--accent-color); stroke-width: 2; transition: stroke 0.3s ease, opacity 0.3s ease; } /* Arrow line styles */
+        /* Marker styles are now part of the marker definition in JS */
 
         /* Ordering */
         .ordering-instructions { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
@@ -373,7 +374,6 @@
         #stats-table tr:last-child td { border-bottom: none; }
         #stats-table th:last-child, #stats-table td:last-child { font-weight: bold; color: var(--text-color); }
 
-
         /* --- END OF styles.css --- */
     </style>
 </head>
@@ -389,7 +389,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="container initially-hidden">
+    <div class="container initially-hidden" id="main-container"> <!-- Added ID here -->
         <div class="header">
             <h1>Question Bank</h1>
             <div class="header-buttons">
@@ -1301,7 +1301,8 @@
             }
         };
 
-        let contentElement, quizViewElement, quizTitleElement, quizContainerElement, feedbackContainerElement, quizButtonsContainerElement, matchingSvgElement, navSectionElement, welcomeViewElement, mainContainerElement;
+        // Declare variables in broader scope
+        let contentElement, quizViewElement, quizTitleElement, quizContainerElement, feedbackContainerElement, quizButtonsContainerElement, matchingSvgElement = null, navSectionElement, welcomeViewElement, mainContainerElement;
         let settingsModalElement, settingsButtonElement, statsModalElement, statsButtonElement;
         let matchingArrowObserver = null; let resizeTimeout = null;
 
@@ -1747,7 +1748,7 @@
         document.addEventListener('DOMContentLoaded',()=>{
             // Get DOM elements
             welcomeViewElement=document.getElementById('welcome-view');
-            mainContainerElement=document.querySelector('.container');
+            mainContainerElement=document.getElementById('main-container'); // Assign here
             contentElement=document.getElementById('content');
             quizViewElement=document.getElementById('quiz-view');
             quizTitleElement=document.getElementById('quiz-title');
@@ -1759,6 +1760,7 @@
             settingsModalElement=document.getElementById('settings-modal');
             statsButtonElement = document.getElementById('stats-btn');
             statsModalElement = document.getElementById('stats-modal');
+            matchingSvgElement = null; // Ensure it's initially null
 
             // Initial Setup
             calculateSubjectTotals(); // Calculate totals from topicsData FIRST
@@ -1878,10 +1880,8 @@
             // Remove SVG element if it exists
             if (matchingSvgElement && matchingSvgElement.parentNode) {
                 matchingSvgElement.remove();
-                matchingSvgElement = null;
+                matchingSvgElement = null; // Clear the reference
             }
-            // Destroy SortableJS instances (if using Drag-and-Drop alternative)
-            quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
 
             // Reset quiz state (important parts)
             quizState = {
@@ -1989,7 +1989,7 @@
             feedbackContainerElement.classList.add('hidden');
             quizButtonsContainerElement.innerHTML='';
             if(matchingArrowObserver){matchingArrowObserver.disconnect();matchingArrowObserver=null;}
-            if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;}
+            if(matchingSvgElement&&matchingSvgElement.parentNode){matchingSvgElement.remove();matchingSvgElement=null;} // Remove old SVG if exists
             quizState.matchingState?.sortableInstances?.forEach(instance => instance.destroy());
             quizState.matchingState = { selectedPromptElement: null, selectedMatchElement: null, userPairs: {}, sortableInstances: [] }; // Ensure clean state
 
@@ -2018,8 +2018,8 @@
             try{
                 switch(currentQuestion.type){
                     case "matching":
-                        renderMatching(currentQuestion,typeWrapper);
-                        requestAnimationFrame(setupArrowObserver);
+                        renderMatching(currentQuestion,typeWrapper); // This will now create the SVG and assign to matchingSvgElement
+                        // Observer setup moved inside renderMatching to ensure SVG exists
                         break;
                     case "ordering":
                         renderOrdering(currentQuestion,typeWrapper);
@@ -2092,6 +2092,7 @@
             container.appendChild(optionsDiv);
         }
 
+        // --- MODIFIED renderMatching ---
         function renderMatching(question, container) {
              if (!question.prompts?.length || !question.matches?.length || question.prompts.length !== question.matches.length) { container.textContent = 'Error: Matching data is invalid.'; return; }
 
@@ -2112,11 +2113,36 @@
              outer.id = `matching-outer-${quizState.currentQuestionIndex}`;
              container.appendChild(outer);
 
-             // SVG for arrows
-             matchingSvgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+             // --- SVG for arrows (CREATED AND STYLED HERE) ---
+             matchingSvgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); // Assign to global var
              matchingSvgElement.id = 'matching-arrow-svg';
-             matchingSvgElement.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-color)"/></marker></defs>';
-             outer.appendChild(matchingSvgElement); // Add SVG first (z-index matters less if added first)
+             matchingSvgElement.setAttribute('class', 'matching-svg');
+             matchingSvgElement.style.position = 'absolute';
+             matchingSvgElement.style.top = '0';
+             matchingSvgElement.style.left = '0';
+             matchingSvgElement.style.width = '100%';
+             matchingSvgElement.style.height = '100%';
+             matchingSvgElement.style.pointerEvents = 'none'; // Critical
+             matchingSvgElement.style.overflow = 'visible';
+             matchingSvgElement.style.zIndex = '1'; // Above columns
+
+             // Define the marker INSIDE the <defs> tag
+             matchingSvgElement.innerHTML = `
+                 <defs>
+                     <marker
+                         id="arrowhead"
+                         viewBox="0 0 10 7"
+                         refX="9"         Adjust this value (e.g., 8, 9, 10) for perfect tip alignment!
+                         refY="3.5"
+                         markerUnits="strokeWidth"
+                         markerWidth="5"  Adjust size if needed
+                         markerHeight="4" Adjust size if needed
+                         orient="auto">
+                         <polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-color, black)" />
+                     </marker>
+                 </defs>
+             `; // Use CSS var for fill
+             outer.appendChild(matchingSvgElement); // Add SVG to the outer container FIRST
 
              // Container for the two columns
              const matchCont = document.createElement('div');
@@ -2148,7 +2174,6 @@
                  item.dataset.index = promptIndex; // Store original index
                  item.id = `prompt-${promptIndex}`;
                  item.onclick = handleMatchingClick;
-                 // item.onkeydown = handleMatchingKeydown; // Add if keyboard nav is needed
                  promCol.appendChild(item);
              });
 
@@ -2160,13 +2185,16 @@
                  item.dataset.index = matchObject.originalIndex; // Store original index
                  item.id = `match-${matchObject.originalIndex}`;
                  item.onclick = handleMatchingClick;
-                 // item.onkeydown = handleMatchingKeydown; // Add if keyboard nav is needed
                  matCol.appendChild(item);
              });
 
              matchCont.append(promCol, matCol);
-             outer.appendChild(matchCont); // Add columns container to the outer div
+             outer.appendChild(matchCont); // Add columns container AFTER the SVG
+
+             // Setup observer AFTER columns are in the DOM
+              requestAnimationFrame(setupArrowObserver);
         }
+        // --- END OF MODIFIED renderMatching ---
 
         function renderOrdering(q,container){
             if(!q.items?.length) { container.textContent='Error: Ordering data invalid.'; return; }
@@ -2290,223 +2318,157 @@
             const currentSelectedPrompt = quizState.matchingState.selectedPromptElement;
             const currentSelectedMatch = quizState.matchingState.selectedMatchElement;
 
-            if (isRTL) { // Right-to-Left Logic (Match -> Prompt)
-                 if (isMatch) { // Clicked a match item
-                     if (clickedItem === currentSelectedMatch) { // Clicked same match again: Deselect
-                         clickedItem.classList.remove('selected');
-                         quizState.matchingState.selectedMatchElement = null;
-                     } else { // Clicked a new match item
-                         if (currentSelectedMatch) currentSelectedMatch.classList.remove('selected'); // Deselect old
-                         clickedItem.classList.add('selected'); // Select new
-                         quizState.matchingState.selectedMatchElement = clickedItem;
-                         // If a prompt was also selected, deselect it (only one side active)
-                         if (currentSelectedPrompt) {
-                             currentSelectedPrompt.classList.remove('selected');
-                             quizState.matchingState.selectedPromptElement = null;
-                         }
-                     }
-                 } else if (isPrompt && currentSelectedMatch) { // Clicked a prompt WHILE a match is selected: Create Pair
-                     const matchIndex = currentSelectedMatch.dataset.index;
-                     const promptIndex = clickedIndex;
+            // *** Simplified Logic: Always think Prompt -> Match conceptually ***
+            // * Select Prompt first, then Match (LTR or RTL)
+            // * Select Match first has no effect until a Prompt is selected
 
-                     quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); // Store pair
-
-                     // Update visual state
-                     currentSelectedMatch.classList.remove('selected');
-                     currentSelectedMatch.classList.add('matched');
-                     clickedItem.classList.add('matched'); // Mark prompt as matched too
-                     drawArrow(clickedItem, currentSelectedMatch, promptIndex); // Draw arrow (prompt -> match) NOTE: Swapped args for RTL
-
-                     // Reset selection
-                     quizState.matchingState.selectedMatchElement = null;
-
-                     // Check if all prompts are matched to enable submit
-                     const totalPrompts = document.querySelectorAll('.prompt-item').length;
-                     const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
-                     const submitBtn = document.getElementById('submit-btn');
-                     if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
-                         submitBtn.disabled = false;
-                     }
-                 }
-
-            } else { // Left-to-Right Logic (Prompt -> Match) - Default
-                 if (isPrompt) { // Clicked a prompt item
-                     if (clickedItem === currentSelectedPrompt) { // Clicked same prompt again: Deselect
-                         clickedItem.classList.remove('selected');
-                         quizState.matchingState.selectedPromptElement = null;
-                     } else { // Clicked a new prompt item
-                         if (currentSelectedPrompt) currentSelectedPrompt.classList.remove('selected'); // Deselect old
-                         clickedItem.classList.add('selected'); // Select new
-                         quizState.matchingState.selectedPromptElement = clickedItem;
-                          // If a match was also selected, deselect it (only one side active)
-                         if (currentSelectedMatch) {
-                             currentSelectedMatch.classList.remove('selected');
-                             quizState.matchingState.selectedMatchElement = null;
-                         }
-                     }
-                 } else if (isMatch && currentSelectedPrompt) { // Clicked a match WHILE a prompt is selected: Create Pair
-                     const promptIndex = currentSelectedPrompt.dataset.index;
-                     const matchIndex = clickedIndex;
-
-                     quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); // Store pair
-
-                     // Update visual state
-                     currentSelectedPrompt.classList.remove('selected');
-                     currentSelectedPrompt.classList.add('matched');
-                     clickedItem.classList.add('matched'); // Mark match as matched too
-                     drawArrow(currentSelectedPrompt, clickedItem, promptIndex); // Draw arrow (prompt -> match)
-
-                     // Reset selection
+            if (isPrompt) { // Clicked a prompt item
+                 if (clickedItem === currentSelectedPrompt) { // Clicked same prompt again: Deselect
+                     clickedItem.classList.remove('selected');
                      quizState.matchingState.selectedPromptElement = null;
-
-                     // Check if all prompts are matched to enable submit
-                     const totalPrompts = document.querySelectorAll('.prompt-item').length;
-                     const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
-                     const submitBtn = document.getElementById('submit-btn');
-                     if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
-                         submitBtn.disabled = false;
+                 } else { // Clicked a new prompt item
+                     if (currentSelectedPrompt) currentSelectedPrompt.classList.remove('selected'); // Deselect old prompt
+                     clickedItem.classList.add('selected'); // Select new prompt
+                     quizState.matchingState.selectedPromptElement = clickedItem;
+                     // Always deselect match if a prompt is selected
+                     if (currentSelectedMatch) {
+                          currentSelectedMatch.classList.remove('selected');
+                          quizState.matchingState.selectedMatchElement = null;
                      }
                  }
+            } else if (isMatch && currentSelectedPrompt) { // Clicked a match WHILE a prompt is selected: Create Pair
+                 const promptIndex = currentSelectedPrompt.dataset.index;
+                 const matchIndex = clickedIndex;
+
+                 quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); // Store pair
+
+                 // Update visual state
+                 currentSelectedPrompt.classList.remove('selected');
+                 currentSelectedPrompt.classList.add('matched');
+                 clickedItem.classList.add('matched'); // Mark match as matched too
+                 drawArrow(currentSelectedPrompt, clickedItem, promptIndex); // Draw arrow (always prompt -> match conceptually)
+
+                 // Reset selection
+                 quizState.matchingState.selectedPromptElement = null;
+                 quizState.matchingState.selectedMatchElement = null; // Clear match selection too
+
+                 // Check if all prompts are matched to enable submit
+                 const totalPrompts = document.querySelectorAll('.prompt-item').length;
+                 const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
+                 const submitBtn = document.getElementById('submit-btn');
+                 if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
+                     submitBtn.disabled = false;
+                 }
             }
+            // Clicking a Match item without a Prompt selected does nothing visually or state-wise
         }
 
-
+        // --- REVISED drawArrow Function ---
         function drawArrow(promptElement, matchElement, promptIndex) {
-    console.log(`drawArrow START for index: ${promptIndex}`, { promptId: promptElement?.id, matchId: matchElement?.id });
+            const arrowId = `arrow-${promptIndex}`;
+            // console.log(`drawArrow (${arrowId}): START`, { promptId: promptElement?.id, matchId: matchElement?.id }); // Reduced logging noise
 
-    // Ensure global/scoped variables are accessible
-    const svgContainer = typeof matchingSvgElement !== 'undefined' ? matchingSvgElement : null;
-    const mainContainerElement = typeof mainContainerElement !== 'undefined' ? mainContainerElement : document.getElementById('main-container'); // Or your actual container reference
-    const outerDiv = document.getElementById(`matching-outer-${quizState?.currentQuestionIndex}`); // Added optional chaining for quizState
+            // --- Get Context Elements (using existing variables) ---
+            const svgContainer = matchingSvgElement; // Global var set by renderMatching
+            const layoutCheckerElement = mainContainerElement; // Global var set by DOMContentLoaded
+            const outerDiv = document.getElementById(`matching-outer-${quizState?.currentQuestionIndex}`);
 
-    // --- Initial Element Check ---
-    if (!svgContainer || !promptElement || !matchElement || !outerDiv || !mainContainerElement) {
-        console.warn("drawArrow EXIT: Missing required elements.", {
-            svgContainer: !!svgContainer,
-            promptElement: !!promptElement,
-            matchElement: !!matchElement,
-            outerDiv: !!outerDiv,
-            mainContainerElement: !!mainContainerElement,
-            promptId: promptElement?.id,
-            matchId: matchElement?.id,
-            index: promptIndex
-        });
-        return; // Exit early if essential elements are missing
-    }
-    console.log("drawArrow: All initial elements found.", { svgContainer, promptElement, matchElement, outerDiv, mainContainerElement });
-
-    try {
-        // --- Get Bounding Rects ---
-        const svgRect = svgContainer.getBoundingClientRect();
-        const promptRect = promptElement.getBoundingClientRect();
-        const matchRect = matchElement.getBoundingClientRect();
-        console.log('drawArrow - Rects:', { svgRect, promptRect, matchRect });
-
-        // Check if rects have zero size (might indicate hidden elements)
-        if (promptRect.width === 0 || promptRect.height === 0 || matchRect.width === 0 || matchRect.height === 0) {
-             console.warn(`drawArrow WARN: promptRect or matchRect has zero dimensions for index ${promptIndex}. Elements might be hidden or not rendered.`, { promptRect, matchRect });
-             // Decide if you want to return here or try drawing anyway
-             // return;
-        }
-
-        const isRTL = mainContainerElement.classList.contains('rtl-layout');
-        console.log('drawArrow - isRTL:', isRTL);
-
-        let startX, startY, endX, endY;
-
-        // --- Calculate Midpoints ---
-        // Check svgRect dimensions before using them for offsets
-        if (svgRect.width === 0 && svgRect.height === 0 && svgRect.top === 0 && svgRect.left === 0) {
-            console.warn(`drawArrow WARN: svgRect has zero dimensions or default values. Using absolute coordinates as fallback. Index: ${promptIndex}`, svgRect);
-            // Fallback: use absolute midpoints (less ideal, might be offset if SVG is scrolled)
-             promptMidY = promptRect.top + promptRect.height / 2;
-             matchMidY  = matchRect.top + matchRect.height / 2;
-        } else {
-             promptMidY = promptRect.top + promptRect.height / 2 - svgRect.top;
-             matchMidY  = matchRect.top + matchRect.height / 2 - svgRect.top;
-        }
-
-
-        // --- Calculate Start/End X based on RTL/LTR ---
-        if (isRTL) {
-            startX = (promptRect.left) - (svgRect.left); // Prompt = Right Col -> Use Left Edge
-            startY = promptMidY;
-            endX = (matchRect.right) - (svgRect.left); // Match = Left Col -> Use Right Edge
-            endY = matchMidY;
-        } else { // LTR
-            startX = (promptRect.right) - (svgRect.left); // Prompt = Left Col -> Use Right Edge
-            startY = promptMidY;
-            endX = (matchRect.left) - (svgRect.left); // Match = Right Col -> Use Left Edge
-            endY = matchMidY;
-        }
-        console.log('drawArrow - Calculated Raw Coords:', { startX, startY, endX, endY });
-
-        // --- Coordinate Validity Check ---
-        if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) ||
-            !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
-            console.error(`drawArrow EXIT: Invalid coordinates calculated for index ${promptIndex}. Check element visibility/layout.`, {
-                startX, startY, endX, endY, promptIndex, isRTL,
-                promptRect, matchRect, svgRect // Include rects in error for context
-             });
-            return; // Exit if coordinates are bad
-        }
-        console.log('drawArrow: Coordinates are valid numbers.');
-
-        // --- Find or Create Line ---
-        let line = svgContainer.querySelector(`#arrow-${promptIndex}`);
-        const isNewLine = !line;
-        console.log(`drawArrow: Line search result for #arrow-${promptIndex}`, { line: !!line, isNewLine });
-
-        if (isNewLine) {
-            line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            if (!line) { // Check if element creation failed (highly unlikely but possible)
-                 console.error(`drawArrow EXIT: Failed to create SVG 'line' element for index ${promptIndex}.`);
-                 return;
+            // --- 1. Validate Context ---
+            if (!svgContainer || !promptElement || !matchElement || !outerDiv || !layoutCheckerElement) {
+                console.warn(`drawArrow (${arrowId}): EXIT - Missing required elements.`, {
+                    svg: !!svgContainer, prompt: !!promptElement, match: !!matchElement, outer: !!outerDiv, layoutChecker: !!layoutCheckerElement,
+                    promptId: promptElement?.id, matchId: matchElement?.id,
+                });
+                return;
             }
-            line.id = `arrow-${promptIndex}`;
-            line.style.transition = 'opacity 0.3s ease-in-out';
-            line.style.opacity = '0';
-            console.log(`drawArrow: Created new line element, ID: ${line.id}`);
-            svgContainer.appendChild(line);
-             console.log(`drawArrow: Appended line #arrow-${promptIndex} to svgContainer.`);
-        } else {
-            console.log(`drawArrow: Found existing line element, ID: ${line.id}`);
+             if (typeof promptElement.getBoundingClientRect !== 'function' || typeof matchElement.getBoundingClientRect !== 'function') {
+                console.error(`drawArrow (${arrowId}): EXIT - promptElement or matchElement is not a valid DOM Element.`);
+                return;
+            }
+             // console.log(`drawArrow (${arrowId}): All required elements found.`); // Reduced logging noise
+
+            try {
+                // --- 2. Get Geometry & Layout ---
+                const svgRect = svgContainer.getBoundingClientRect();
+                const promptRect = promptElement.getBoundingClientRect();
+                const matchRect = matchElement.getBoundingClientRect();
+                const isRTL = layoutCheckerElement.classList.contains('rtl-layout');
+
+                // console.log(`drawArrow (${arrowId}): Geometry`, { svgRect, promptRect, matchRect, isRTL }); // Reduced logging noise
+
+                 if (!svgRect.width || !svgRect.height) { console.warn(`drawArrow (${arrowId}): WARN - SVG container has zero dimensions.`, { svgRect }); }
+                 if (!promptRect.width || !promptRect.height || !matchRect.width || !matchRect.height) { console.warn(`drawArrow (${arrowId}): WARN - Prompt or Match element has zero dimensions.`, { promptRect, matchRect }); }
+
+                // --- 3. Calculate Coordinates (Relative to SVG) ---
+                let startX, startY, endX, endY;
+                const promptMidY = promptRect.top + promptRect.height / 2 - svgRect.top;
+                const matchMidY = matchRect.top + matchRect.height / 2 - svgRect.top;
+
+                if (isRTL) {
+                    startX = promptRect.left - svgRect.left;
+                    endX = matchRect.right - svgRect.left;
+                } else { // LTR
+                    startX = promptRect.right - svgRect.left;
+                    endX = matchRect.left - svgRect.left;
+                }
+                startY = promptMidY;
+                endY = matchMidY;
+                // console.log(`drawArrow (${arrowId}): Calculated Coords`, { startX, startY, endX, endY }); // Reduced logging noise
+
+                // --- 4. Validate Coordinates ---
+                if (isNaN(startX) || isNaN(startY) || isNaN(endX) || isNaN(endY) || !isFinite(startX) || !isFinite(startY) || !isFinite(endX) || !isFinite(endY)) {
+                    console.error(`drawArrow (${arrowId}): EXIT - Invalid coordinates calculated.`, { startX, startY, endX, endY, promptRect, matchRect, svgRect });
+                    return;
+                }
+                 // console.log(`drawArrow (${arrowId}): Coordinates are valid.`); // Reduced logging noise
+
+                // --- 5. Manage SVG Line Element ---
+                let line = svgContainer.querySelector(`#${arrowId}`);
+                const isNewLine = !line;
+
+                if (isNewLine) {
+                    line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    if (!line) { console.error(`drawArrow (${arrowId}): EXIT - Failed to create SVG 'line' element.`); return; }
+                    line.id = arrowId;
+                    // console.log(`drawArrow (${arrowId}): Creating new line element.`); // Reduced logging noise
+                    line.style.opacity = '0';
+                    line.style.transition = 'opacity 0.3s ease-in-out';
+                    svgContainer.appendChild(line);
+                    // console.log(`drawArrow (${arrowId}): Appended line to SVG.`); // Reduced logging noise
+                } else {
+                    // console.log(`drawArrow (${arrowId}): Found existing line element.`); // Reduced logging noise
+                    if (!line.style.transition) { line.style.transition = 'opacity 0.3s ease-in-out'; }
+                }
+
+                // --- 6. Set Attributes ---
+                // console.log(`drawArrow (${arrowId}): Setting attributes...`); // Reduced logging noise
+                line.setAttribute('x1', startX);
+                line.setAttribute('y1', startY);
+                line.setAttribute('x2', endX);
+                line.setAttribute('y2', endY);
+                line.setAttribute('stroke', 'var(--accent-color, black)');
+                line.setAttribute('stroke-width', '2');
+                line.removeAttribute('marker-start'); // Cleanup
+                line.setAttribute('marker-end', 'url(#arrowhead)'); // Ensure marker exists in SVG defs
+
+                // --- 7. Handle Visibility / Animation ---
+                 requestAnimationFrame(() => {
+                     const currentLine = svgContainer.querySelector(`#${arrowId}`);
+                     if (currentLine) {
+                        currentLine.style.opacity = '1';
+                        // console.log(`drawArrow (${arrowId}): Opacity set to 1.`); // Reduced logging noise
+                     } else {
+                         console.warn(`drawArrow (${arrowId}): WARN - Line disappeared before opacity could be set.`);
+                     }
+                 });
+
+            } catch (error) {
+                console.error(`drawArrow (${arrowId}): EXIT - Uncaught error during execution.`, error);
+            } finally {
+                // console.log(`drawArrow (${arrowId}): END`); // Reduced logging noise
+            }
         }
-
-        // --- Set Line Attributes ---
-        console.log(`drawArrow: Setting attributes for line ${line.id}`, { x1: startX, y1: startY, x2: endX, y2: endY });
-        line.setAttribute('x1', startX);
-        line.setAttribute('y1', startY);
-        line.setAttribute('x2', endX);
-        line.setAttribute('y2', endY);
-        line.setAttribute('stroke', 'var(--accent-color, black)');
-        line.setAttribute('stroke-width', '2');
-        line.removeAttribute('marker-start'); // Clean up just in case
-        line.setAttribute('marker-end', 'url(#arrowhead)');
-        console.log(`drawArrow: Attributes set for line ${line.id}.`);
-
-
-        // --- Fade In ---
-        // Ensure opacity is applied even for existing lines in case it was reset
-        // Use timeout to ensure attributes are set and transition can apply
-        setTimeout(() => {
-             if (line && line.style) { // Check if line still exists and has style property
-                 line.style.opacity = '1';
-                 console.log(`drawArrow: Opacity set to 1 for line ${line.id}.`);
-             } else {
-                  console.warn(`drawArrow WARN: Line ${promptIndex} not found or invalid during opacity update.`);
-             }
-        }, 50); // Small delay (instead of rAF for simplicity here)
-
-
-    } catch (e) {
-        console.error(`Error during drawArrow for index ${promptIndex}:`, e, {
-             promptId: promptElement?.id,
-             matchId: matchElement?.id,
-         });
-    }
-     console.log(`drawArrow END for index: ${promptIndex}`);
-}
+        // --- END OF REVISED drawArrow Function ---
 
         function removeArrow(pI){
             if(!matchingSvgElement)return;
@@ -2724,16 +2686,16 @@
 
                     if (!line || !promptEl || !userMatchEl) continue; // Skip if elements are missing
 
+                    const markerPolygon = matchingSvgElement?.querySelector('#arrowhead polygon'); // Select polygon inside marker
+
                     if (isPairCorrect) {
                         line.style.stroke = 'var(--correct-border)';
-                        const arrowhead = line.parentNode.querySelector('#arrowhead polygon'); // Find arrowhead within SVG
-                        if (arrowhead) arrowhead.setAttribute('fill', 'var(--correct-border)');
+                        if (markerPolygon) markerPolygon.setAttribute('fill', 'var(--correct-border)');
                         promptEl.style.borderColor = 'var(--correct-border)';
                         userMatchEl.style.borderColor = 'var(--correct-border)';
                     } else {
                         line.style.stroke = 'var(--incorrect-border)';
-                        const arrowhead = line.parentNode.querySelector('#arrowhead polygon');
-                         if (arrowhead) arrowhead.setAttribute('fill', 'var(--incorrect-border)');
+                         if (markerPolygon) markerPolygon.setAttribute('fill', 'var(--incorrect-border)');
                         promptEl.style.borderColor = 'var(--incorrect-border)';
                         userMatchEl.style.borderColor = 'var(--incorrect-border)';
                         // Optional: Draw correct arrow if user was wrong
