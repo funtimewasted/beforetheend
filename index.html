@@ -2274,100 +2274,136 @@
         // --- Interaction Handlers ---
         function handleMatchingClick(event) {
             const clickedItem = event.target.closest('.matching-item');
-            if (!clickedItem || clickedItem.disabled) return; // Ignore if disabled (after submit)
+            if (!clickedItem) return;
 
-            const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
+            const isRTL = mainContainerElement.classList.contains('rtl-layout');
             const isPrompt = clickedItem.classList.contains('prompt-item');
             const isMatch = clickedItem.classList.contains('match-item');
             const isAlreadyMatched = clickedItem.classList.contains('matched');
             const clickedIndex = clickedItem.dataset.index;
 
-            // --- Case 1: Clicked a Matched Item (to unmatch) ---
+            // References to currently selected items (adapt names for clarity)
+            let selectedPrimary = isRTL ? quizState.matchingState.selectedMatchElement : quizState.matchingState.selectedPromptElement;
+            let selectedSecondary = isRTL ? quizState.matchingState.selectedPromptElement : quizState.matchingState.selectedMatchElement; // Conceptually
+
+            // --- Case 1: Clicking an already matched item (prompt or match) ---
             if (isAlreadyMatched) {
                 let promptIndexToClear = -1;
                 let matchIndexToClear = -1;
 
-                // Find the corresponding prompt/match index
-                if (isPrompt) {
+                if (isPrompt) { // Clicked a matched prompt item
                     promptIndexToClear = clickedIndex;
                     matchIndexToClear = quizState.matchingState.userPairs[promptIndexToClear];
-                } else { // Clicked on a matched 'match' item
+                } else { // Clicked a matched match item
                     matchIndexToClear = clickedIndex;
-                    // Find the prompt index that maps to this match index
-                    promptIndexToClear = Object.keys(quizState.matchingState.userPairs).find(
-                        pIdx => quizState.matchingState.userPairs[pIdx] == matchIndexToClear // Use == for potential string/number comparison
-                    );
+                    promptIndexToClear = Object.keys(quizState.matchingState.userPairs).find(pIdx => quizState.matchingState.userPairs[pIdx] == matchIndexToClear);
                 }
 
-                // If we found the pair, unmatch them
-                if (promptIndexToClear != -1 && matchIndexToClear !== undefined && promptIndexToClear !== undefined) {
+                if (promptIndexToClear != -1 && matchIndexToClear !== undefined) {
                     const promptElement = document.getElementById(`prompt-${promptIndexToClear}`);
                     const matchElement = document.getElementById(`match-${matchIndexToClear}`);
 
                     if (promptElement) promptElement.classList.remove('matched', 'selected');
-                    if (matchElement) matchElement.classList.remove('matched', 'selected');
+                    if (matchElement) matchElement.classList.remove('matched', 'selected'); // Deselect match if it was selected in RTL
 
-                    delete quizState.matchingState.userPairs[promptIndexToClear]; // Remove from state
-                    removeArrow(promptIndexToClear); // Remove visual arrow
+                    delete quizState.matchingState.userPairs[promptIndexToClear];
+                    removeArrow(promptIndexToClear);
 
-                    // Reset selection state if needed
+                    // Clear potentially selected state based on mode
                     quizState.matchingState.selectedPromptElement = null;
                     quizState.matchingState.selectedMatchElement = null;
 
-                     // Disable submit button as the match is now incomplete
                     const submitBtn = document.getElementById('submit-btn');
-                    if (submitBtn) submitBtn.disabled = true;
+                    if (submitBtn) submitBtn.disabled = true; // Always disable on deselect
                 }
-                return; // Stop further processing for unmatching
+                return; // Done handling deselect
             }
 
-            // --- Case 2: Clicked an Unmatched Item ---
-            const currentSelectedPrompt = quizState.matchingState.selectedPromptElement;
-            const currentSelectedMatch = quizState.matchingState.selectedMatchElement;
+            // --- Case 2: Interaction based on LTR/RTL ---
+            if (isRTL) {
+                // --- RTL FLOW ---
+                if (isMatch) { // Clicked a MATCH item (Right column) - This is the primary selection in RTL
+                    if (clickedItem === quizState.matchingState.selectedMatchElement) {
+                        // Clicking the selected match again: Deselect it
+                        clickedItem.classList.remove('selected');
+                        quizState.matchingState.selectedMatchElement = null;
+                    } else {
+                        // Clicking a new match: Deselect old, select new
+                        if (quizState.matchingState.selectedMatchElement) {
+                            quizState.matchingState.selectedMatchElement.classList.remove('selected');
+                        }
+                        clickedItem.classList.add('selected');
+                        quizState.matchingState.selectedMatchElement = clickedItem;
+                    }
+                } else if (isPrompt && quizState.matchingState.selectedMatchElement) {
+                    // Clicked a PROMPT item (Left column) WHILE a MATCH item is selected: Create pair
+                    const matchIndex = quizState.matchingState.selectedMatchElement.dataset.index;
+                    const promptIndex = clickedIndex;
 
-            // *** Simplified Logic: Always think Prompt -> Match conceptually ***
-            // * Select Prompt first, then Match (LTR or RTL)
-            // * Select Match first has no effect until a Prompt is selected
+                    quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10);
 
-            if (isPrompt) { // Clicked a prompt item
-                 if (clickedItem === currentSelectedPrompt) { // Clicked same prompt again: Deselect
-                     clickedItem.classList.remove('selected');
-                     quizState.matchingState.selectedPromptElement = null;
-                 } else { // Clicked a new prompt item
-                     if (currentSelectedPrompt) currentSelectedPrompt.classList.remove('selected'); // Deselect old prompt
-                     clickedItem.classList.add('selected'); // Select new prompt
-                     quizState.matchingState.selectedPromptElement = clickedItem;
-                     // Always deselect match if a prompt is selected
-                     if (currentSelectedMatch) {
-                          currentSelectedMatch.classList.remove('selected');
-                          quizState.matchingState.selectedMatchElement = null;
-                     }
-                 }
-            } else if (isMatch && currentSelectedPrompt) { // Clicked a match WHILE a prompt is selected: Create Pair
-                 const promptIndex = currentSelectedPrompt.dataset.index;
-                 const matchIndex = clickedIndex;
+                    // Update visuals
+                    quizState.matchingState.selectedMatchElement.classList.remove('selected');
+                    quizState.matchingState.selectedMatchElement.classList.add('matched');
+                    clickedItem.classList.add('matched'); // Mark prompt as matched
 
-                 quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10); // Store pair
+                    drawArrow(clickedItem, quizState.matchingState.selectedMatchElement, promptIndex); // Pass prompt, match, promptIndex
 
-                 // Update visual state
-                 currentSelectedPrompt.classList.remove('selected');
-                 currentSelectedPrompt.classList.add('matched');
-                 clickedItem.classList.add('matched'); // Mark match as matched too
-                 drawArrow(currentSelectedPrompt, clickedItem, promptIndex); // Draw arrow (always prompt -> match conceptually)
+                    // Clear selected state
+                    quizState.matchingState.selectedMatchElement = null;
 
-                 // Reset selection
-                 quizState.matchingState.selectedPromptElement = null;
-                 quizState.matchingState.selectedMatchElement = null; // Clear match selection too
+                    // Check completion
+                    const totalPrompts = document.querySelectorAll('.prompt-item').length;
+                    const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
+                        submitBtn.disabled = false;
+                    }
+                }
+                // Else: Clicking prompt with no match selected, or clicking already matched -> Do nothing further here
 
-                 // Check if all prompts are matched to enable submit
-                 const totalPrompts = document.querySelectorAll('.prompt-item').length;
-                 const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
-                 const submitBtn = document.getElementById('submit-btn');
-                 if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
-                     submitBtn.disabled = false;
-                 }
+            } else {
+                // --- LTR FLOW (Original Logic) ---
+                 if (isPrompt) { // Clicked a PROMPT item (Left column)
+                    if (clickedItem === quizState.matchingState.selectedPromptElement) {
+                        // Clicking the selected prompt again: Deselect it
+                        clickedItem.classList.remove('selected');
+                        quizState.matchingState.selectedPromptElement = null;
+                    } else {
+                        // Clicking a new prompt: Deselect old, select new
+                        if (quizState.matchingState.selectedPromptElement) {
+                            quizState.matchingState.selectedPromptElement.classList.remove('selected');
+                        }
+                        clickedItem.classList.add('selected');
+                        quizState.matchingState.selectedPromptElement = clickedItem;
+                    }
+                } else if (isMatch && quizState.matchingState.selectedPromptElement) {
+                    // Clicked a MATCH item (Right column) WHILE a PROMPT item is selected: Create pair
+                    const promptIndex = quizState.matchingState.selectedPromptElement.dataset.index;
+                    const matchIndex = clickedIndex;
+
+                    quizState.matchingState.userPairs[promptIndex] = parseInt(matchIndex, 10);
+
+                    // Update visuals
+                    quizState.matchingState.selectedPromptElement.classList.remove('selected');
+                    quizState.matchingState.selectedPromptElement.classList.add('matched');
+                    clickedItem.classList.add('matched'); // Mark match as matched
+
+                    drawArrow(quizState.matchingState.selectedPromptElement, clickedItem, promptIndex); // Pass prompt, match, promptIndex
+
+                    // Clear selected state
+                    quizState.matchingState.selectedPromptElement = null;
+
+                    // Check completion
+                    const totalPrompts = document.querySelectorAll('.prompt-item').length;
+                    const matchedCount = Object.keys(quizState.matchingState.userPairs).length;
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn && totalPrompts > 0 && totalPrompts === matchedCount) {
+                        submitBtn.disabled = false;
+                    }
+                }
+                 // Else: Clicking match with no prompt selected, or clicking already matched -> Do nothing further here
             }
-            // Clicking a Match item without a Prompt selected does nothing visually or state-wise
         }
 
         // --- REVISED drawArrow Function ---
@@ -2401,34 +2437,36 @@
             const svgRect = matchingSvgElement.getBoundingClientRect();
             const pR = pE.getBoundingClientRect(); // Prompt Element Rect
             const mR = mE.getBoundingClientRect(); // Match Element Rect
-
-            // *** ADDED: Check for RTL Layout ***
-            const isRTL = mainContainerElement && mainContainerElement.classList.contains('rtl-layout');
+            const isRTL = mainContainerElement.classList.contains('rtl-layout');
 
             let startX, startY, endX, endY;
 
             // Calculate Midpoints relative to SVG Top (Common calculation)
             const promptMidY = pR.top + pR.height / 2 - svgRect.top;
             const matchMidY  = mR.top + mR.height / 2 - svgRect.top;
-            startY = promptMidY; // Visual start Y is always prompt's midpoint
-            endY = matchMidY;     // Visual end Y is always match's midpoint
 
-            // --- Calculate X based on Layout Direction ---
+            // --- Calculate X and Y based on Layout Direction ---
             if (isRTL) {
-                // RTL VISUAL: Prompt(Right) --> Match(Left)
-                // Start Point: LEFT edge of Prompt element (pE)
-                // End Point:   RIGHT edge of Match element (mE)
+                // RTL VISUAL: Match(Left) --> Prompt(Right)
+                // Start Point: LEFT edge of Match element (mE)
+                // End Point:   RIGHT edge of Prompt element (pE)
 
-                startX = pR.left - svgRect.left;  // X: Left edge of the Prompt element (VISUAL START)
-                endX   = mR.right - svgRect.left; // X: Right edge of the Match element (VISUAL END)
+                startX = mR.left - svgRect.left;   // X: Left edge of the Match element relative to SVG left
+                startY = matchMidY;                // Y: Vertical center of the Match element (VISUAL START)
+
+                endX   = pR.right - svgRect.left;  // X: Right edge of the Prompt element relative to SVG left
+                endY   = promptMidY;               // Y: Vertical center of the Prompt element (VISUAL END)
 
             } else {
                 // LTR VISUAL: Prompt(Left) --> Match(Right)
                 // Start Point: RIGHT edge of Prompt element (pE)
                 // End Point:   LEFT edge of Match element (mE)
 
-                startX = pR.right - svgRect.left; // X: Right edge of the Prompt element (VISUAL START)
-                endX   = mR.left - svgRect.left;  // X: Left edge of the Match element (VISUAL END)
+                startX = pR.right - svgRect.left; // X: Right edge of the Prompt element relative to SVG left
+                startY = promptMidY;              // Y: Vertical center of the Prompt element (VISUAL START)
+
+                endX   = mR.left - svgRect.left;  // X: Left edge of the Match element relative to SVG left
+                endY   = matchMidY;               // Y: Vertical center of the Match element (VISUAL END)
             }
 
             // Find or create the line element
